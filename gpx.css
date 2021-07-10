@@ -1,0 +1,421 @@
+div[set_id]
+{
+    background-color:whitesmoke;
+}
+
+
+.wp_panel
+{
+position1: absolute;
+font-size: 10px;
+}
+
+.red {color:red; }
+.blue {color:blue; }
+
+.hide 
+{
+ display: none;
+}
+
+body
+{
+    font-family: Tahoma;
+}
+
+div.bselect 
+{
+    font-size:14px;
+    color:black;
+    background-color: #fff;
+    border: 0px solid black;
+    opacity:1;
+    z-index:100;
+    }
+
+.bselect br,
+.bselect .color,
+.bselect .lat,
+.bselect .lng,
+.bselect .time,
+.bselect .color,
+.bselect .idx 
+{
+   display: inline;
+} 
+
+br1, .color, .lat, .lng, .time, .color, .idx 
+{
+    display: none;
+} 
+
+
+
+
+
+
+.baloon, .baloon input
+{
+    font-size: 8px;
+    color:gray;
+    opacity:.7;
+    max-width:70px;
+    padding:2px;
+    }
+
+.tab{ border-collapse:collapse;
+      background-color:#fff;
+      width:100%;  
+
+    }
+
+#gps_xml {font-size: 9px; width:400px; height: 100px;}
+
+/* table styles */
+
+.tab tr:nth-child(even){background-color:#eef0ee;}
+.tab td {border:1px solid #fefefe; font-size: 11px;}
+.header td {font-weight:bold;}
+
+[contenteditable]       {background-color: rgba(217, 245, 255, 0.2)}
+[contenteditable]:hover {background-color: rgba(217, 245, 255, 0.5);}
+[contenteditable]:focus {outline: 1px solid rgba(170, 190, 200, 0.9); }
+
+
+
+td.geocoded {background-color:#ffee00;}
+
+.rowselect {
+            background-color:#aaf0aa !important;
+            } 
+.modified_geo {background-color:#ffeeee;}
+.rowdel {background-color:#ff4400;}
+
+#container{
+    width: 100%; 
+}
+/*<!-- Left -->*/
+
+
+/*2020-10-05 set info editable input*/
+
+[set_id]
+{
+    font-size:16px;
+    padding: 0px 5px;
+}
+
+ 
+#map_container1 {position1: fixed;
+               float:left;  
+               display:block;  
+               top:0px;
+               padding:2px 2px 2px 2px; 
+               left:0px;
+               width:calc(100% - 650px);
+               height:calc(100% - 150px);
+               border:1px solid gray;
+               }
+
+
+#table_container1 {position1: absolute;
+                  top:0; 
+                  right:0px;
+                  float:left;
+                  margin:0px;
+                  width:500px;
+                  border: 0px solid red;
+                  }
+
+
+#left_panel{
+    width: 500px;
+    height:calc(100% - 0px);
+    overflow:scroll;
+    float: left;
+    padding: 10px;
+    background-color1: #FFee88;
+    background-color: #FFF;
+}
+
+
+/* Right -->*/
+
+#right_panel{
+    /*padding: 3px; */
+    /*width:calc(100% - 630px);    */
+    /*height:calc(100% - 150px);*/
+    /*float: left;*/
+    /*background-color: #9999FF;*/
+}
+
+#heatmap_style
+{
+   /*position: fixed;*/
+   /*right: 10px;*/
+   /*top:10px;  */
+}
+
+.clear{
+    clear:both;
+}
+
+#elevation-chart
+      {
+       border:0px solid gray;
+       }
+
+#elevation-chart-div, #debug
+      {
+       /*position: absolute;*/
+       float:left;
+       display1:block;  
+       top:0px;
+       padding:0px 0px 0px 0px; 
+       left:10px;
+       /*top:calc(100% - 310px);*/
+       width:90%;
+       height:200px;
+       background-color: rgba(255,255,255,.5);
+       border:1px solid gray;
+       }
+
+
+
+.checkbox_field
+{
+    padding: 3px 10px 3px 2px;
+    display: block;
+    background-color:#f4f4f4;
+    font-size:12px;
+    margin:1px;
+}
+
+
+#map,.map1 {
+        width:100%;
+        height: 100%;
+        /*height: calc(100% - 200px);*/
+      }
+
+
+.button {
+    -webkit-transition-duration: 0.4s; /* Safari */
+    opacity:1;
+    text-align:left;
+    width1:130px;
+    height1: 40px;
+    padding:4px 6px;
+    z-index: 100;
+    background: #fbfbfb;
+    color: #222;
+}
+
+.button.active{
+    background: #aaa;
+}
+
+select option1 {
+  margin: 40px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+
+.option_1
+{
+    background-color:lightgreen;
+}
+
+.option_0
+{
+    background-color:rgba(150, 210, 255, 0.4);
+    color:black;
+}
+
+
+button.small
+{
+    padding: 3px 5px;
+    font-size:13px;
+}
+
+#datasetpanel
+{
+    position: fixed;
+    padding: 0px;
+    top:0px;
+    width:100%;
+    height:0px;
+    right:0px;
+    background: rgba(255,255,255,1);
+}
+
+[set_info]
+{
+    background-color: whitesmoke;
+}
+
+
+.wp_panel /* таблица с точками*/
+{
+    border: solid 1px lightgray;
+}
+
+.datasets
+{
+margin: 0px 0px 0px 150px;
+    border:1px solid red;
+/*float:left;    */
+}
+
+
+.datasetcheckbox {
+    left1: calc(100% - 650px);
+    width:150px;
+    margin:0px 100px 0px 0px;
+    } 
+
+.buttons_panel { 
+    margin:10px 10px; 
+    z-index:100;
+    background: rgba(255,255,255,0.5);
+    }
+
+button.sign
+{
+    border:0px red solid;
+    background:none;
+    text-decoration:underline;
+}
+
+.button:hover {
+  background-color: #fff; /* Green */
+  color: #000;
+}
+
+
+#save button
+{
+    font-size:16px;
+    border-radius: 3px;
+    border: gray solid 1px;
+}               
+
+
+.button1 {
+  background-color: #4CAF50;
+  border: none;
+  font-size: 28px;
+  color: #FFFFFF;
+  padding: 20px;
+  width: 200px;
+  text-align: center;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  text-decoration: none;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.button1:after {
+  content: "";
+  background: #f1f1f1;
+  display: block;
+  position: absolute;
+  padding-top: 300%;
+  padding-left: 350%;
+  margin-left: -20px !important;
+  margin-top: -120%;
+  opacity: 0;
+  transition: all 0.8s
+}
+
+.button1:active:after {
+  padding: 0;
+  margin: 0;
+  opacity: 1;
+  transition: 0s
+}
+
+/* Mercator heatmap overlay */
+
+ #floating-panel {
+        position: absolute;
+        margin-top: 40px;
+        left: 45%;
+        width:100px;
+        z-index: 5;
+        background-color: transparent;
+        padding: 2px;
+        border: 0px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+zoom, latlng
+{
+    font-size: 15px;
+    background: white;  
+}
+
+#slider_transperency span.ui-slider-handle /* регулятор прозрачности */      
+{   font-size:9px; 
+    top:-6px; 
+    height:15px; 
+    width:16px; 
+    padding-top:0px; 
+    text-align1: center;
+    background-color: #4466cc;
+    color:#ffffff;
+    line-height: 180%;
+    border:1px solid rgb(30,70,235);
+    border-radius:7px;
+    }
+
+#slider_transperency span.ui-slider-handle div
+{
+    margin-left: -1px;
+    left:50%; 
+    background-color: rgba(255,255,255,0);
+    text-align: center;
+    border:0px solid red;
+}
+
+    
+#slider_transperency.ui-slider-horizontal  /* ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content*/    
+{
+    height:3px; 
+    border: red solid 0px;
+    background-color: #8899ee;
+}
+
+#1slider_transperency.ui-slider-horizontal  /* ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content*/    
+{
+    height:3px; 
+    border: green solid 1px;
+    background-color: #2244cc;
+}
+
+
+#slider_transperency span.ui-state-focus { outline:none;}
+
+#slider_transperency div {
+    border: magenta solid 0px;
+    background-color: #4466cc;
+   } /*ui-slider-range ui-corner-all ui-widget-header ui-slider-range-min*/
+   
+   
+.legend div
+{
+    display:inline-block;
+    width:20px;
+    height:15px;
+    font-size:10px;
+    text-align: center;;
+    color: #fff;
+}
+                

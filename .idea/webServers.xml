@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ce4da9d6-437c-4e02-8766-fff540c4a153" name="gpxlab_reg" url="http://gpxlab.ru">
+        <fileTransfer rootFolder="/var/www/u1371051/data" accessType="SFTP" host="31.31.196.98" port="22" sshConfigId="42387d1f-602b-41c2-bd89-211748d169bf" sshConfig="u1371051@31.31.196.98:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

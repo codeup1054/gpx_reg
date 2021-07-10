@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="gpxlab_reg" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="gpxlab_reg">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/www/gpxlab.ru" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
