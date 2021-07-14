@@ -1020,7 +1020,7 @@ var mapOptions = {
          lng = this.getCenter().lng().toFixed(4);
          
          $('latlng').html(lng+" "+lat);
-         console.log("lng ",lng,lat);
+         // console.log("@@ lng ",lng,lat);
       });
 
   
