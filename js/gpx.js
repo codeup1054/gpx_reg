@@ -1839,18 +1839,36 @@ CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
   {
     
     // AnyGis  
-      srcImage  = 'https://anygis.ru/api/v1/Tracks_Strava_All/'+tile.x+'/'+tile.y+'/'+zoom;
+    //   srcImage  = 'https://anygis.ru/api/v1/Tracks_Strava_All/'+tile.x+'/'+tile.y+'/'+zoom;
     
     // ODH cache
-      srcImage  = 'http://gpxlab.ru/img_cache/'+zoom+'/'+tile.x+'/'+tile.y+'.png';
+    //   srcImage  = 'http://gpxlab.ru/img_cache/'+zoom+'/'+tile.x+'/'+tile.y+'.png';
     
     // ODH strava
-      srcImage  = srcImageStrava  = 'http://gpxlab.ru/strava.php?z='+zoom+
+      const srcImage  = srcImageStrava  = 'http://gpxlab.ru/strava.php?z='+zoom+
             '&x='+tile.x+
             '&y='+tile.y+
             '&heat_activities_type='+heat_map.heat_activities_type+
-            '&heat_color='+heat_map.heat_color
+            '&heat_color='+heat_map.heat_color+
+            '&month='+heat_map.heat_color
             ;
+
+      var d = new Date();
+      d.setMonth(d.getMonth() - 1);
+
+      console.log(d, d.toISOString().substring(0, 10));
+
+
+      const srcImage_last   = 'http://gpxlab.ru/strava.php?z='+zoom+
+          '&x='+tile.x+
+          '&y='+tile.y+
+          '&heat_activities_type='+heat_map.heat_activities_type+
+          '&heat_color='+heat_map.heat_color+
+          '&month='+d.toISOString().substring(0, 10)
+      ;
+
+
+
 
       div.style.backgroundImage = "url('"+srcImage+"')";
 
