@@ -218,6 +218,7 @@ $heat_color =   ['hot','bluered','purple','blue','gray'];
         </div>
         <div id="floating-panel">
             <div id="slider_transperency"></div>
+            <div id="slider_transperency"  hist="2021-07"></div>
         </div>
         <div class="row">
             <div id="elevation-chart-div" class="ui-widget-content" >

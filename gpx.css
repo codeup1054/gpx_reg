@@ -362,10 +362,13 @@ zoom, latlng
     background: white;  
 }
 
+
+
+
+
 #slider_transperency span.ui-slider-handle /* регулятор прозрачности */      
 {   font-size:9px; 
-    top:-6px; 
-    height:15px; 
+    height:15px;
     width:16px; 
     padding-top:0px; 
     text-align1: center;
@@ -403,8 +406,18 @@ zoom, latlng
 
 #slider_transperency span.ui-state-focus { outline:none;}
 
+#slider_transperency[hist="2021-07"]
+{
+    top:-6px;
+}
+
+#slider_transperency[hist="2021-06"]
+{
+    top:-16px;
+}
+
 #slider_transperency div {
-    border: magenta solid 0px;
+    border: magenta solid 1px;
     background-color: #4466cc;
    } /*ui-slider-range ui-corner-all ui-widget-header ui-slider-range-min*/
    
