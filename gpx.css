@@ -341,9 +341,9 @@ button.sign
 
 /* Mercator heatmap overlay */
 
- #floating-panel {
+ #floating-panel1 {
         position: absolute;
-        margin-top: 40px;
+        margin-top: 10px;
         left: 45%;
         width:100px;
         z-index: 5;
@@ -359,56 +359,15 @@ button.sign
 zoom, latlng
 {
     font-size: 15px;
-    background: white;  
+    background: white;
+    display:inline-block;
 }
 
-#slider_transperency span.ui-slider-handle /* регулятор прозрачности */      
-{   font-size:9px; 
-    top:-6px; 
-    height:15px; 
-    width:16px; 
-    padding-top:0px; 
-    text-align1: center;
-    background-color: #4466cc;
-    color:#ffffff;
-    line-height: 180%;
-    border:1px solid rgb(30,70,235);
-    border-radius:7px;
-    }
-
-#slider_transperency span.ui-slider-handle div
+.inline
 {
-    margin-left: -1px;
-    left:50%; 
-    background-color: rgba(255,255,255,0);
-    text-align: center;
-    border:0px solid red;
+    display:inline-block;
 }
 
-    
-#slider_transperency.ui-slider-horizontal  /* ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content*/    
-{
-    height:3px; 
-    border: red solid 0px;
-    background-color: #8899ee;
-}
-
-#1slider_transperency.ui-slider-horizontal  /* ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content*/    
-{
-    height:3px; 
-    border: green solid 1px;
-    background-color: #2244cc;
-}
-
-
-#slider_transperency span.ui-state-focus { outline:none;}
-
-#slider_transperency div {
-    border: magenta solid 0px;
-    background-color: #4466cc;
-   } /*ui-slider-range ui-corner-all ui-widget-header ui-slider-range-min*/
-   
-   
 .legend div
 {
     display:inline-block;
@@ -418,4 +377,61 @@ zoom, latlng
     text-align: center;;
     color: #fff;
 }
-                
+
+#slider-panel
+{
+    display: block;
+}
+
+.slider_transperency[hist="2021-06"]
+{
+    top:5px;
+    font-size: 9px;
+}
+
+.slider_transperency[hist="2021-07"]
+{
+    top:25px;
+    font-size: 9px;
+}
+
+
+.slider_transperency span.ui-slider-handle /* регулятор прозрачности */
+{   font-size:9px; 
+    height:15px;
+    width:16px; 
+    padding-top:0px;
+    margin-top: -4px;
+    text-align1: center;
+    background-color: #4466cc;
+    color:#ffffff;
+    line-height: 180%;
+    border:1px solid rgb(30,70,235);
+    border-radius:7px;
+    }
+
+.slider_transperency span.ui-slider-handle div
+{
+    margin-left: -1px;
+    left:50%; 
+    background-color: rgba(255,255,255,0);
+    text-align: center;
+    border:0px solid red;
+}
+
+
+.slider_transperency.ui-slider-horizontal  /* ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content*/
+{
+    height:3px;
+    border: green solid 1px;
+    background-color: #2244cc;
+}
+
+
+.slider_transperency span.ui-state-focus { outline:none;}
+
+.slider_transperency div {
+    border: magenta solid 0px;
+    background-color: #4466cc;
+   } /*ui-slider-range ui-corner-all ui-widget-header ui-slider-range-min*/
+

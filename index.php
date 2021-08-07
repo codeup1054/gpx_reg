@@ -183,10 +183,13 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
                 -->
            </fieldset>
 <!--           Zoom lat,lng -->
-            <legend></legend>
+            <div id='legend' class="inline"></div>
             <zoom>10</zoom>
             <latlng>10</latlng>
-
+            <div id="slider-panel">
+                <div class="slider_transperency" id="slider_transperency" hist="2021-06">2021-06</div>
+                <div class="slider_transperency" hist="2021-07">2021-07</div>
+            </div>
         </div>
         <div class="col-2"><table id='heatmap_style'>
            <?php
@@ -210,14 +213,10 @@ $heat_color =   ['hot','bluered','purple','blue','gray'];
 ?></table>
     </div>
         </div>
-
         <div class="row h-75">
             <div class="map col-12">
             <div id="map"></div>
             </div>
-        </div>
-        <div id="floating-panel">
-            <div id="slider_transperency"></div>
         </div>
         <div class="row">
             <div id="elevation-chart-div" class="ui-widget-content" >

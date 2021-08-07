@@ -82,18 +82,36 @@ $file_age  =  time()-filemtime($img_cache_path);
 
 //print ($file_age);
 
-if (file_exists($img_cache_path) && $file_age < 30*24*3600 )
-{
-    $image = new Imagick($img_cache_path);
-    echo $image;
-}
-else
-{
-    $watermark = 0;
-    loadFromStrava($p->z,$p->x,$p->y, $p->heat_activities_type, $p->heat_color, $watermark);
-}
 
 
+if (!isset($_REQUEST['hist']) || $_REQUEST['hist'] != '2021-06') {
+    if (file_exists($img_cache_path) && $file_age < 30 * 24 * 3600) {
+        $image = new Imagick($img_cache_path);
+        echo $image;
+    } else {
+        $watermark = 0;
+        loadFromStrava($p->z, $p->x, $p->y, $p->heat_activities_type, $p->heat_color, $watermark);
+    }
+}
+
+else {
+    $img_cache_path_history = "img_cache_history/2021-06/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/$p->y.png";
+
+    if (file_exists($img_cache_path_history) ) {
+        $image = new Imagick($img_cache_path_history);
+        echo $image;
+    } else {
+        $img_nomap = "img_cache_history/nomap.png";
+        $image = new Imagick( $img_nomap);
+
+        $watermark_text = new ImagickDraw();
+        $watermark_text->annotation(10, 10, "$p->z/$p->x/$p->y.png");
+        $watermark_text->setFontSize(5);
+        $image->drawImage($watermark_text);
+        echo $image;
+
+    }
+}
 
 
 function loadFromStrava($z,$x,$y,$heat_activities_type,$heat_color,$watermark=0)
@@ -145,7 +163,6 @@ function loadFromStrava($z,$x,$y,$heat_activities_type,$heat_color,$watermark=0)
     if (!is_dir($path_parts_history['dirname'])) {  // ************ 2020 Create directory *****************
         mkdir($path_parts_history['dirname'],0777, true);
     }
-
 
 
     $image = new Imagick($img_url);
