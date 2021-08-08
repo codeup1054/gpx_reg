@@ -188,7 +188,7 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
             <latlng>10</latlng>
             <div id="slider-panel">
                 <div class="slider_transperency" id="slider_transperency" hist="2021-06">2021-06</div>
-                <div class="slider_transperency" hist="2021-07">2021-07</div>
+                <div class="slider_transperency" hist="2021-08">2021-08</div>
             </div>
         </div>
         <div class="col-2"><table id='heatmap_style'>

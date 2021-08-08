@@ -995,7 +995,7 @@ function initMap() {
     elevator = new google.maps.ElevationService();
 
     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06'));
-    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-07'));
+    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-08'));
 
     google.maps.event.addListener(map, 'zoom_changed', function () {
         $('#zoom_info').html(this.getZoom());
@@ -1852,7 +1852,7 @@ $(function () {
     });
 
     $( ".slider_transperency" ).on( "slide", function( event, ui ) {
-        console.log("@@ ", ui, $(this).attr('hist'))
+        console.log("@@ ui", ui, $(this).attr('hist'))
 
         let hist = $(this).attr('hist')
 
