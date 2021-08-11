@@ -485,11 +485,6 @@ class _markers {
 
         markers.push(marker);
 
-        if (0) drawPath(); //elevation() altitude
-
-
-        //    map.panTo(pos);
-        // geocoding
     } // end method PlaceMarker
 }
 
@@ -724,11 +719,6 @@ function callDrag(marker, drag_end = 0) {
             gpxPointsToTable(glob_gpx[set_id], set_id, "checked");
             updateLatLngInGlobalGpx(marker, lat, lng);
             updateGeoInTable(marker, lat, lng);
-//          updateMarkersOnMap();         // все маркеры
-//          updateMarkerIcon(marker);   // одиночный маркер
-//          drawPath();
-//          markersArray.addMarkers();  // все маркеры
-//          updateTotalDist(marker);
             gpxexec(["updateMarkersOnMap"]);
         }
     };
@@ -1041,17 +1031,9 @@ function initMap() {
 
         addPoint(set_id, i);
 
-
-//        int_latlng = {lat:e.latLng.lat(),lng:e.latLng.lng()};
-//        var b=MERCATOR.getTileBounds(MERCATOR.getTileAtLatLng(int_latlng,this.getZoom()));
-//        checkCacheMultyZoomBySQL(int_latlng, this.getZoom(),6)
-//        cacheMap(b,this.getZoom(),2);
-//       rect.setOptions({bounds:new google.maps.LatLngBounds(new google.maps.LatLng(b.sw.lat,b.sw.lng),new google.maps.LatLng(b.ne.lat,b.ne.lng)),
-//                      map:map});
-
     });
 
-    var controlDiv = $("#floating-panel");
+    let controlDiv = $("#floating-panel");
     controlDiv.index = 1;
 
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv[0]);
@@ -1062,6 +1044,7 @@ function initMap() {
 
 
 // ************* карта покрытия *********************
+
 function cacheMap(b, z = 10, z_depth = 2) {
 
     console.log("@@ cacheMap(): ", b, z, z_depth);
@@ -1106,7 +1089,6 @@ function checkByFiles(latlng, layer_zoom) {
 
     console.log("layer_zoom=", srcImage);
 
-
     $.ajax({
         url: srcImage,
         async: false,
@@ -1148,8 +1130,10 @@ function checkByFiles(latlng, layer_zoom) {
         }
     });
 
-
 }
+
+
+
 
 
 function drawCacheArea(z, x, y) {
@@ -1164,14 +1148,8 @@ function drawCacheArea(z, x, y) {
         hmk = ((z > 8) ? z - 9 : 0) / 7;
 
         cache_area[r_idx] = new google.maps.Rectangle({
-//            fillColor: clr_r[z%8],
-//            fillColor: clr_r[z%8],
-//            fillColor: 'red',
-//            strokeWeight: hmk*1.5 + 0.2,
             strokeWeight: 1,
-//            strokeOpacity: Math.pow(2,z)/Math.pow(2,16),
             strokeOpacity: Math.pow(z, 2) / Math.pow(16, 2.5),
-//            strokeColor: clr_r[z%8],
             strokeColor: heatMapColorforValue(hmk),
             fillOpacity: 0
         })
@@ -1183,17 +1161,10 @@ function drawCacheArea(z, x, y) {
         swlng = b2.sw.lng;
         nelat = b2.ne.lat;
         nelng = b2.ne.lng;
-
-//    frame = 400000/Math.pow(1.9,z);
-
-//    frame = Math.pow(0.1,(17-z));
         frame = (z * Math.pow(2.4, z)) / Math.pow(10, 8);
-
 
         dlt = (b2.ne.lat - b2.sw.lat) * frame;
         dlg = (b2.ne.lng - b2.sw.lng) * frame;
-
-//    console.log("@@ dlt",dlt)
 
         swlat = b2.sw.lat + dlt;
         swlng = b2.sw.lng + dlg;
@@ -1209,7 +1180,7 @@ function drawCacheArea(z, x, y) {
             map: map
         });
     }
-} // end drawCacheArea
+} // end drawCacheArea()
 
 
 var markers = [];
@@ -1282,471 +1253,6 @@ function getGeo(addr) {  // используется при геокодиров
     };
 }
 
-function updateGeoInTable(m, lat, lng) {
-//    tdgeos = $('.datasets td:contains('+addr+')').parent("tr").find("td").slice(4,7)
-//    row = $("#")
-    rselect = 'tr[gpx_id="' + m.m.gpx_id + '"]';
-
-    tdgeos = $(rselect).find("td").slice(4, 7)
-
-    console.log("@@ tdgeos", m, rselect, tdgeos);
-
-    tdgeos.addClass('modified_geo');
-
-    $(tdgeos[0]).text(lat);
-    $(tdgeos[1]).text(lng);
-    $(tdgeos[2]).text(getDistanceFromLatLonInKm(lat, lng));
-}
-
-function fitMarkers() {
-    var bounds = new google.maps.LatLngBounds();
-
-    for (var i = 1; i < markers.length; i++) {
-//    for (var i = 1; i < 5; i++) {
-        lat = markers[i].getPosition().lat().toFixed(5);
-        lng = markers[i].getPosition().lng().toFixed(5);
-
-        if (lat == 'NaN' || lng == 'NaN') continue;
-
-//    console.log("@@@ fitMarkers markers",markers[i].name,lat, lng);
-        var myLatLng = new google.maps.LatLng(lat, lng);
-        bounds.extend(myLatLng);
-    }
-
-    map.fitBounds(bounds);
-    var zoom = map.getZoom();
-    console.log("@@@ fit ", zoom, markers.length, bounds);
-    map.setZoom(zoom + 0)
-
-}
-
-function drawPath() {
-
-    while (polylines.length) {
-        polylines.pop().setMap(null);
-    }
-    if (polyline) {
-        polyline.setMap(null);
-    }
-
-    if (!globalSettings.pathOnOff.on) return;
-
-    var globalZIndex = 100;
-    var path_points = {};
-
-    var checked_points_by_set = {};
-
-    $("[gpx_id] input:checked").map(function (i, e) {
-
-//         console.log("@@ chkd",$(e),i);
-
-        [setName, pointName, p_pos, set_id, gpx_id] = $(e).attr('gpx_id').split('|');
-
-        pnt = glob_gpx[set_id].points[p_pos];
-
-        var latLng = new google.maps.LatLng(pnt.lat, pnt.lng);
-
-        if (path_points[set_id]) path_points[set_id].push(latLng);
-        else path_points[set_id] = [latLng];
-
-
-    });
-
-//         console.log("@@@ lat, lng",path_points);
-
-    /*         if ( olatLng)
-             {
-                if (set_id == o_set_id)
-                {
-                 pathOptions.path = [latLng, olatLng];
-                 polyline = new google.maps.Polyline(pathOptions);
-
-                 polyline.k= i;
-
-                 polyline.setOptions({ zIndex: globalZIndex++ });
-
-                 google.maps.event.addListener(polyline , 'click', function (e,o) { polylineClick( e, $(this) );});
-                 polylines.push(polyline);
-                }
-                o_set_id =
-             }
-             else
-             {
-
-             }
-
-         olatLng  = latLng;
-
-
-
-
-    }
-
-//         v = e.closest('tr');
-
-//         name = $(v).find("td:eq(2)").text();
-//         lat = $(v).find("td:eq(4)").text(); // переделать на global_gpx
-//         lng = $(v).find("td:eq(5)").text();
-
-
-
-
-//         var latLng = new google.maps.LatLng(lat,lng);
-
-         if ( olatLng )
-             {
-                 pathOptions.path = [latLng, olatLng];
-                 polyline = new google.maps.Polyline(pathOptions);
-
-                 polyline.k= i;
-
-                 polyline.setOptions({ zIndex: globalZIndex++ });
-
-                 google.maps.event.addListener(polyline , 'click', function (e,o) { polylineClick( e, $(this) );});
-                 polylines.push(polyline);
-             }
-
-         olatLng  = latLng;
-
-
-         return latLng ;
-      }).get();
-*/
-    if (!globalSettings.elevOnOff.on) return;
-
-    var pathOptions = {
-        //          path: path_points,
-        strokeWeight: 4,
-        strokeColor: 'orange',
-        strokeOpacity: 0.2,
-        map: map
-    }
-
-
-    $.each(path_points, function (set_id, points) {
-
-        if (glob_gpx[set_id].set_type == 1) return;
-
-
-        o_segment = 0;
-
-        $.each(points, function (segment_id, segment) {
-            if (o_segment) {
-                pathOptions.path = [o_segment, segment];
-                polyline = new google.maps.Polyline(pathOptions);
-                polyline.segment_id = segment_id;
-                polyline.set_id = set_id;
-                polyline.setOptions({zIndex: globalZIndex++});
-                google.maps.event.addListener(polyline, 'click', function (e) {
-                    polylineClick(e, set_id, segment_id);
-                });
-                polylines.push(polyline);
-            }
-
-            o_segment = segment;
-        });
-
-//    console.log("@@ Math.floor", points)
-//    samp = Math.floor(($(window).width()-500)/7);
-        samp = 200;
-
-        var pathRequest = {
-            'path': points,
-            'samples': samp
-        }
-
-        chart = new google.visualization.AreaChart(document.getElementById('elevation-chart'));
-        elevator.getElevationAlongPath(pathRequest, plotElevation);
-
-    });
-
-}
-
-
-function polylineClick(e, set_id, segment_id) {
-    //        pathstart = e.getPath().getArray()[0];
-    //        addMarker(map, {title:"Новая точка"}, pathstart)
-
-    console.log("@@ polylineClick ", set_id, segment_id);
-
-
-    seg_idx = segment_id;
-
-    i = {
-        name: "Новая точка " + glob_gpx[set_id].points.length,
-        description: "Описание",
-        lat: e.latLng.lat().toFixed(5) || "55.4",
-        lng: e.latLng.lng().toFixed(5) || "37.45",
-        set_id: set_id,
-        seg_idx: seg_idx
-    }
-
-    set_id = context.activePointId.split("|")[3];
-
-    addPoint(set_id, i);
-
-
-}
-
-
-var el_markers = [];
-var polylines = [];
-
-
-function plotElevation(results, status) {
-
-    var elev_max = -11000;
-    var elev_min = 9000;
-
-    if (status == google.maps.ElevationStatus.OK) {
-        elevations = results;
-
-        // Extract the elevation samples from the returned results
-        // and store them in an array of LatLngs.
-        var elevationPath = [];
-
-
-        for (var i = 0; i < results.length; i++) {
-            elev_max = Math.max(elevations[i].elevation, elev_max);
-            elev_min = Math.min(elevations[i].elevation, elev_min);
-        }
-
-
-        for (var i = 0; i < results.length; i++) {
-            elevationPath.push(elevations[i].location);
-
-            if (i > 1) {
-
-                color = heatMapColorforValue(((elevations[i].elevation + elevations[i - 1].elevation) / 2 - elev_min) / (elev_max - elev_min));
-
-//         console.log("@@ elevationPath.slice", i, elev_max, elev_min, color, elevations[i-2]);
-
-
-                var pathOptions = {
-                    path: elevationPath.slice(i - 1, i + 1),
-                    strokeWeight: 4,
-//          strokeColor: (i%2)?'#2255cc':'#ff4422' ,
-                    strokeColor: color,
-                    strokeOpacity: 0.75,
-                    map: map
-                }
-                polyline = new google.maps.Polyline(pathOptions);
-
-
-                /*         polyline.data = { marker_idx: Math.floor(i/(($(window).width()-500)/7)),
-                           i: i,
-                           seg: (($(window).width()-500)/7)
-                         } ;  // 200-08-07 ищем предидущую точку с учетом разбиения на samp
-*/
-//         google.maps.event.addListener(polyline , 'click', function (e) { return true;});
-
-                polylines.push(polyline);
-
-            }
-        }
-
-
-        // Display a polyline of the elevation path.
-        var pathOptions = {
-            path: elevationPath,
-            strokeWeight: 2,
-            strokeColor: '#2255cc',
-            strokeOpacity: 0.75,
-            map: map
-        }
-
-        //polyline = new google.maps.Polyline(pathOptions);
-
-        // Extract the data from which to populate the chart.
-        // Because the samples are equidistant, the 'Sample'
-        // column here does double duty as distance along the
-        // X axis.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Sample');
-        data.addColumn('number', 'Высота');
-        for (var i = 0; i < results.length; i++) {
-//      console.log ("@@@ chart result", results[i]);
-            data.addRow(['', elevations[i].elevation]);
-        }
-
-        // Draw the chart using the data within its DIV.
-        document.getElementById('elevation-chart').style.display = 'block';
-
-        options = {
-            width: $("#elevation-chart-div").width() - 30,
-            height: $("#elevation-chart-div").height() - 30,
-            legend: 'Профиль',
-            backgroundColor: 'rgba(255,255,255,.1)',
-            hAxis: {
-                maxValue: 7,
-                // title: "Профиль",
-                gridlines: {count: 3, color: '#CCC'},
-            },
-            vAxis: {maxValue: 13},
-            titleY: 'Высота (m)',
-            lineWidth: 2,
-            pointSize: 1,
-            pointShape: 'none',
-            colors: ['#d3068d', '#e2431e', '#e7711b',
-                '#e49307', '#e49307', '#b9c246']
-        };
-
-
-        options2 = {
-            width: $(window).width() - 10,
-            height: 150,
-//      color: '#ccddff',
-            legend: 'none',
-            titleY1: '1Elevation (m)'
-        };
-
-        chart.draw(data, options);
-
-// add bar listner
-
-        google.visualization.events.addListener(chart, 'onmouseover', function (e) {
-
-//        var selection = chart.getSelection();
-            pos = elevationPath[e.row];
-            console.log("@@@ pos", pos, e, elevations[e.row]);
-
-            while (el_markers.length) {
-                el_markers.pop().setMap(null);
-//             base_dist.setMap(null);
-            }
-
-            var elev = elevations[e.row].elevation.toFixed(0);
-
-            var image1 = 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2238%22%20height%3D%2238%22%20viewBox%3D%220%200%2038%2038%22%3E%3Cpath%20fill%3D%22%23ff8080%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%22.5%22%20d%3D%22M34.305%2016.234c0%208.83-15.148%2019.158-15.148%2019.158S3.507%2025.065%203.507%2016.1c0-8.505%206.894-14.304%2015.4-14.304%208.504%200%2015.398%205.933%2015.398%2014.438z%22%2F%3E%3Ctext%20transform%3D%22translate%2819%2018.5%29%22%20fill%3D%22%23fff%22%20style%3D%22font-family%3A%20Arial%2C%20sans-serif%3Bfont-weight%3Abold%3Btext-align%3Acenter%3B%22%20font-size%3D%2212%22%20text-anchor%3D%22middle%22%3E' + elev + '%3C%2Ftext%3E%3C%2Fsvg%3E';
-
-            var image = '<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">\
-        <path fill="#ffaa20" stroke="#ccc" stroke-width=".5" \
-        d="M34.305 16.234c0 8.83-15.148 19.158-15.148 19.158S3.507 25.065 3.507 16.1c0-8.505 6.894-14.304 15.4-14.304 8.504 0 15.398 5.933 15.398 14.438z"/>\
-        <text transform="translate(19 18.5)" fill="#fff" style="font-family: Arial, sans-serif;font-weight:bold;text-align:center;" font-size="12" text-anchor="middle">' + elev + '</text></svg>';
-
-            image = 'data:image/svg+xml,' + encodeURIComponent(image);
-
-//      console.log("@@ image1, image", image1, image);
-
-            el_marker = new google.maps.Marker({
-                map: map,
-                title: ':' + elev,
-                icon2: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 5.5,
-                    fillColor: "#ddeeff",
-                    strokeColor: "#4444dd",
-                    fillOpacity: 0.95,
-                    strokeWeight: 1.3,
-                },
-                icon: image,
-                position: pos
-            });
-            el_markers.push(el_marker);
-
-//      map.panTo(pos);
-
-
-        });
-
-
-        google.visualization.events.addListener(chart, 'select', function (e) {
-
-            var selection = chart.getSelection();
-
-
-            if (selection.length) {
-                var row = selection[0].row;
-
-                pos = elevationPath[row];
-                map.panTo(pos);
-
-                var view = new google.visualization.DataView(data);
-                chart.draw(view, options);
-            }
-        });
-
-        google.visualization.events.addListener(chart, 'onmouseover1', function (e) {
-
-//        var selection = chart.getSelection();
-
-//        console.log ("@@@ selection ", selection);
-
-//        var row = selection[0].row;
-//        pos = elevationPath[row];
-
-            setTooltipContent(data, e.row);
-        });
-    }
-}
-
-function setTooltipContent(data, row) {
-    if (row != null) {
-        var content = '<div class="custom-tooltip" ><h1>' + data.getValue(row, 0) + '</h1><div>' + data.getValue(row, 1) + '</div></div>'; //generate tooltip content
-        var tooltip = document.getElementsByClassName("google-visualization-tooltip")[0];
-        console.log("@@@ setTool", content, data);
-
-//        pos = elevationPath[row];
-
-        var marker = new google.maps.Marker({map: map, position: pos});
-        map.panTo(pos);
-
-//        tooltip.innerHTML = content;
-    }
-}
-
-
-function chartOver() {
-    var selection = chart.getSelection();
-    if (selection.length) {
-        var row = selection[0].row;
-//        document.querySelector('#myValueHolder').innerHTML = data.getValue(row, 1);
-
-        pos = elevationPath[row];
-
-        var marker = new google.maps.Marker({map: map, position: pos});
-        map.panTo(pos);
-
-        var view = new google.visualization.DataView(data);
-        view.setColumns([0, 1, {
-            type: 'string',
-            role: 'style',
-            calc: function (dt, i) {
-                return (i == row) ? 'color: red' : null;
-            }
-        }]);
-
-        chart.draw(view, options);
-    }
-}
-
-
-function resizeChart() {
-    // console.log("@@@ resize", $('elevation-chart').length);
-    if ($('elevation-chart-div').length)
-        drawPath();
-}
-
-if (document.addEventListener) {
-    window.addEventListener('resize', resizeChart);
-} else if (document.attachEvent) {
-    window.attachEvent('onresize', resizeChart);
-} else {
-    window.resize = resizeChart;
-}
-
-
-// хелперы
-
-function isInt(n) {
-    return Number(n) === n && n % 1 === 0;
-}
-
-function isFloat(n) {
-    return Number(n) === n && n % 1 !== 0;
-}
-
-
 // reorder tr
 
 var fixHelperModified = function (e, tr) {
@@ -1761,9 +1267,6 @@ var fixHelperModified = function (e, tr) {
     updateIndex = function (e, ui) {
 
         const splt = [setName, pointName, pos, set_id, gpx_id] = $(ui.item[0]).attr('gpx_id').split('|');
-        console.log("@@@ updateIndex", splt, e, ui);
-        updatePointOrderInGlobalGpx(set_id, pos);
-        drawPath();
 
         $('td.index', ui.item.parent()).each(function (i) {
             $(this).html(i + 1);
@@ -1808,7 +1311,6 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     divTile.style.borderColor = '#AAAAAA';
     divTile.style.opacity = hmOpacity;
 
-
     if (zoom < 17) {
 
         // ODH strava
@@ -1820,15 +1322,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
             '&hist=' + this.hist
         ;
 
-        // console.log("@@ tile this.hist",this.hist);
-
-        // var d = new Date();
-        // d.setMonth(d.getMonth() - 1);
-        //
-        // console.log(d, d.toISOString().substring(0, 7));
-
         divTile.style.backgroundImage = "url('" + srcImage + "')";
-
 
     } else {
 
@@ -1844,11 +1338,11 @@ $(function () {
     console.log("@@ slider_transperency=", hmOpacity)
 
     $( ".slider_transperency" ).slider({
-       orientation: "horizontal",
-       range: "min",
-       max: 100,
-       value: hmOpacity * 100,
-       slide: function( event, ui ) {}
+        orientation: "horizontal",
+        range: "min",
+        max: 100,
+        value: hmOpacity * 100,
+        slide: function( event, ui ) {}
     });
 
     $( ".slider_transperency" ).on( "slide", function( event, ui ) {
@@ -1866,7 +1360,7 @@ $(function () {
         $('div.heatmapdiv.'+hist).css({opacity: hmOpacity});
         //            $("#slider_transperency" ).find(".ui-slider-handle").text(tval);
         $('[hist="'+hist+'"] span.ui-slider-handle').css({'display': 'inline-block'})
-        .html("<div>" + tval + "</div>");
+            .html("<div>" + tval + "</div>");
 
         ifMapChanged();
 
@@ -1876,60 +1370,6 @@ $(function () {
 })
 
 
-
-// $(function () {
-//     const sldr = $("#slider_transperency");
-//     // const hist = $(".slider_transperency").attr('hist');
-//     // console.log("@@ sldr=",sldr, hist);
-//
-//     sldr.slider(
-//         {
-//             orientation: "horizontal",
-//             range: "min",
-//             max: 100,
-//             value: hmOpacity * 100,
-//             // slide: function( event, ui ) {},
-//             // change: function( event, ui ) {}
-//         });
-//
-//     // sldr.on( "slide", function( event, ui ) {
-//     //     // console.log("@@ ",  event, ui)
-//     // } );
-//
-//
-//     // $('span.ui-slider-handle').css({'display': 'inline-block'})
-//     //     .html("<div>" + hmOpacity * 100 + "</div>");
-//
-// });
-
-
-// function refreshTrans(event, ui) {
-//
-//     const sldr = $(".slider_transperency")[0];
-//
-//     console.log("@@ hist=",$(this));
-//
-//     tval = sldr.slider("value");
-//     if ($('#toggleHM').val() == "Show HM") toggle();
-//
-//     hmOpacity = tval / 100;
-//     $('div.heatmapdiv.2021-07').css({opacity: hmOpacity});
-//     $('div.heatmapdiv.2021-06').css({opacity: 1-hmOpacity});
-// //            $("#slider_transperency" ).find(".ui-slider-handle").text(tval);
-//     $('span.ui-slider-handle').css({'display': 'inline-block'})
-//         .html("<div>" + tval + "</div>");
-//            // console.log("@@ tval",tval,$('div.heatmapdiv'), hist );
-//
-//     ifMapChanged();
-//
-// }
-
-// toggle = function (s = 1) {
-//     $("div.heatmapdiv").toggle();
-//     $('#toggleHM').val($('#toggleHM').val() == "Show HM" ? "Hide HM" : "Show HM");
-// //    console.log("@@ toggle v=", $('#toggleHM').val() );
-// };
-
 function ifMapChanged() {
 //    return;
 //        console.log("@@ map",map);
@@ -1938,19 +1378,14 @@ function ifMapChanged() {
         + c.lng().toFixed(5)
         + ',' + map.getZoom()
         + ',' + hmOpacity;
-        // + ',' + dinfo;
+    // + ',' + dinfo;
 
     href = window.location.origin + window.location.pathname + "#" + location_search;
 
     console.log("@@ href ", location_search,'\n' ,href, window.location);
 
     window.location.href = href;
-//         $.cookie('msp-settings', '#'+location_search);
     $.cookie('location-settings', location_search);
-
-//         console.log("@@ location_search", location_search);
-
-// Read the cookie
 
 } //*** ifMapChanged()
 
@@ -1994,12 +1429,6 @@ function updateIntCols(d) {
     $('.by_int').map(function (k, v) {
         var svg = "<svg height='2' width='400'></svg><br />";
 
-//    var maxRow = d['groups'].map(function(row){
-//        return Math.max.apply(Math, Object.values(row).map(function(c){return c['cnt'];})); });
-
-//    max_cnt = Math.max.apply(Math, maxRow);
-
-//        delete d['ranges']['0rgb(200, 200, 200)'];
 
 
         $.each(d['ranges'], function (kk, vv) {
@@ -2105,6 +1534,7 @@ function checkCacheMultyZoomBySQL(latlng, zoom, z_depth) {
     });
 
 } // end checkBySQL
+
 
 
 function clear_cache() {
@@ -2373,13 +1803,21 @@ function makeApiCall(action = "get_gpx_DB", apiCallData = "*") {
             });
 
             break;
+        case 'hm_area':
+            hm_area();
+            break;
 
         default:
-            console.log("@@ make call API", action, apiCallData);
+            console.log("@@ make call API not found:", action, apiCallData);
 //            gpxFromJson();
 //            gpxFromGoogle();
     }
 } // make call API
+
+function hm_area(){
+    const  bounds = map.getBounds();
+    console.log("@@ bounds =",bounds);
+}
 
 
 function gpxFromJson() {
@@ -3106,8 +2544,7 @@ function updateMarkersOnMap(id = 0) {
 
 
     markersArray.addMarkers();
-    drawPath();
-//  savegpx();
+
 }
 
 
