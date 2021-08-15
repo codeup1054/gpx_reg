@@ -60,6 +60,9 @@ $(document).ready(function () {
             zoom = p[2] * 1 || 11;
 
             hmOpacity = p[3].split("|") || [0.9,0];
+
+            console.log("@@ hmOpacity",hmOpacity);
+
             dinfo = p[4] || 0;
 
             initMap();
@@ -164,8 +167,8 @@ function initMap(listener) {
     // Create an ElevationService.
     elevator = new google.maps.ElevationService();
 
-    // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06'));
-    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 255), '2021-08'));
+    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06'));
+    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-08'));
 
     google.maps.event.addListener(map, 'zoom_changed', function () {
         $('#zoom_info').html(this.getZoom());
@@ -188,26 +191,6 @@ function initMap(listener) {
     });
 
 
-    google.maps.event.addListener(map, 'click', function (e) { // select div rectangle on map
-
-        if (!isKeyControll) return;
-
-        console.log("@@ addListener", context);
-
-        set_id = context.activePointId.split("|")[3];
-
-        console.log("@@ click addPoint", set_id, e.latLng.lat());
-
-        i = {
-            name: "Новая точка " + glob_gpx[set_id].points.length,
-            description: "Описание",
-            lat: e.latLng.lat().toFixed(5) || "55.4",
-            lng: e.latLng.lng().toFixed(5) || "37.45"
-        }
-
-
-    });
-
     let controlDiv = $("#floating-panel");
     controlDiv.index = 1;
 
@@ -228,7 +211,7 @@ function initMap(listener) {
     const test_bounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(55.1790354627009, 36.56279423131479),
         new google.maps.LatLng(55.27894749259669, 36.73798701868521)
-    );
+        );
 
     const  x = 1232
     const  y = 645
@@ -354,9 +337,9 @@ function initMap(listener) {
     hmAreaButton.classList.add("custom-map-control-button");
     hmAreaButton.addEventListener("click", () => {
         let map_bounds = map.getBounds()
-        z = map.getZoom() + 1;
+        z = map.getZoom() + 3; // addzoom
         hm_area(map_bounds,z)
-     });
+    });
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(hmAreaButton);
 
 
@@ -384,16 +367,16 @@ function initMap(listener) {
     /**
      2021-08-15 create slider at map
 
-    const mapSlider =  document.createElement("div");
-    // $('zoom').html(zoom);
-    // $('latlng').html(homeGeo[0] + " " + homeGeo[1]);
+     const mapSlider =  document.createElement("div");
+     // $('zoom').html(zoom);
+     // $('latlng').html(homeGeo[0] + " " + homeGeo[1]);
 
-    mapSlider.innerHTML = '<div id="slider-panel">' +
-        '<div className="slider_transparency" hist="2021-08">2021-08</div>' +
-        '</div>';
+     mapSlider.innerHTML = '<div id="slider-panel">' +
+     '<div className="slider_transparency" hist="2021-08">2021-08</div>' +
+     '</div>';
 
-    map.controls[google.maps.ControlPosition.TOP_CENTER].push(mapSlider);
-*/
+     map.controls[google.maps.ControlPosition.TOP_CENTER].push(mapSlider);
+     */
 
 
     function hm_area(map_bounds,z){
@@ -437,18 +420,18 @@ function initMap(listener) {
                 let srcImage1 = 'http://gpxlab.ru/strava.php?z=' + z +
                     '&x=' + x +
                     '&y=' + y +
-                    '&thumb=1'
+                    '&thumb1=1'
                 ;
 
                 let tile_bounds = MERCATOR.getTileBounds({x: x, y: y, z: z})
 
                 const img_bounds = new google.maps.LatLngBounds(tile_bounds.sw,tile_bounds.ne);
 
-                 if ( !hm_tiles[x+'_'+y+'_'+z] ) {
-                     overlay = new USGSOverlay(img_bounds, srcImage1);
-                     hm_tiles[x + '_' + y + '_' + z] = overlay
-                     overlay.setMap(map);
-                 }
+                if ( !hm_tiles[x+'_'+y+'_'+z] ) {
+                    overlay = new USGSOverlay(img_bounds, srcImage1);
+                    hm_tiles[x + '_' + y + '_' + z] = overlay
+                    overlay.setMap(map);
+                }
 
                 // drawCacheArea(z, x, y, 0.1,srcImage)
             }
@@ -517,14 +500,14 @@ function drawCacheArea(z, x, y , opacity=.1, srcImage=false) {
 } // end drawCacheArea()
 
 
-CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument, zoomplus=0) {
+CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
     var tile = MERCATOR.normalizeTile({x: coord.x, y: coord.y, z: zoom }),
         tileBounds = MERCATOR.getTileBounds(tile);
 
     var divTile = ownerDocument.createElement('div');
 
-    dinfo = '2'
+    dinfo = '1'
 
     switch (dinfo) {
         case '1' :
@@ -535,8 +518,8 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument, zoomplus=
                 + zoom + ','
                 + tile.x + ','
                 + tile.y + '<br />'
-                + tileBounds.ne.lat.toFixed(5) + ','
-                + tileBounds.ne.lng.toFixed(5) + ',<br />'
+                + tileBounds.ne.lat.toFixed(7) + ','
+                + tileBounds.ne.lng.toFixed(7) + ',<br />'
                 + "|</div>";
             break;
         default:
@@ -550,9 +533,9 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument, zoomplus=
     divTile.hist = this.hist;
     divTile.style.fontSize = '10';
     divTile.style.borderStyle = 'solid';
-    divTile.style.borderWidth = dinfo + 'px';
+    divTile.style.borderWidth = '0px';
     divTile.style.borderColor = '#AAAAAA';
-    divTile.style.opacity = hmOpacity;
+    divTile.style.opacity = hmOpacity[(this.hist === '2021-06')?0:1]
 
     if (zoom < 17) {
 
@@ -562,7 +545,8 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument, zoomplus=
             '&y=' + tile.y  +
             '&heat_activities_type=' + heat_map.heat_activities_type +
             '&heat_color=' + heat_map.heat_color +
-            '&hist=' + this.hist
+            '&hist=2021-08'
+        // '&hist=' + this.hist
         ;
 
         divTile.style.backgroundImage = "url('" + srcImage + "')";
@@ -611,109 +595,4 @@ function clear_hm_tiles() {
     });
 }
 
-// >>>> Секция для обработки кнопок тулбара
-// ****************  helpers *******************
-
-function heatMapColorforValue(value) {
-
-    /*
-0    : blue   (hsl(240, 100%, 50%))
-0.25 : cyan   (hsl(180, 100%, 50%))
-0.5  : green  (hsl(120, 100%, 50%))
-0.75 : yellow (hsl(60, 100%, 50%))
-1    : red    (hsl(0, 100%, 50%))
-*/
-
-    let h = (1 - value) * 280 + 5
-    return "hsl(" + h + ", 100%, 40%)";
-}
-
-
-function show_cache_legend() {
-    dv = "";
-    for (i = 0; i <= 16; i++) {
-        dv = dv + "<div style='background-color:" + heatMapColorforValue(i / 16) + "'>" + i + "</div>";
-    }
-
-    $('#legend').append("<div class=legend>" + dv + "</div>");
-};
-
-function gpxexec(proc) {
-    $(proc).each(function (k, v) {
-//        console.log ("@@ gpxexec", k,v );
-        eval("(async () => {" + v + "()})()")
-//        eval(v+"()");
-    });
-}
-
-
-// google_sheets 2020-10-15
-
-var glob_gpx = {};
-var glob_gpx_set = {
-    cols: ["set_id",
-        "set_name",
-        "set_description",
-        "set_type",
-        "set_prop",
-        "user_id",
-        "ord"],
-    el: []
-};
-var glob_gpx_points = {};
-var glob_gpx_to_save = {};
-var gpx_line = [];
-var setCounter;
-var deferreds = [];
-
-function hm_area(){
-    const  bounds = map.getBounds();
-    let ne = bounds.getNorthEast();
-    let sw = bounds.getSouthWest();
-
-    const N = map.getBounds().getNorthEast().lat();
-    const E = map.getBounds().getNorthEast().lng();
-    const S = map.getBounds().getSouthWest().lat();
-    const W = map.getBounds().getSouthWest().lng();
-
-    const z = map.getZoom() + 1;
-
-    // const N1 = new google.maps.LatLng(S, (W + E) / 2);
-
-    let coord_NE = MERCATOR.getTileAtLatLng({lat:ne.lat(), lng:ne.lng()}, z);
-    let coord_SW = MERCATOR.getTileAtLatLng({lat:sw.lat(), lng:sw.lng()}, z);
-
-    let x =  coord_SW.x
-    let y = start_y =  coord_SW.y
-
-    let cnt = 0
-    let max_cnt = 30
-    let srcImage;
-
-    console.log("@ NE=", coord_NE,"\nSW=",coord_SW);
-
-    while (x++ < coord_NE.x )
-    {
-        let y = start_y
-
-        while (y-- > coord_NE.y && cnt++ < max_cnt)
-        {
-        // coord = MERCATOR.getTileAtLatLng({lat:llat, lng:W }, z);
-        // let nextTile = MERCATOR.getTileBounds({x: coord.x, y: coord.y + cnt, z: z});
-        // llat = nextTile.sw.lat
-
-            srcImage = 'http://gpxlab.ru/strava.php?z=' + z +
-                '&x=' + x +
-                '&y=' + y
-            ;
-
-        drawCacheArea(z, x, y, 0.1,srcImage)
-
-        }
-        console.log("@@ bounds lat =", x, y, srcImage);
-    }
-
-    console.log("@ x,y=", x,coord_SW.x,"|",y,coord_NE.y);
-
-}
 

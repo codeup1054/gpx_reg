@@ -33,11 +33,14 @@
 
 </head>
 <body>
+</body>
 
-<div id="container-fluid">
+<div id="container-fluid" >
     <div id="right_panel" class="container-fluid">
-        <div id="slider-panel">
+        <div id="slider-panel" style="height: 30px">
+            <div class="slider_transparency" hist="2021-06">2021-06</div>
             <div class="slider_transparency" hist="2021-08">2021-08</div>
+<!--            <div class="slider_transparency" hist="2021-08">2021-08</div>-->
         </div>
         <div id="map"></div>
     </div>
