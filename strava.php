@@ -69,10 +69,10 @@ global $heat_activities, $heat_color;
 //print_r ($p);         
 
 
-
     $img_cache_path = "img_cache/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/$p->y.png";
     $y_m = date('Y-m');
     $img_cache_path_history = "img_cache_history/$y_m/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/$p->y.png";
+    $img_cache_path_history_thumb = "img_cache_history_thumb/$y_m/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/_$p->y.png";
 
 
 tm();
@@ -82,7 +82,18 @@ $file_age  =  time()-filemtime($img_cache_path);
 
 //print ($file_age);
 
-
+//
+//if (isset($_REQUEST['thumb']) ) {
+//    if (file_exists($img_cache_path_history_thumb) ) {
+//        $image = new Imagick($img_cache_path_history_thumb);
+//        echo $image;
+//    } else {
+//        $watermark = 0;
+//        loadFromStrava($p->z, $p->x, $p->y, $p->heat_activities_type, $p->heat_color, $watermark);
+//    }
+//}
+//
+//else
 
 if (!isset($_REQUEST['hist']) || $_REQUEST['hist'] != '2021-06') {
     if (file_exists($img_cache_path) && $file_age < 30 * 24 * 3600) {
@@ -116,7 +127,7 @@ else {
 
 function loadFromStrava($z,$x,$y,$heat_activities_type,$heat_color,$watermark=0)
 {
-    global $img_str, $img_cache_path, $watermark_img_str, $img_cache_path_history;
+    global $img_str, $img_cache_path, $watermark_img_str, $img_cache_path_history, $img_cache_path_history_thumb;
 
 
     $strava_url = "https://heatmap-external-a.strava.com/tiles-auth/$heat_activities_type/$heat_color";
@@ -165,13 +176,29 @@ function loadFromStrava($z,$x,$y,$heat_activities_type,$heat_color,$watermark=0)
     }
 
 
+    $path_parts_history_thumb = pathinfo($img_cache_path_history_thumb);
+
+    if (!is_dir($path_parts_history_thumb['dirname'])) {  // ************ 2020 Create directory *****************
+        mkdir($path_parts_history_thumb['dirname'],0777, true);
+    }
+
+
+
+
     $image = new Imagick($img_url);
+
 
     // записываем изображение из Strava
     $image->writeImage($img_cache_path);
     $image->writeImage($img_cache_path_history);
 
-    
+    $image->resizeImage(32, 32,Imagick::FILTER_LANCZOS,1 );
+
+    $image->writeImage($img_cache_path_history_thumb);
+
+
+
+
     $update_res = update_gpx($z,$x,$y); // записываем в базу
 //    $watermark_img_str =  $watermark_img_str."{".$watermark."}date: ".tm('res',1)."\n".$update_res;
     $watermark_img_str =  $watermark_img_str."date: ".tm('res',1)."\n".$update_res;

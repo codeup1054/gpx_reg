@@ -2,7 +2,6 @@ document.write('<script type="text/javascript" src="js/cookie/jquery.cookie.js">
 //2019-11-15 global var init
 
 var map;
-var homeGeo = ["55.6442983", "37.4959946"] // base
 var cache_area = {};
 
 var globalSettings = { // 2020-02-25 добавить обновление из cookies
@@ -16,7 +15,6 @@ var globalSettings = { // 2020-02-25 добавить обновление из 
 };
 
 var heat_map = {heat_activities_type: "all", heat_color: "hot"};
-
 
 var context;
 
@@ -32,6 +30,18 @@ var polyline;
 // Load the Visualization API and the columnchart package.
 var isKeyControll = false;
 
+var elevator;
+var chart;
+var isKeyControll = false;
+var homeGeo
+var zoom
+var p
+
+let hmOpacity
+let sliderOpacity
+let dinfo
+let param
+
 
 //$( "#elevation-chart-div" ).resize( function(){ console.log("@@@ resize"); } );
 
@@ -42,6 +52,45 @@ $(document).ready(function () {
     document.onkeyup = function (e) {
         isKeyControll = false;
     }
+
+    $(function () {
+        $.getScript('js/gpx.adds.js');
+        $.getScript('js/gpx.slider.js');
+        $.getScript('js/gpx.location.cookie.js',function() {
+
+            p = param.split(',');
+
+            homeGeo = (isNaN(parseFloat(p[0])) || isNaN(parseFloat(p[1])))
+                ? ["55.7", "37.32"] : [p[0].substr(0), p[1]];
+
+            zoom = p[2] * 1 || 11;
+
+            hmOpacity = p[3].split("|") || [0.9,0];
+            dinfo = p[4] || 0;
+            const param_sliderOpacity = p[5] || 0;
+
+            let sliderOpacity = new URLSearchParams(param_sliderOpacity);
+
+            const entries = sliderOpacity.entries();
+
+            function paramsToObject(entries) {
+                const result = {}
+                for(const [key, value] of entries) { // each 'entry' is a [key, value] tupple
+                    result[key] = value;
+                }
+                return result;
+            }
+
+            console.log("@@ sliderOpacity",  param_sliderOpacity, sliderOpacity, paramsToObject(entries))
+
+            initMap();
+
+
+        });
+
+    });
+
+
 
 
     $("input:radio").change(function (e) {
@@ -164,42 +213,6 @@ $(document).ready(function () {
 
 })
 
-
-var clr_r = [
-    'rgb(200,  0,  0)',
-    'rgb(255, 90, 20)',
-    'rgb(250,225, 10)',
-    'rgb(100,230, 10)',
-    'rgb( 30,180, 15)',
-    'rgb( 80,190,155)',
-    'rgb( 80,180,230)',
-    'rgb( 100,120,230)',
-    'rgb( 170,190,210)',
-    'rgb( 210,220,230)'
-];
-
-
-param = document.location.hash.substr(1) || $.cookie('location-settings') || "55.644,37.495,11,0.90"
-
-
-var p = param.split(',');
-
-var homeGeo = (isNaN(parseFloat(p[0])) || isNaN(parseFloat(p[1])))
-    ? ["55.7", "37.32"] : [p[0].substr(0), p[1]];
-
-//var homeGeo = [hashGeo[0].substr(1),hashGeo[1]]
-
-var zoom = p[2] * 1 || 11;
-var hmOpacity = p[3] || 0.9;
-var dinfo = p[4] || 0;
-
-
-//var zoom = hashGeo[2].substr(0, hashGeo[2].length - 1);
-
-// console.log("@@ 2 hashGeo", $.cookie('location-settings'),
-//     "\nparams=", param,
-//     "\np=", p,
-//     "\nhomeGeo=", homeGeo, zoom, document.location);
 
 
 var tile_cnt = 0;
@@ -980,12 +993,15 @@ function CoordMapType(tileSize, hist) {
 
 function initMap() {
 
+
     var mapOptions = {
         zoom: zoom,
 //    mapTypeId: 'satellite',
 
         center: new google.maps.LatLng(homeGeo[0], homeGeo[1])
     };
+
+
     $('zoom').html(zoom);
     $('latlng').html(homeGeo[0] + " " + homeGeo[1]);
 
@@ -1806,7 +1822,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     divTile.style.borderStyle = 'solid';
     divTile.style.borderWidth = dinfo + 'px';
     divTile.style.borderColor = '#AAAAAA';
-    divTile.style.opacity = hmOpacity;
+    divTile.style.opacity = hmOpacity[(this.hist === '2021-06')?0:1];
 
 
     if (zoom < 17) {
@@ -1838,119 +1854,12 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 };
 
 
-$(function () {
-
-
-    console.log("@@ slider_transperency=", hmOpacity)
-
-    $( ".slider_transperency" ).slider({
-       orientation: "horizontal",
-       range: "min",
-       max: 100,
-       value: hmOpacity * 100,
-       slide: function( event, ui ) {}
-    });
-
-    $( ".slider_transperency" ).on( "slide", function( event, ui ) {
-        console.log("@@ ui", ui, $(this).attr('hist'))
-
-        let hist = $(this).attr('hist')
-
-        let tval = ui.value;
-
-        // if ($('#toggleHM').val() == "Show HM") toggle();
-
-        hmOpacity = tval / 100;
-
-
-        $('div.heatmapdiv.'+hist).css({opacity: hmOpacity});
-        //            $("#slider_transperency" ).find(".ui-slider-handle").text(tval);
-        $('[hist="'+hist+'"] span.ui-slider-handle').css({'display': 'inline-block'})
-        .html("<div>" + tval + "</div>");
-
-        ifMapChanged();
-
-    } );
-
-
-})
-
-
-
-// $(function () {
-//     const sldr = $("#slider_transperency");
-//     // const hist = $(".slider_transperency").attr('hist');
-//     // console.log("@@ sldr=",sldr, hist);
-//
-//     sldr.slider(
-//         {
-//             orientation: "horizontal",
-//             range: "min",
-//             max: 100,
-//             value: hmOpacity * 100,
-//             // slide: function( event, ui ) {},
-//             // change: function( event, ui ) {}
-//         });
-//
-//     // sldr.on( "slide", function( event, ui ) {
-//     //     // console.log("@@ ",  event, ui)
-//     // } );
-//
-//
-//     // $('span.ui-slider-handle').css({'display': 'inline-block'})
-//     //     .html("<div>" + hmOpacity * 100 + "</div>");
-//
-// });
-
-
-// function refreshTrans(event, ui) {
-//
-//     const sldr = $(".slider_transperency")[0];
-//
-//     console.log("@@ hist=",$(this));
-//
-//     tval = sldr.slider("value");
-//     if ($('#toggleHM').val() == "Show HM") toggle();
-//
-//     hmOpacity = tval / 100;
-//     $('div.heatmapdiv.2021-07').css({opacity: hmOpacity});
-//     $('div.heatmapdiv.2021-06').css({opacity: 1-hmOpacity});
-// //            $("#slider_transperency" ).find(".ui-slider-handle").text(tval);
-//     $('span.ui-slider-handle').css({'display': 'inline-block'})
-//         .html("<div>" + tval + "</div>");
-//            // console.log("@@ tval",tval,$('div.heatmapdiv'), hist );
-//
-//     ifMapChanged();
-//
-// }
 
 // toggle = function (s = 1) {
 //     $("div.heatmapdiv").toggle();
 //     $('#toggleHM').val($('#toggleHM').val() == "Show HM" ? "Hide HM" : "Show HM");
 // //    console.log("@@ toggle v=", $('#toggleHM').val() );
 // };
-
-function ifMapChanged() {
-//    return;
-//        console.log("@@ map",map);
-    c = map.getCenter();
-    location_search = c.lat().toFixed(5) + ','
-        + c.lng().toFixed(5)
-        + ',' + map.getZoom()
-        + ',' + hmOpacity
-        + ',' + dinfo;
-
-    href = window.location.origin + "/#" + location_search;
-//         console.log("@@ href ", href );
-    window.location.href = href;
-//         $.cookie('msp-settings', '#'+location_search);
-    $.cookie('location-settings', location_search);
-
-//         console.log("@@ location_search", location_search);
-
-// Read the cookie
-
-} //*** ifMapChanged()
 
 
 // 2020-01-17 get stat by group

@@ -1,10 +1,10 @@
 <html>
 <!-- 2019.08.29 сделать сегменты для маршрута. -->
-<head>                                                               
+<head>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
     <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
     <link href="/gpx.css" rel="stylesheet" type="text/css" />
-    
+
 <!--    <script type="text/javascript" src="js/jquery.js"></script> -->
     <link rel="stylesheet" href="/js/jquery/jquery-ui.min.css">
 
@@ -15,7 +15,7 @@
     <script src="/js/gpx.js"></script>
 <!--    <script type="text/javascript" src="/gpx/js/google_sheets_api.js"></script> -->
 
-<!--   bootstrap  -->    
+<!--   bootstrap  -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
@@ -23,19 +23,19 @@
 <!-- chart and elevation -->
 
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    
+
     <script>
       google.charts.load('current', {packages: ['columnchart']});
       google.charts.load('current', {packages: ['corechart']});
 //      google.charts.setOnLoadCallback(drawChart);
     </script>
-    
+
     <!-- Yandex.Metrika counter ->
     <script type="text/javascript" >
        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
        m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-    
+
        ym(67941814, "init", {
             clickmap:true,
             trackLinks:true,
@@ -45,8 +45,8 @@
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/67941814" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
-    
-<!--    <script src="https://www.google.com/uds/?file=visualization&amp;v=1&amp;packages=columnchart" type="text/javascript"></script> --> 
+
+<!--    <script src="https://www.google.com/uds/?file=visualization&amp;v=1&amp;packages=columnchart" type="text/javascript"></script> -->
 
 </head>
 <body>
@@ -69,41 +69,41 @@ function trm($st)
 function getStations()
 {
 
-$dom = new DOMDocument();  
+$dom = new DOMDocument();
 
 $f_html = file_get_contents('../data/stations.xml', true);
 $f_html = mb_convert_encoding($f_html , 'HTML-ENTITIES', "UTF-8");
 
-$html = $dom->loadHTML($f_html);  
-   
-$dom->preserveWhiteSpace = false; //discard white space   
-$tables = $dom->getElementsByTagName('table');   //the table by its tag name   
-$rows = $tables->item(0)->getElementsByTagName('tr');     //get all rows from the table   
-$cols = $rows->item(0)->getElementsByTagName('th');   // get each column by tag name   
+$html = $dom->loadHTML($f_html);
+
+$dom->preserveWhiteSpace = false; //discard white space
+$tables = $dom->getElementsByTagName('table');   //the table by its tag name
+$rows = $tables->item(0)->getElementsByTagName('tr');     //get all rows from the table
+$cols = $rows->item(0)->getElementsByTagName('th');   // get each column by tag name
 
 $row_headers = NULL;
 foreach ($cols as $node) {
     $row_headers[] = trm($node->nodeValue);  //print $node->nodeValue."\n";
-}   
+}
 
 $table = array();
-$rows = $tables->item(0)->getElementsByTagName('tr');   //get all rows from the table   
-foreach ($rows as $row)   
-{   
-   // get each column by tag name  
-    $cols = $row->getElementsByTagName('td');   
+$rows = $tables->item(0)->getElementsByTagName('tr');   //get all rows from the table
+foreach ($rows as $row)
+{
+   // get each column by tag name
+    $cols = $row->getElementsByTagName('td');
     $row = array();
     $i=0;
     foreach ($cols as $node) {
-        //print $node->nodeValue."\n";   
+        //print $node->nodeValue."\n";
         if($row_headers==NULL)
             $row[] = $node->nodeValue;
         else
             $row[$row_headers[$i]] = trm($node->nodeValue) ;
         $i++;
-    }   
+    }
     $table[] = $row;
-}   
+}
 
 
 $fp = fopen('stations.csv', 'w');
@@ -111,14 +111,14 @@ $fp = fopen('stations.csv', 'w');
 foreach ($table as $rows) {
 //    print_r ($rows);
 //    print ($rows['Станция']);
-    
+
     fputcsv($fp, $rows);
 }
 
 fclose($fp);
 return $table;
 }
-    
+
 
 
 function distance($lat1, $lon1, $lat2, $lon2, $unit) {
@@ -144,15 +144,15 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
 }
 
 ?>
- 
+
 
 <div id="container-fluid">
     <div id="left_panel">
            <div>
            <input id='newgpx' value="Новый набор"/>
-                <select id='newGpxType'><option id=0>Путь</option><option id=1>Точки</option></select> 
+                <select id='newGpxType'><option id=0>Путь</option><option id=1>Точки</option></select>
                 <button class="small ui-button ui-widget ui-corner-all small" onclick="makeApiCall('newGpxSet')">Новый набор</button>
-           </div> 
+           </div>
            <div id="datasetpanel">
                <div class="datasetcheckbox"></div>
            </div>
@@ -174,7 +174,8 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
             <button id="zoom_info" class="small ui-button ui-widget ui-corner-all"  onclick="">11</button>
                 <button id="button  signin-button" class="sign"  onclick="handleSignInClick()">Sign in</button>
                 <button class='sign' id="button signout-button" onclick="handleSignOutClick()">Sign out</button>
-                <a href="du.php">Лог</a>
+                    <a href="du.php">Лог</a>|
+                    <a href="hmarea.php">Area</a>|
                 <a target="_blank" href="https://my.apify.com/actors/9rJZagTpspnLsgeX6#/source">Apify</a>
 
             <fieldset id='onmapOnOff'>
@@ -187,8 +188,8 @@ function distance($lat1, $lon1, $lat2, $lon2, $unit) {
             <zoom>10</zoom>
             <latlng>10</latlng>
             <div id="slider-panel">
-                <div class="slider_transperency" id="slider_transperency" hist="2021-06">2021-06</div>
-                <div class="slider_transperency" hist="2021-08">2021-08</div>
+                <div class="slider_transparency" id="slider_transparency" hist="2021-06">2021-06</div>
+                <div class="slider_transparency" hist="2021-08">2021-08</div>
             </div>
         </div>
         <div class="col-2"><table id='heatmap_style'>
@@ -206,10 +207,10 @@ $heat_color =   ['hot','bluered','purple','blue','gray'];
                                value='$v $vv' 
                                name=group1></td>";
                 if ($v == 'all') $hdr  .= "<td>$vv</td>";
-               
+
                }
                 echo "<tr>".(($v == 'all')?"<td></td>$hdr</tr><tr>":"")."<td>$v</td>".$cols."</tr>";
-           }    
+           }
 ?></table>
     </div>
         </div>
@@ -238,15 +239,15 @@ $heat_color =   ['hot','bluered','purple','blue','gray'];
      stop : function(event,ui) { drawPath(); }
      }
     );
-    
+
   } );
   </script>
 
 
 <style>
 
- 
-/*style the arrow div div div div div div div div */ 
+
+/*style the arrow div div div div div div div div */
 .gm-style .gm-style-iw{
    font-family: 'Open Sans Condensed', sans-serif;
    top:0px;
@@ -273,9 +274,10 @@ $heat_color =   ['hot','bluered','purple','blue','gray'];
 */
 
 </script>
+<!--            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqtLzdiGvGIu85wF1C7w4UKdUncnwgF0M&callback=initMap">-->
 
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqtLzdiGvGIu85wF1C7w4UKdUncnwgF0M&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqtLzdiGvGIu85wF1C7w4UKdUncnwgF0M">
     </script>
     <script async defer src="https://apis.google.com/js/api.js"
       onload="this.onload=function(){}; handleClientLoad()"
@@ -283,6 +285,6 @@ $heat_color =   ['hot','bluered','purple','blue','gray'];
     </script>
 
 <div id="debug" class="hide"><button onclick='$("#debug").addClass("hide");'>Закрыть</button></div>
-    
+
 </body>
 </html>
