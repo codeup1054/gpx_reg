@@ -3,7 +3,7 @@ document.write('<script type="text/javascript" src="js/cookie/jquery.cookie.js">
 
 var map;
 var homeGeo = ["55.6442983", "37.4959946"] // base
-const hm_tiles={"v":1}
+let hm_tiles = {}
 
 var globalSettings = { // 2020-02-25 добавить обновление из cookies
     distOnOff: {on: true, name: 'Дистанция', exec: ["updateMarkersOnMap"]},
@@ -50,7 +50,7 @@ $(document).ready(function () {
     $(function () {
         $.getScript('js/gpx.adds.js');
         $.getScript('js/gpx.slider.js');
-        $.getScript('js/gpx.location.cookie.js',function() {
+        $.getScript('js/gpx.location.cookie.js', function () {
 
             p = param.split(',');
 
@@ -59,9 +59,9 @@ $(document).ready(function () {
 
             zoom = p[2] * 1 || 11;
 
-            hmOpacity = p[3].split("|") || [0.9,0];
+            hmOpacity = p[3].split("|") || [0.9, 0];
 
-            console.log("@@ hmOpacity",hmOpacity);
+            console.log("@@ hmOpacity", hmOpacity);
 
             dinfo = p[4] || 0;
 
@@ -213,9 +213,9 @@ function initMap(listener) {
         new google.maps.LatLng(55.27894749259669, 36.73798701868521)
         );
 
-    const  x = 1232
-    const  y = 645
-    let  z = 11
+    const x = 1232
+    const y = 645
+    let z = 11
 
     const testImage = 'http://gpxlab.ru/strava.php?z=' + z +
         '&x=' + x +
@@ -226,12 +226,14 @@ function initMap(listener) {
         bounds;
         image;
         div;
+
         constructor(bounds, image) {
             super();
             this.bounds = bounds;
             this.image = image;
 
         }
+
         /**
          * onAdd is called when the map's panes are ready and the overlay has been
          * added to the map.
@@ -252,6 +254,7 @@ function initMap(listener) {
             const panes = this.getPanes();
             panes.overlayLayer.appendChild(this.div);
         }
+
         draw() {
             // console.log("@@ USGSOverlay draw", this.bounds, this.image)
 
@@ -277,6 +280,7 @@ function initMap(listener) {
                 this.div.style.height = sw.y - ne.y + "px";
             }
         }
+
         /**
          * The onRemove() method will be called automatically from the API if
          * we ever set the overlay's map property to 'null'.
@@ -287,6 +291,7 @@ function initMap(listener) {
                 delete this.div;
             }
         }
+
         /**
          *  Set the visibility to 'hidden' or 'visible'.
          */
@@ -295,11 +300,13 @@ function initMap(listener) {
                 this.div.style.visibility = "hidden";
             }
         }
+
         show() {
             if (this.div) {
                 this.div.style.visibility = "visible";
             }
         }
+
         toggle() {
             if (this.div) {
                 if (this.div.style.visibility === "hidden") {
@@ -309,6 +316,7 @@ function initMap(listener) {
                 }
             }
         }
+
         toggleDOM(map) {
             if (this.getMap()) {
                 this.setMap(null);
@@ -337,8 +345,9 @@ function initMap(listener) {
     hmAreaButton.classList.add("custom-map-control-button");
     hmAreaButton.addEventListener("click", () => {
         let map_bounds = map.getBounds()
-        z = map.getZoom() + 3; // addzoom
-        hm_area(map_bounds,z)
+        z = map.getZoom()*1 + $("#zoom_depth").val()*1; // addzoom
+        // console.log("@@ zoom depth=", map.getZoom(), z, $("#zoom_depth").val())
+        hm_area(map_bounds, z)
     });
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(hmAreaButton);
 
@@ -346,7 +355,9 @@ function initMap(listener) {
     const clearHMButton = document.createElement("button"); // add to map clear HM button
     clearHMButton.textContent = "ClearHM"
     clearHMButton.classList.add("custom-map-control-button")
-    clearHMButton.addEventListener("click", () => { clear_hm_tiles()});
+    clearHMButton.addEventListener("click", () => {
+        clear_hm_tiles()
+    });
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearHMButton);
 
@@ -355,13 +366,19 @@ function initMap(listener) {
      */
 
 
-    const zoomLatLngMonitor =  document.createElement("div");
+    const zoomLatLngMonitor = document.createElement("div");
     // $('zoom').html(zoom);
     // $('latlng').html(homeGeo[0] + " " + homeGeo[1]);
 
-    zoomLatLngMonitor.innerHTML = "<zoom>"+zoom+"</zoom>"+" "+"<latlng>"+homeGeo[0] + " " + homeGeo[1]+"</latlng>";
+    zoomLatLngMonitor.innerHTML = "<zoom>" + zoom + "</zoom>" + " " + "<latlng>" + homeGeo[0] + " " + homeGeo[1] +
+        `</latlng></br><select id='zoom_depth'>
+            <option value='1'>1</option>
+            <option value='2' selected>2</option>
+            <option value='3'>3</option>
+            <option value='4'>4</option>
+            </select>`;
 
-    map.controls[google.maps.ControlPosition.TOP_CENTER].push(zoomLatLngMonitor);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(zoomLatLngMonitor);
 
 
     /**
@@ -379,10 +396,10 @@ function initMap(listener) {
      */
 
 
-    function hm_area(map_bounds,z){
+    function hm_area(map_bounds, z) {
 
 
-        console.log("@@ bounds=",map_bounds, test_bounds);
+        console.log("@@ bounds=", map_bounds, test_bounds);
         let ne = map_bounds.getNorthEast();
         let sw = map_bounds.getSouthWest();
 
@@ -393,12 +410,11 @@ function initMap(listener) {
         // const N1 = new google.maps.LatLng(S, (W + E) / 2);
 
 
+        let coord_NE = MERCATOR.getTileAtLatLng({lat: ne.lat(), lng: ne.lng()}, z);
+        let coord_SW = MERCATOR.getTileAtLatLng({lat: sw.lat(), lng: sw.lng()}, z);
 
-        let coord_NE = MERCATOR.getTileAtLatLng({lat:ne.lat(), lng:ne.lng()}, z);
-        let coord_SW = MERCATOR.getTileAtLatLng({lat:sw.lat(), lng:sw.lng()}, z);
-
-        let x =  coord_SW.x
-        let y = start_y =  coord_SW.y
+        let x = coord_SW.x
+        let y = start_y = coord_SW.y
 
         let cnt = 0
         let max_cnt = 40000
@@ -408,14 +424,12 @@ function initMap(listener) {
 
         let overlay;
 
-        while (x++ < coord_NE.x )
-        {
+        while (x++ < coord_NE.x) {
 
 
             let y = start_y
 
-            while (y-- > coord_NE.y && cnt++ < max_cnt)
-            {
+            while (y-- > coord_NE.y && cnt++ < max_cnt) {
 
                 let srcImage1 = 'http://gpxlab.ru/strava.php?z=' + z +
                     '&x=' + x +
@@ -425,9 +439,9 @@ function initMap(listener) {
 
                 let tile_bounds = MERCATOR.getTileBounds({x: x, y: y, z: z})
 
-                const img_bounds = new google.maps.LatLngBounds(tile_bounds.sw,tile_bounds.ne);
+                const img_bounds = new google.maps.LatLngBounds(tile_bounds.sw, tile_bounds.ne);
 
-                if ( !hm_tiles[x+'_'+y+'_'+z] ) {
+                if (!hm_tiles[x + '_' + y + '_' + z]) {
                     overlay = new USGSOverlay(img_bounds, srcImage1);
                     hm_tiles[x + '_' + y + '_' + z] = overlay
                     overlay.setMap(map);
@@ -442,7 +456,7 @@ function initMap(listener) {
 }
 
 
-function drawCacheArea(z, x, y , opacity=.1, srcImage=false) {
+function drawCacheArea(z, x, y, opacity = .1, srcImage = false) {
 
     r_idx = z + "_" + x + "_" + y;
 
@@ -477,7 +491,7 @@ function drawCacheArea(z, x, y , opacity=.1, srcImage=false) {
         nelat = b2.ne.lat - dlt;
         nelng = b2.ne.lng - dlg;
 
-        const bounds =  new google.maps.LatLngBounds(
+        const bounds = new google.maps.LatLngBounds(
             new google.maps.LatLng(swlat, swlng),
             new google.maps.LatLng(nelat, nelng))
 
@@ -489,8 +503,7 @@ function drawCacheArea(z, x, y , opacity=.1, srcImage=false) {
             map: map
         });
 
-        if (srcImage)
-        {
+        if (srcImage) {
             // new_overlay()
             // hmOverlay.draw(bounds, srcImage)
             // hmOverlay.onAdd()
@@ -502,7 +515,7 @@ function drawCacheArea(z, x, y , opacity=.1, srcImage=false) {
 
 CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
-    var tile = MERCATOR.normalizeTile({x: coord.x, y: coord.y, z: zoom }),
+    var tile = MERCATOR.normalizeTile({x: coord.x, y: coord.y, z: zoom}),
         tileBounds = MERCATOR.getTileBounds(tile);
 
     var divTile = ownerDocument.createElement('div');
@@ -529,24 +542,24 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     divTile.innerHTML = tile_html;
     divTile.style.width = this.tileSize.width + 'px';
     divTile.style.height = this.tileSize.height + 'px';
-    divTile.className = 'heatmapdiv '+this.hist;
+    divTile.className = 'heatmapdiv ' + this.hist;
     divTile.hist = this.hist;
     divTile.style.fontSize = '10';
     divTile.style.borderStyle = 'solid';
     divTile.style.borderWidth = '0px';
     divTile.style.borderColor = '#AAAAAA';
-    divTile.style.opacity = hmOpacity[(this.hist === '2021-06')?0:1]
+    divTile.style.opacity = hmOpacity[(this.hist === '2021-06') ? 0 : 1]
 
     if (zoom < 17) {
 
         // ODH strava
         const srcImage = srcImageStrava = 'http://gpxlab.ru/strava.php?z=' + zoom +
             '&x=' + tile.x +
-            '&y=' + tile.y  +
+            '&y=' + tile.y +
             '&heat_activities_type=' + heat_map.heat_activities_type +
             '&heat_color=' + heat_map.heat_color +
             '&hist=2021-08'
-        // '&hist=' + this.hist
+            // '&hist=' + this.hist
         ;
 
         divTile.style.backgroundImage = "url('" + srcImage + "')";
@@ -557,7 +570,6 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
     return divTile;
 };
-
 
 
 function getCacheStat(i) {
@@ -583,14 +595,13 @@ function getCacheStat(i) {
 function clear_hm_tiles() {
 
     break_cnt = 0;
-    console.log("@@ ", hm_tiles.length)
+
 
     if (hm_tiles.length === 0) alert("Nothing to clear")
 
     $.each(hm_tiles, function (k, v) {
 
-        console.log("@@ clear_hm_tiles", k,v)
-        v.onRemove();
+        v.setMap(null);
         delete hm_tiles[k];
     });
 }
