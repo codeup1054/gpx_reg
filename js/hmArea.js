@@ -186,7 +186,8 @@ function initMap(listener) {
         lat = this.getCenter().lat().toFixed(5);
         lng = this.getCenter().lng().toFixed(5);
 
-        $('latlng').html(lng + " " + lat);
+        $('lat').html(lat);
+        $('lng').html(lng);
         // console.log("@@ lng ",lng,lat);
     });
 
@@ -365,13 +366,14 @@ function initMap(listener) {
      2021-08-15 create zoom lat lng
      */
 
-
     const zoomLatLngMonitor = document.createElement("div");
+    zoomLatLngMonitor.classList.add("custom-map-control-div");
     // $('zoom').html(zoom);
     // $('latlng').html(homeGeo[0] + " " + homeGeo[1]);
 
-    zoomLatLngMonitor.innerHTML = "<zoom>" + zoom + "</zoom>" + " " + "<latlng>" + homeGeo[0] + " " + homeGeo[1] +
-        `</latlng></br><select id='zoom_depth'>
+    zoomLatLngMonitor.innerHTML = "<zoom>" + zoom + "</zoom>" +
+        "<lat>" + homeGeo[0] + "</lat><lng>" + homeGeo[1] + "</lng>" +
+        `<select id='zoom_depth'>
             <option value='1'>1</option>
             <option value='2' selected>2</option>
             <option value='3'>3</option>

@@ -1368,66 +1368,7 @@ function drawPath() {
 
     });
 
-//         console.log("@@@ lat, lng",path_points);
 
-    /*         if ( olatLng)
-             {
-                if (set_id == o_set_id)
-                {
-                 pathOptions.path = [latLng, olatLng];
-                 polyline = new google.maps.Polyline(pathOptions);
-
-                 polyline.k= i;
-
-                 polyline.setOptions({ zIndex: globalZIndex++ });
-
-                 google.maps.event.addListener(polyline , 'click', function (e,o) { polylineClick( e, $(this) );});
-                 polylines.push(polyline);
-                }
-                o_set_id =
-             }
-             else
-             {
-
-             }
-
-         olatLng  = latLng;
-
-
-
-
-    }
-
-//         v = e.closest('tr');
-
-//         name = $(v).find("td:eq(2)").text();
-//         lat = $(v).find("td:eq(4)").text(); // переделать на global_gpx
-//         lng = $(v).find("td:eq(5)").text();
-
-
-
-
-//         var latLng = new google.maps.LatLng(lat,lng);
-
-         if ( olatLng )
-             {
-                 pathOptions.path = [latLng, olatLng];
-                 polyline = new google.maps.Polyline(pathOptions);
-
-                 polyline.k= i;
-
-                 polyline.setOptions({ zIndex: globalZIndex++ });
-
-                 google.maps.event.addListener(polyline , 'click', function (e,o) { polylineClick( e, $(this) );});
-                 polylines.push(polyline);
-             }
-
-         olatLng  = latLng;
-
-
-         return latLng ;
-      }).get();
-*/
     if (!globalSettings.elevOnOff.on) return;
 
     var pathOptions = {
@@ -1464,7 +1405,8 @@ function drawPath() {
 
 //    console.log("@@ Math.floor", points)
 //    samp = Math.floor(($(window).width()-500)/7);
-        samp = 200;
+
+        samp = 500;
 
         var pathRequest = {
             'path': points,
@@ -3029,6 +2971,5 @@ function ChangedSelection() {
 }
 
 
-    
-    
-    
+
+
