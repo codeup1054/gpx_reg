@@ -506,7 +506,7 @@ span.ui-state-active
     border: 0;
     border-radius: 0px;
     box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.5);
-    margin: 2px;
+    margin: 2px 3px;
     padding: 0 0.5em;
     font: 400 12px Roboto, Arial, sans-serif;
     overflow: hidden;
@@ -517,7 +517,11 @@ span.ui-state-active
 
 div.custom-map-control-div
 {
-    padding: 3 0.5em;
+    padding: 3px 0px;
+}
+div.custom-map-control-div div
+{
+    padding: 0px 4px;
 }
 
 .custom-map-control-button:hover {
