@@ -20,15 +20,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 
-<!-- chart and elevation -->
-
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-
-    <script>
-      google.charts.load('current', {packages: ['columnchart']});
-      google.charts.load('current', {packages: ['corechart']});
-//      google.charts.setOnLoadCallback(drawChart);
-    </script>
 
 
 </head>
@@ -37,12 +29,11 @@
 
 <div id="container-fluid" >
     <div id="right_panel" class="container-fluid">
-        <div id="slider-panel" style="height: 30px">
-            <div class="slider_transparency" hist="2021-06">2021-06</div>
-            <div class="slider_transparency" hist="2021-08">2021-08</div>
-<!--            <div class="slider_transparency" hist="2021-08">2021-08</div>-->
+        <div id="slider-panel" style="height: 30px; font-size: 8px">
+            <div id ="slider_2021-08" class="slider_transparency" target="2021-08"></div>2021-08<br/>
+            <div id ="slider_map" class="slider_transparency" target="map"></div>map
         </div>
-        <div id="map"></div>
+        <div id="map" class="map"></div>
     </div>
 </div>
 

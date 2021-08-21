@@ -1,41 +1,88 @@
+
+
+// function addSlider(control,target)
+// {
+//     console.log("@@ addSl ", control,target, control.attr("id")  )
+//
+//     control.slider({
+//         orientation: "horizontal",
+//         range: "min",
+//         max: 100,
+//         value: opacity_arr['map'] * 100,
+//         slide: function (event, ui) {
+//         }
+//     })
+//
+//     control.on("slide", function (event, ui) {
+//
+//         let tval = ui.value;
+//
+//         targetOpacity = tval / 100;
+//
+//         target.css({opacity: hmOpacity[k]});
+//
+//         $(control.id + ' span.ui-slider-handle')
+//             .html("<div>" + tval + "</div>");
+//         // ifMapChanged();
+//     });
+//
+//
+// }
+
+// console.log("@@ addSlide init")
+
+
+
 $(function () {
+    // console.log("@@ 2 m $( .slider_transparency )",  $( ".slider_transparency" ))
 
-    $( ".slider_transparency" ).each(function(k,v){
+        $( ".slider_transparency" ).each(function(k,v){
 
-        console.log("@@ slider_transparency",k,v);
+
+        const opacityKey = $(v).attr('id')
+        const sliderId = opacityKey
+        const target = $(v).attr('target')
+        let el_opacity  = arrOpacity[target] || 0.5
+
+            // console.log("@@ slider_transparency 3",[target, opacityKey, k , v ]);
+
+
 
         $(v).slider({
             orientation: "horizontal",
             range: "min",
             max: 100,
-            value: hmOpacity[k]*100,
-            slide: function( event, ui ) {}
+            value: el_opacity*100,
+            create: function( event, ui ) {
+                // console.log("@@ slide callback",event, ui  )
+                $('#' + sliderId+' span.ui-slider-handle').html("<div>" + Math.floor(el_opacity*100) + "</div>");
+                if (target !='map')
+                    $('.' + target).css({opacity: el_opacity});
+                else
+                    setMapStyler(el_opacity*100);
+            },
+
+
+            slide: function( event, ui ) {
+                let tval = ui.value;
+
+                arrOpacity[target] = tval / 100;
+
+                if (target ==='map')
+                {
+                    setMapStyler(tval)
+                }
+                else
+                {
+                    $('.' + target).css({opacity: arrOpacity[target]});
+                }
+
+                $('#' + sliderId+' span.ui-slider-handle').html("<div>" + tval + "</div>");
+
+                ifMapChanged(tval);
+            }
         })
-        let hist = $(this).attr('hist')
-        $('[hist="'+hist+'"] span.ui-slider-handle')
-            .html("<div>" + Math.floor(hmOpacity[k]*100) + "</div>");
-
-
-        $('div.heatmapdiv.'+hist).css({opacity: hmOpacity[k]});
-
-        $(v).on( "slide", function( event, ui ) {
-
-            let hist = $(this).attr('hist')
-
-            let tval = ui.value;
-            let k = ($(this).attr('hist') === '2021-06')?0:1;
-
-            hmOpacity[k] = tval / 100;
-
-            $('div.heatmapdiv.'+hist).css({opacity: hmOpacity[k]});
-
-            $('[hist="'+hist+'"] span.ui-slider-handle')
-                .html("<div>" + tval + "</div>");
-
-            ifMapChanged();
-
-        } );
-
 
     })
+
 })

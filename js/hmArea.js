@@ -17,7 +17,6 @@ var globalSettings = { // 2020-02-25 добавить обновление из 
 
 var heat_map = {heat_activities_type: "all", heat_color: "hot"};
 
-
 var context;
 
 context = {
@@ -26,18 +25,19 @@ context = {
 }; // текущий контекст строка набора
 
 var elevator;
-var chart;
 var isKeyControll = false;
 var homeGeo
 var zoom
-var p
-
-let hmOpacity
-let dinfo
+let p
+let tile_info
 let param
 
-
-//$( "#elevation-chart-div" ).resize( function(){ console.log("@@@ resize"); } );
+let arrOpacity =
+    {
+        'map': 0.2,
+        '2021-08': 0.5,
+        '2021-06': 0.7
+    }
 
 $(document).ready(function () {
     document.onkeydown = function (e) {
@@ -52,18 +52,17 @@ $(document).ready(function () {
         $.getScript('js/gpx.slider.js');
         $.getScript('js/gpx.location.cookie.js', function () {
 
-            p = param.split(',');
+            const data = decodeURIComponent(param);
+            p = JSON.parse(data);
 
-            homeGeo = (isNaN(parseFloat(p[0])) || isNaN(parseFloat(p[1])))
-                ? ["55.7", "37.32"] : [p[0].substr(0), p[1]];
+            homeGeo = (isNaN(parseFloat(p.lat)) || isNaN(parseFloat(p.lng)))
+                ? ["55.7", "37.32"] : [p.lat, p.lng];
 
-            zoom = p[2] * 1 || 11;
+            zoom = p.zoom || 11;
 
-            hmOpacity = p[3].split("|") || [0.9, 0];
+            arrOpacity = p.opacity || {}
 
-            console.log("@@ hmOpacity", hmOpacity);
-
-            dinfo = p[4] || 0;
+            tile_info = p.controls.tile_info || 0;
 
             initMap();
 
@@ -72,6 +71,17 @@ $(document).ready(function () {
     });
 });
 
+
+function setMapStyler(tval)
+{
+    const mapStyles = [{
+        "stylers": [{
+            "lightness": 2*tval - 100
+        }]
+    }];
+
+    map.setOptions({ styles: mapStyles });
+}
 
 window.tm = function (s = "") {
     var output = "";
@@ -156,19 +166,21 @@ function CoordMapType(tileSize, hist) {
 
 function initMap(listener) {
 
+
     var mapOptions = {
-        zoom: zoom,
-//    mapTypeId: 'satellite',
-        center: new google.maps.LatLng(homeGeo[0], homeGeo[1])
+     zoom: zoom,
+//   mapTypeId: 'satellite',
+     center: new google.maps.LatLng(homeGeo[0], homeGeo[1]),
     };
 
+
+
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
-    google.load("visualization", "1", {packages: ["chart"]});
-    // Create an ElevationService.
-    elevator = new google.maps.ElevationService();
 
     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06'));
     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-08'));
+
+    setMapStyler(arrOpacity['map']*100 || 100);
 
     google.maps.event.addListener(map, 'zoom_changed', function () {
         $('#zoom_info').html(this.getZoom());
@@ -371,31 +383,39 @@ function initMap(listener) {
     // $('zoom').html(zoom);
     // $('latlng').html(homeGeo[0] + " " + homeGeo[1]);
 
+
+    const opt = p.controls.tileDetails
+
+    const opts = ['No','X,y','Verb']
+
+    const opts_str = opts.map((v,k)=>{ return k+"<option value='"+k+"' " + ((opt == k)?'selected >': '>') +v+ "</option>"})
+
+
     zoomLatLngMonitor.innerHTML = "<zoom>" + zoom + "</zoom>" +
-        "<lat>" + homeGeo[0] + "</lat><lng>" + homeGeo[1] + "</lng>" +
-        `<select id='zoom_depth'>
-            <option value='1'>1</option>
-            <option value='2' selected>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            </select>`;
+        "<div class='inline-block'><lat>" + homeGeo[0] + "</lat><br><lng>" + homeGeo[1] + "</lng></div>" +
+        `<div class='inline-block '>
+            <select id='zoom_depth' title='Zoom depth'>
+                <option value='1'>1</option>
+                <option value='2' selected>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+            </select>
+      
+            <select id='tile_info' title='Tile details'>`
+            + opts_str +
+            `</select></div>`;
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(zoomLatLngMonitor);
 
 
     /**
      2021-08-15 create slider at map
-
-     const mapSlider =  document.createElement("div");
-     // $('zoom').html(zoom);
-     // $('latlng').html(homeGeo[0] + " " + homeGeo[1]);
-
-     mapSlider.innerHTML = '<div id="slider-panel">' +
-     '<div className="slider_transparency" hist="2021-08">2021-08</div>' +
-     '</div>';
-
-     map.controls[google.maps.ControlPosition.TOP_CENTER].push(mapSlider);
      */
+
+    const mapSliderDiv =  $("#slider-panel")[0];
+    $(mapSliderDiv).addClass("custom-map-control-div");
+
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapSliderDiv);
 
 
     function hm_area(map_bounds, z) {
@@ -404,12 +424,6 @@ function initMap(listener) {
         console.log("@@ bounds=", map_bounds, test_bounds);
         let ne = map_bounds.getNorthEast();
         let sw = map_bounds.getSouthWest();
-
-        // const N = map.getBounds().getNorthEast().lat();
-        // const E = map.getBounds().getNorthEast().lng();
-        // const S = map.getBounds().getSouthWest().lat();
-        // const W = map.getBounds().getSouthWest().lng();
-        // const N1 = new google.maps.LatLng(S, (W + E) / 2);
 
 
         let coord_NE = MERCATOR.getTileAtLatLng({lat: ne.lat(), lng: ne.lng()}, z);
@@ -420,9 +434,6 @@ function initMap(listener) {
 
         let cnt = 0
         let max_cnt = 40000
-        let srcImage;
-
-        // console.log("@ NE=", coord_NE,"\nSW=",coord_SW);
 
         let overlay;
 
@@ -458,63 +469,6 @@ function initMap(listener) {
 }
 
 
-function drawCacheArea(z, x, y, opacity = .1, srcImage = false) {
-
-    r_idx = z + "_" + x + "_" + y;
-
-//    console.log("@@@ drawCacheArea z,x,y=",z,x,y, cache_area[r_idx]);
-
-
-    if (typeof cache_area[r_idx] == 'undefined') {
-
-        hmk = ((z > 8) ? z - 9 : 0) / 7;
-
-        cache_area[r_idx] = new google.maps.Rectangle({
-            strokeWeight: 1,
-            strokeOpacity: Math.pow(z, 2) / Math.pow(16, 2.5),
-            strokeColor: heatMapColorforValue(hmk),
-            fillOpacity: opacity
-        })
-
-
-        var b2 = MERCATOR.getTileBounds({x: x, y: y, z: z});
-
-        swlat = b2.sw.lat;
-        swlng = b2.sw.lng;
-        nelat = b2.ne.lat;
-        nelng = b2.ne.lng;
-        frame = (z * Math.pow(2.4, z)) / Math.pow(10, 8);
-
-        dlt = (b2.ne.lat - b2.sw.lat) * frame;
-        dlg = (b2.ne.lng - b2.sw.lng) * frame;
-
-        swlat = b2.sw.lat + dlt;
-        swlng = b2.sw.lng + dlg;
-        nelat = b2.ne.lat - dlt;
-        nelng = b2.ne.lng - dlg;
-
-        const bounds = new google.maps.LatLngBounds(
-            new google.maps.LatLng(swlat, swlng),
-            new google.maps.LatLng(nelat, nelng))
-
-        // console.log("@@ bounds=", x , y , z ,bounds)
-
-        cache_area[r_idx].setOptions({
-            bounds: bounds,
-//                              new google.maps.LatLng(b2.ne.lat,b2.ne.lng)),
-            map: map
-        });
-
-        if (srcImage) {
-            // new_overlay()
-            // hmOverlay.draw(bounds, srcImage)
-            // hmOverlay.onAdd()
-        }
-
-    }
-} // end drawCacheArea()
-
-
 CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
     var tile = MERCATOR.normalizeTile({x: coord.x, y: coord.y, z: zoom}),
@@ -522,35 +476,44 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
     var divTile = ownerDocument.createElement('div');
 
-    dinfo = '1'
+    tile_info = $('#tile_info').val();
 
-    switch (dinfo) {
+    let tile_border ='0px'
+
+    switch (tile_info) {
         case '1' :
-            tile_html = "<div style='background-color:rgba(255,255,255,0.75); width:100px;'>" + zoom + ',' + tile.x + ',' + tile.y + "</div>";
+            tile_border ='1px'
+            tile_html = `<span class="tile_info " style='font-size:13px;'>`
+                        + zoom + '<br>' + tile.x + '<br>' + tile.y
+                    + "</span>";
             break;
         case '2' :
-            tile_html = "<div style='background-color:rgba(255,255,255,0.75); font-size:15px; color:blue; width:100px;'>"
-                + zoom + ','
-                + tile.x + ','
-                + tile.y + '<br />'
-                + tileBounds.ne.lat.toFixed(7) + ','
-                + tileBounds.ne.lng.toFixed(7) + ',<br />'
-                + "|</div>";
+            tile_border ='1px'
+            tile_html =
+                `<div class="tile_info " style="font-size:15px; " >`
+                    + '<div class="hm t">'+ tileBounds.ne.lat.toFixed(7) + '</div>'
+                    + '<div class="hm t">'+ tileBounds.ne.lat.toFixed(7) + '</div>'
+                    + '<div class="l vm">'+ tileBounds.sw.lng.toFixed(7) + '</div>'
+                    + '<div class="l t">' + zoom   + '<br>'+ tile.x + '<br>'+ tile.y+ '</div>'
+                    + '<div class="l t">' + zoom   + '<br>'+ tile.x + '<br>'+ tile.y+ '</div>'
+                + "</div>";
+                tile_border ='1px'
             break;
         default:
             tile_html = "-";
     }
 
     divTile.innerHTML = tile_html;
+    // divTile.id = this.hist;
     divTile.style.width = this.tileSize.width + 'px';
     divTile.style.height = this.tileSize.height + 'px';
-    divTile.className = 'heatmapdiv ' + this.hist;
+    divTile.className = this.hist;
     divTile.hist = this.hist;
     divTile.style.fontSize = '10';
     divTile.style.borderStyle = 'solid';
-    divTile.style.borderWidth = '0px';
+    divTile.style.borderWidth = tile_border;
     divTile.style.borderColor = '#AAAAAA';
-    divTile.style.opacity = hmOpacity[(this.hist === '2021-06') ? 0 : 1]
+    divTile.style.opacity = arrOpacity[this.hist]
 
     if (zoom < 17) {
 
