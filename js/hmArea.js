@@ -177,7 +177,6 @@ function initMap(listener) {
 
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
-    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06'));
     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-08'));
 
     setMapStyler(arrOpacity['map']*100 || 100);
@@ -380,30 +379,25 @@ function initMap(listener) {
 
     const zoomLatLngMonitor = document.createElement("div");
     zoomLatLngMonitor.classList.add("custom-map-control-div");
-    // $('zoom').html(zoom);
-    // $('latlng').html(homeGeo[0] + " " + homeGeo[1]);
+
+    console.log(p)
 
 
-    const opt = p.controls.tileDetails
+    const locationZoomDepth = p.controls.zoom_depth
+    const zoomDepthOpts = ['1','2','3','4']
+    const zoomDepthOptsSelect = zoomDepthOpts.map((v,k)=>{ return k+"<option value='"+k+"' " + ((locationZoomDepth == k)?'selected >': '>') +v+ "</option>"})
 
-    const opts = ['No','X,y','Verb']
-
-    const opts_str = opts.map((v,k)=>{ return k+"<option value='"+k+"' " + ((opt == k)?'selected >': '>') +v+ "</option>"})
+    const locationTileDetails = p.controls.tileDetails
+    const tileOpts = ['No','X,y','Verb']
+    const tileOptsSelect = tileOpts.map((v,k)=>{ return k+"<option value='"+k+"' " + ((locationTileDetails == k)?'selected >': '>') +v+ "</option>"})
 
 
     zoomLatLngMonitor.innerHTML = "<zoom>" + zoom + "</zoom>" +
         "<div class='inline-block'><lat>" + homeGeo[0] + "</lat><br><lng>" + homeGeo[1] + "</lng></div>" +
         `<div class='inline-block '>
-            <select id='zoom_depth' title='Zoom depth'>
-                <option value='1'>1</option>
-                <option value='2' selected>2</option>
-                <option value='3'>3</option>
-                <option value='4'>4</option>
-            </select>
-      
-            <select id='tile_info' title='Tile details'>`
-            + opts_str +
-            `</select></div>`;
+            <select id='zoom_depth' title='Zoom depth'>`+zoomDepthOptsSelect+`</select>
+            <select id='tile_info' title='Tile details'>`+ tileOptsSelect + `</select>
+         </div>`;
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(zoomLatLngMonitor);
 

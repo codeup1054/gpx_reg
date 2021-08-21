@@ -11,7 +11,10 @@ function ifMapChanged() {
             lng:c.lng().toFixed(5),
             zoom:map.getZoom(),
             opacity: arrOpacity,
-            controls: { tileDetails: tile_info }
+            controls: {
+                tileDetails: tile_info,
+                zoom_depth: $("#zoom_depth").val()*1
+            }
         }
 
     // let location_search = c.lat().toFixed(5) + ','
