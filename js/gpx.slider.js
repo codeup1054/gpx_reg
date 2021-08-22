@@ -61,8 +61,6 @@ $(function () {
                 else
                     setMapStyler(el_opacity*100);
             },
-
-
             slide: function( event, ui ) {
                 let tval = ui.value;
 
@@ -79,10 +77,24 @@ $(function () {
 
                 $('#' + sliderId+' span.ui-slider-handle').html("<div>" + tval + "</div>");
 
-                ifMapChanged(tval);
+                ifMapChanged();
             }
         })
+    })
 
+    $('.slider_transparency').dblclick(function() {
+        var sliderId = $(this).attr('id') ;
+
+        if (sliderId== 'slider_map') {
+            $(this).slider('value', 50, $(this));
+            $('#' + sliderId +' span.ui-slider-handle').html("<div>" + 50 + "</div>");
+
+            setMapStyler(50)
+
+            arrOpacity[$(this).attr('target')] =0.5
+
+            ifMapChanged()
+        }
     })
 
 })
