@@ -30,7 +30,9 @@
 <div id="container-fluid" >
     <div id="right_panel" class="container-fluid">
         <div id="slider-panel" style="height: 30px; font-size: 8px">
-            <div id ="slider_2021-08" class="slider_transparency" target="2021-08"></div>2021-08<br/>
+            <div id ="id_2021-06" class="slider_transparency" target="2021-06"></div>2021-06<br/>
+            <div id ="id_2021-08" class="slider_transparency" target="2021-08"></div>2021-08<br/>
+            <div id ="id_2021-06_2021-08" class="slider_transparency" target="2021-06_2021-08"></div>2021-06_2021-08<br/>
             <div id ="slider_map" class="slider_transparency" target="map"></div>map
         </div>
         <div id="map" class="map"></div>

@@ -66,6 +66,9 @@ $(function () {
 
                 arrOpacity[target] = tval / 100;
 
+                // console.log ("@@ arrOpacity",arrOpacity)
+
+
                 if (target ==='map')
                 {
                     setMapStyler(tval)

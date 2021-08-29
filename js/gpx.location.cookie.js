@@ -22,7 +22,7 @@ function ifMapChanged() {
     href = window.location.origin + window.location.pathname + "#" + location_search;
     window.location.href = href;
 
-    console.log("@@ cookie ", [location_par, window.location, location_search])
+    // console.log("@@ cookie ", [location_par, window.location, location_search])
 
     $.cookie('location-settings'+window.location.pathname, location_search);
 

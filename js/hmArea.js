@@ -166,7 +166,6 @@ function CoordMapType(tileSize, hist) {
 
 function initMap(listener) {
 
-
     var mapOptions = {
      zoom: zoom,
 //   mapTypeId: 'satellite',
@@ -177,7 +176,9 @@ function initMap(listener) {
 
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
+    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06'));
     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-08'));
+    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06_2021-08'));
 
     setMapStyler(arrOpacity['map']*100 || 100);
 
@@ -338,19 +339,7 @@ function initMap(listener) {
         }
     }
 
-    // console.log("@@ overlay",overlay)
 
-    // const toggleButton = document.createElement("button");
-    // toggleButton.textContent = "Toggle";
-    // toggleButton.classList.add("custom-map-control-button");
-    // const toggleDOMButton = document.createElement("button");
-    // toggleDOMButton.textContent = "Toggle DOM Attachment";
-    // toggleDOMButton.classList.add("custom-map-control-button");
-    // toggleDOMButton.addEventListener("click", () => {
-    //     overlay.toggleDOM(map);
-    // });
-    // map.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleDOMButton);
-    // map.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
 
     const hmAreaButton = document.createElement("button");
     hmAreaButton.textContent = "GetHM"; // get hm_tile for cache
@@ -463,6 +452,7 @@ function initMap(listener) {
 }
 
 
+
 CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
     var tile = MERCATOR.normalizeTile({x: coord.x, y: coord.y, z: zoom}),
@@ -509,6 +499,27 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     divTile.style.borderColor = '#AAAAAA';
     divTile.style.opacity = arrOpacity[this.hist]
 
+    if (this.hist == '2021-06_2021-08')
+    {
+        divTile.innerHTML = "";
+        const srcImage = srcImageStrava = 'http://gpxlab.ru/php_modules/imgcmpr.php?z=' + zoom +
+            '&x=' + tile.x +
+            '&y=' + tile.y +
+            '&ms=' + '2021-06' +
+            '&me=' + '2021-08' +
+            '&heat_activities_type=' + heat_map.heat_activities_type +
+            '&heat_color=' + heat_map.heat_color +
+            '&hist=2021-08'
+            // '&hist=' + this.hist
+        ;
+
+        divTile.style.backgroundImage = "url('" + srcImage + "')";
+        // console.log ("@@ srcImage",srcImage)
+        
+        return divTile;
+    }
+
+
     if (zoom < 17) {
 
         // ODH strava
@@ -517,9 +528,11 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
             '&y=' + tile.y +
             '&heat_activities_type=' + heat_map.heat_activities_type +
             '&heat_color=' + heat_map.heat_color +
-            '&hist=2021-08'
+            '&hist='+this.hist
             // '&hist=' + this.hist
         ;
+
+
 
         divTile.style.backgroundImage = "url('" + srcImage + "')";
 

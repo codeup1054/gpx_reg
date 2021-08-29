@@ -421,15 +421,16 @@ zoom
 
 #slider-panel
 {
-    width:260px;
+    width:310px;
     padding:2px;
+    height: 75px !important;
 }
 
 .slider_transparency
 {
     padding: 1px;
     display: inline-block;
-    width:200px;
+    width:230px;
 }
 
 /*div.slider_transparency span*/
