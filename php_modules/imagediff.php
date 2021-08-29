@@ -99,9 +99,14 @@ foreach ($yrange as $yk=>$yv) {
 //            $result[0]->opaquePaintImage($target_color, $fill, $fuzz, false, Imagick::CHANNEL_DEFAULT);
 
 
+
+
             $result[0]->transparentPaintImage(
                 $target_color, $alpha, $fuzz, false
             );
+
+            [$brightness, $saturation, $hue] = [100,100,70];
+            $result[0]->modulateImage($brightness, $saturation, $hue);
 
 
             $imgbase64 = "data:image/jpg;base64,". base64_encode($result[0]->getImageBlob());

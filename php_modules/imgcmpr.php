@@ -3,12 +3,12 @@
 $CONS = [];
 
 $p = [
-    'ms'=> '2021-06',
+    'ms'=> '2021-07',
     'me'=> '2021-08',
     'z' => '16',
     'x' => 39549,
     'y' => 20501,
-    'fuzz' => 55,
+    'fuzz' => 45,
     'root_dir' => $_SERVER['DOCUMENT_ROOT'],
 
  ];
@@ -70,7 +70,10 @@ else
         );
 
 
-        $result[0]->writeImage($root_dir.$path_comp_relative . $filename_comp);
+        [$brightness, $saturation, $hue] = [100,100,70];
+        $result[0]->modulateImage($brightness, $saturation, $hue);
+
+        $result[0]->writeImage($root_dir . $path_comp_relative . $filename_comp);
 //        print $path_comp_relative . $filename_comp;
         echo $result[0];
     }

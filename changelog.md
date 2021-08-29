@@ -1,3 +1,6 @@
+<h1>2021-08-29</h1> 
+<p>todo refactor get strava.php from cache </p>  
+
 <h1>2021-08-15</h1> 
 <p>download img_cache_history z [15,16] </p>  
 12:06 - start 12:31 - finish : 1,12 ГБ (1 203 693 845 байт)</br>

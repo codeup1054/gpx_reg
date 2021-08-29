@@ -176,9 +176,9 @@ function initMap(listener) {
 
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
-    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06'));
+    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-07'));
     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-08'));
-    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-06_2021-08'));
+    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-07_2021-08'));
 
     setMapStyler(arrOpacity['map']*100 || 100);
 
@@ -499,17 +499,16 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     divTile.style.borderColor = '#AAAAAA';
     divTile.style.opacity = arrOpacity[this.hist]
 
-    if (this.hist == '2021-06_2021-08')
+    if (this.hist == '2021-07_2021-08')
     {
         divTile.innerHTML = "";
         const srcImage = srcImageStrava = 'http://gpxlab.ru/php_modules/imgcmpr.php?z=' + zoom +
             '&x=' + tile.x +
             '&y=' + tile.y +
-            '&ms=' + '2021-06' +
+            '&ms=' + '2021-07' +
             '&me=' + '2021-08' +
             '&heat_activities_type=' + heat_map.heat_activities_type +
-            '&heat_color=' + heat_map.heat_color +
-            '&hist=2021-08'
+            '&heat_color=' + heat_map.heat_color
             // '&hist=' + this.hist
         ;
 
@@ -531,8 +530,6 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
             '&hist='+this.hist
             // '&hist=' + this.hist
         ;
-
-
 
         divTile.style.backgroundImage = "url('" + srcImage + "')";
 

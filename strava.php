@@ -70,7 +70,9 @@ foreach($default_p as $k=>$v)
 
 
 $img_cache_path = "img_cache/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/$p->y.png";
+
 $y_m = date('Y-m');
+
 $img_cache_path_history = "img_cache_history/$y_m/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/$p->y.png";
 $img_cache_path_history_thumb = "img_cache_history_thumb/$y_m/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/_$p->y.png";
 
@@ -133,9 +135,7 @@ function loadFromStrava($z,$x,$y,$heat_activities_type,$heat_color,$watermark=0)
     //11,1149,657
     // chrome://settings/cookies/detail?site=strava.com  искать после перехода по ссылке https://www.strava.com/heatmap#9.03/37.74883/55.67465/hot/all
     //описание авторизации https://developers.strava.com/docs/getting-started/#oauth
-
-
-//  $img_url = "$strava_url/$z/$x/$y.png?px=256&$Signature&$Key";
+    //$img_url = "$strava_url/$z/$x/$y.png?px=256&$Signature&$Key";
 
     $Key_Pair_Id = "APKAIDPUN4QMG7VUQPSA";
 
