@@ -52,16 +52,31 @@ $(document).ready(function () {
         $.getScript('js/gpx.slider.js');
         $.getScript('js/gpx.location.cookie.js', function () {
 
-            const data = decodeURIComponent(param);
-            p = JSON.parse(data);
+            console.log("@@ param", param)
+
+            p = {
+                lat: '55.7',
+                lng: '37.32',
+                zoom: 11,
+                opacity: {},
+                controls: {
+                    tileDetails: 1,
+                    zoom_depth: $("#zoom_depth").val() * 1
+                }
+            }
+
+            if (param.length) {
+                const data = decodeURIComponent(param);
+                p = JSON.parse(data);
+            }
 
             homeGeo = (isNaN(parseFloat(p.lat)) || isNaN(parseFloat(p.lng)))
                 ? ["55.7", "37.32"] : [p.lat, p.lng];
 
+            console.log("@@ homeGeo",homeGeo)
+
             zoom = p.zoom || 11;
-
             arrOpacity = p.opacity || {}
-
             tile_info = p.controls.tile_info || 0;
 
             initMap();
@@ -72,15 +87,17 @@ $(document).ready(function () {
 });
 
 
-function setMapStyler(tval)
-{
+function setMapStyler(tval) {
     const mapStyles = [{
         "stylers": [{
-            "lightness": 2*tval - 100
+            "lightness": 2 * tval - 100
         }]
     }];
 
-    map.setOptions({ styles: mapStyles });
+console.log("@@ mapStyles",mapStyles)
+
+    map.setOptions({styles: mapStyles});
+
 }
 
 window.tm = function (s = "") {
@@ -165,13 +182,14 @@ function CoordMapType(tileSize, hist) {
 
 
 function initMap(listener) {
+    console.log("@@ homeGeo 2",homeGeo)
 
     var mapOptions = {
-     zoom: zoom,
+        zoom: zoom,
 //   mapTypeId: 'satellite',
-     center: new google.maps.LatLng(homeGeo[0], homeGeo[1]),
+//         center: new google.maps.LatLng('55', '37'),
+        center: new google.maps.LatLng(homeGeo[0], homeGeo[1]),
     };
-
 
 
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
@@ -180,7 +198,7 @@ function initMap(listener) {
     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-08'));
     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-07_2021-08'));
 
-    setMapStyler(arrOpacity['map']*100 || 100);
+    setMapStyler(arrOpacity['map'] * 100 || 100);
 
     google.maps.event.addListener(map, 'zoom_changed', function () {
         $('#zoom_info').html(this.getZoom());
@@ -340,13 +358,12 @@ function initMap(listener) {
     }
 
 
-
     const hmAreaButton = document.createElement("button");
     hmAreaButton.textContent = "GetHM"; // get hm_tile for cache
     hmAreaButton.classList.add("custom-map-control-button");
     hmAreaButton.addEventListener("click", () => {
         let map_bounds = map.getBounds()
-        z = map.getZoom()*1 + $("#zoom_depth").val()*1; // addzoom
+        z = map.getZoom() * 1 + $("#zoom_depth").val() * 1; // addzoom
         // console.log("@@ zoom depth=", map.getZoom(), z, $("#zoom_depth").val())
         hm_area(map_bounds, z)
     });
@@ -373,19 +390,23 @@ function initMap(listener) {
 
 
     const locationZoomDepth = p.controls.zoom_depth
-    const zoomDepthOpts = ['1','2','3','4']
-    const zoomDepthOptsSelect = zoomDepthOpts.map((v,k)=>{ return k+"<option value='"+k+"' " + ((locationZoomDepth == k)?'selected >': '>') +v+ "</option>"})
+    const zoomDepthOpts = ['1', '2', '3', '4']
+    const zoomDepthOptsSelect = zoomDepthOpts.map((v, k) => {
+        return k + "<option value='" + k + "' " + ((locationZoomDepth == k) ? 'selected >' : '>') + v + "</option>"
+    })
 
     const locationTileDetails = p.controls.tileDetails
-    const tileOpts = ['No','X,y','Verb']
-    const tileOptsSelect = tileOpts.map((v,k)=>{ return k+"<option value='"+k+"' " + ((locationTileDetails == k)?'selected >': '>') +v+ "</option>"})
+    const tileOpts = ['No', 'X,y', 'Verb']
+    const tileOptsSelect = tileOpts.map((v, k) => {
+        return k + "<option value='" + k + "' " + ((locationTileDetails == k) ? 'selected >' : '>') + v + "</option>"
+    })
 
 
     zoomLatLngMonitor.innerHTML = "<zoom>" + zoom + "</zoom>" +
         "<div class='inline-block'><lat>" + homeGeo[0] + "</lat><br><lng>" + homeGeo[1] + "</lng></div>" +
         `<div class='inline-block '>
-            <select id='zoom_depth' title='Zoom depth'>`+zoomDepthOptsSelect+`</select>
-            <select id='tile_info' title='Tile details'>`+ tileOptsSelect + `</select>
+            <select id='zoom_depth' title='Zoom depth'>` + zoomDepthOptsSelect + `</select>
+            <select id='tile_info' title='Tile details'>` + tileOptsSelect + `</select>
          </div>`;
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(zoomLatLngMonitor);
@@ -395,7 +416,7 @@ function initMap(listener) {
      2021-08-15 create slider at map
      */
 
-    const mapSliderDiv =  $("#slider-panel")[0];
+    const mapSliderDiv = $("#slider-panel")[0];
     $(mapSliderDiv).addClass("custom-map-control-div");
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapSliderDiv);
@@ -452,7 +473,6 @@ function initMap(listener) {
 }
 
 
-
 CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
     var tile = MERCATOR.normalizeTile({x: coord.x, y: coord.y, z: zoom}),
@@ -462,26 +482,26 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
     tile_info = $('#tile_info').val();
 
-    let tile_border ='0px'
+    let tile_border = '0px'
 
     switch (tile_info) {
         case '1' :
-            tile_border ='1px'
+            tile_border = '1px'
             tile_html = `<span class="tile_info " style='font-size:13px;'>`
-                        + zoom + '<br>' + tile.x + '<br>' + tile.y
-                    + "</span>";
+                + zoom + '<br>' + tile.x + '<br>' + tile.y
+                + "</span>";
             break;
         case '2' :
-            tile_border ='1px'
+            tile_border = '1px'
             tile_html =
                 `<div class="tile_info " style="font-size:15px; " >`
-                    + '<div class="hm t">'+ tileBounds.ne.lat.toFixed(7) + '</div>'
-                    + '<div class="hm t">'+ tileBounds.ne.lat.toFixed(7) + '</div>'
-                    + '<div class="l vm">'+ tileBounds.sw.lng.toFixed(7) + '</div>'
-                    + '<div class="l t">' + zoom   + '<br>'+ tile.x + '<br>'+ tile.y+ '</div>'
-                    + '<div class="l t">' + zoom   + '<br>'+ tile.x + '<br>'+ tile.y+ '</div>'
+                + '<div class="hm t">' + tileBounds.ne.lat.toFixed(7) + '</div>'
+                + '<div class="hm t">' + tileBounds.ne.lat.toFixed(7) + '</div>'
+                + '<div class="l vm">' + tileBounds.sw.lng.toFixed(7) + '</div>'
+                + '<div class="l t">' + zoom + '<br>' + tile.x + '<br>' + tile.y + '</div>'
+                + '<div class="l t">' + zoom + '<br>' + tile.x + '<br>' + tile.y + '</div>'
                 + "</div>";
-                tile_border ='1px'
+            tile_border = '1px'
             break;
         default:
             tile_html = "-";
@@ -499,8 +519,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     divTile.style.borderColor = '#AAAAAA';
     divTile.style.opacity = arrOpacity[this.hist]
 
-    if (this.hist == '2021-07_2021-08')
-    {
+    if (this.hist == '2021-07_2021-08') {
         divTile.innerHTML = "";
         const srcImage = srcImageStrava = 'http://gpxlab.ru/php_modules/imgcmpr.php?z=' + zoom +
             '&x=' + tile.x +
@@ -514,7 +533,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
         divTile.style.backgroundImage = "url('" + srcImage + "')";
         // console.log ("@@ srcImage",srcImage)
-        
+
         return divTile;
     }
 
@@ -527,7 +546,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
             '&y=' + tile.y +
             '&heat_activities_type=' + heat_map.heat_activities_type +
             '&heat_color=' + heat_map.heat_color +
-            '&hist='+this.hist
+            '&hist=' + this.hist
             // '&hist=' + this.hist
         ;
 

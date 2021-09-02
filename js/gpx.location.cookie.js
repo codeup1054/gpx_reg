@@ -1,6 +1,10 @@
 /*** 2021-08-15 Global param */
 
-param = document.location.hash.substr(1) || $.cookie('location-settings'+window.location.pathname) || "55.644,37.495,11,0.90"
+const default_param = {}
+
+param = document.location.hash.substr(1)
+    || $.cookie('location-settings'+window.location.pathname)
+    || default_param
 
 function ifMapChanged() {
     c = map.getCenter();

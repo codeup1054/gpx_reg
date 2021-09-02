@@ -58,16 +58,34 @@ $(document).ready(function () {
         $.getScript('js/gpx.slider.js');
         $.getScript('js/gpx.location.cookie.js',function() {
 
-            p = param.split(',');
 
-            homeGeo = (isNaN(parseFloat(p[0])) || isNaN(parseFloat(p[1])))
-                ? ["55.7", "37.32"] : [p[0].substr(0), p[1]];
+            let p = {
+                lat: '55.7',
+                lng: '37.32',
+                zoom: 11,
+                opacity: {},
+                controls: {
+                    tileDetails: 1,
+                    zoom_depth: $("#zoom_depth").val() * 1
+                }
+            }
 
-            zoom = p[2] * 1 || 11;
+            if (param.length) {
+                const data = decodeURIComponent(param);
+                p = JSON.parse(data);
+            }
 
-            hmOpacity = p[3].split("|") || [0.9,0];
-            dinfo = p[4] || 0;
-            const param_sliderOpacity = p[5] || 0;
+            homeGeo = (isNaN(parseFloat(p.lat)) || isNaN(parseFloat(p.lng)))
+                ? ["55.7", "37.32"] : [p.lat, p.lng];
+
+            console.log("@@ homeGeo",homeGeo)
+
+            zoom = p.zoom || 11;
+            arrOpacity = p.opacity || {}
+            tile_info = 0;
+            // tile_info = p.controls.tile_info || 0;
+
+            const param_sliderOpacity = p[5] || 0.5;
 
             let sliderOpacity = new URLSearchParams(param_sliderOpacity);
 
@@ -1764,7 +1782,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     divTile.style.borderStyle = 'solid';
     divTile.style.borderWidth = dinfo + 'px';
     divTile.style.borderColor = '#AAAAAA';
-    divTile.style.opacity = hmOpacity[(this.hist === '2021-06')?0:1];
+    divTile.style.opacity = 0.5;
 
 
     if (zoom < 17) {

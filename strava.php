@@ -71,7 +71,7 @@ foreach($default_p as $k=>$v)
 
 $img_cache_path = "img_cache/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/$p->y.png";
 
-$y_m = date('Y-m');
+$y_m = (isset($p->hist))? $p->hist : date('Y-m');
 
 $img_cache_path_history = "img_cache_history/$y_m/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/$p->y.png";
 $img_cache_path_history_thumb = "img_cache_history_thumb/$y_m/$p->heat_activities_type/$p->heat_color/$p->z/$p->x/_$p->y.png";
