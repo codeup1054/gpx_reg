@@ -21,9 +21,8 @@
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqtLzdiGvGIu85wF1C7w4UKdUncnwgF0M">
 </script>
-<script src="/js/jquery/jquery.js"></script>
 
-<script type="module"  src="/app/app.js"></script>
+<script type="module"  src="/app/app.js?3"></script>
 
 
 <div id="debug" class="hide"><button onclick='$("#debug").addClass("hide");'>Закрыть</button></div>

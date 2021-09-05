@@ -19,14 +19,14 @@ default_params = {
 
 
 
-param = document.location.hash.substr(1)
+let param = document.location.hash.substr(1)
     || $.cookie('location-settings'+window.location.pathname)
     || default_params
 
 console.log("@@ init param ", [param,default_params, window.location, $.cookie('location-settings'+window.location.pathname)])
 
 
-export function ifMapChanged() {
+function ifMapChanged() {
     let c = map.getCenter();
 
     const location_par =
