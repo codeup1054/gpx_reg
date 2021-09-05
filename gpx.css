@@ -419,7 +419,7 @@ zoom
 }
 
 
-#slider-panel
+#slider-panel, .sliders_control
 {
     width:310px;
     padding:2px;

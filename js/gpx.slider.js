@@ -1,38 +1,4 @@
 
-
-// function addSlider(control,target)
-// {
-//     console.log("@@ addSl ", control,target, control.attr("id")  )
-//
-//     control.slider({
-//         orientation: "horizontal",
-//         range: "min",
-//         max: 100,
-//         value: opacity_arr['map'] * 100,
-//         slide: function (event, ui) {
-//         }
-//     })
-//
-//     control.on("slide", function (event, ui) {
-//
-//         let tval = ui.value;
-//
-//         targetOpacity = tval / 100;
-//
-//         target.css({opacity: hmOpacity[k]});
-//
-//         $(control.id + ' span.ui-slider-handle')
-//             .html("<div>" + tval + "</div>");
-//         // ifMapChanged();
-//     });
-//
-//
-// }
-
-// console.log("@@ addSlide init")
-
-
-
 $(function () {
     // console.log("@@ 2 m $( .slider_transparency )",  $( ".slider_transparency" ))
 
@@ -101,3 +67,50 @@ $(function () {
     })
 
 })
+
+
+function addSlider(els)
+{
+    $.each(els, function(k,v)
+    {
+    console.log("@@ addSlider k v ",k,v);
+
+        const el_opacity = 0.5
+
+        $(v).slider({
+            orientation: "horizontal",
+            range: "min",
+            max: 100,
+            value: el_opacity*100,
+            create: function( event, ui ) {
+                // console.log("@@ slide callback",event, ui  )
+                $('#' + sliderId+' span.ui-slider-handle').html("<div>" + Math.floor(el_opacity*100) + "</div>");
+                if (target !='map')
+                    $('.' + target).css({opacity: el_opacity});
+                else
+                    setMapStyler(el_opacity*100);
+            },
+            slide: function( event, ui ) {
+                let tval = ui.value;
+
+                arrOpacity[target] = tval / 100;
+
+                // console.log ("@@ arrOpacity",arrOpacity)
+
+
+                if (target ==='map')
+                {
+                    setMapStyler(tval)
+                }
+                else
+                {
+                    $('.' + target).css({opacity: arrOpacity[target]});
+                }
+
+                $('#' + sliderId+' span.ui-slider-handle').html("<div>" + tval + "</div>");
+
+                ifMapChanged();
+            }
+        })
+    })
+}

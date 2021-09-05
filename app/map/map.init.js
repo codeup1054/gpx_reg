@@ -1,44 +1,3 @@
-document.write('<script type="text/javascript" src="js/cookie/jquery.cookie.js"></script>');
-//2019-11-15 global var init
-
-var map;
-var homeGeo = ["55.6442983", "37.4959946"] // base
-let hm_tiles = {}
-
-var globalSettings = { // 2020-02-25 добавить обновление из cookies
-    distOnOff: {on: true, name: 'Дистанция', exec: ["updateMarkersOnMap"]},
-    markerLableOnOff: {on: false, name: 'Метка точки', exec: ["updateMarkersOnMap"]},
-    cacheOnOff: {on: false, name: 'Cache', exec: ["cacheOnOff"]},
-    latlngOnOff: {on: true, name: 'LatLng', exec: ["updateMarkersOnMap"]},
-    pathOnOff: {on: true, name: 'Путь', exec: ["updateMarkersOnMap"]},
-    elevOnOff: {on: true, name: 'Высоты', exec: ["updateMarkersOnMap"]},
-    overlay: {options: ["нет", "микро", "средние"], name: 'Покрытие', exec: ["updateOverlay"]}
-};
-
-var heat_map = {heat_activities_type: "all", heat_color: "hot"};
-
-var context;
-
-context = {
-    activePointId: "",
-    set_id: 0
-}; // текущий контекст строка набора
-
-var elevator;
-var isKeyControll = false;
-var homeGeo
-var zoom
-let p
-let tile_info
-let param
-
-let arrOpacity =
-    {
-        'map': 0.2,
-        '2021-08': 0.5,
-        '2021-06': 0.7
-    }
-
 $(document).ready(function () {
     document.onkeydown = function (e) {
         isKeyControll = ((e.ctrlKey == true));
@@ -47,44 +6,8 @@ $(document).ready(function () {
         isKeyControll = false;
     }
 
-    $(function () {
-        $.getScript('js/gpx.adds.js');
-        // $.getScript('js/gpx.slider.js');
-        $.getScript('js/gpx.location.cookie.js', function () {
-
-            console.log("@@ param", param)
-
-            p = {
-                lat: '55.7',
-                lng: '37.32',
-                zoom: 11,
-                opacity: {},
-                controls: {
-                    tileDetails: 1,
-                    zoom_depth: $("#zoom_depth").val() * 1
-                }
-            }
-
-            if (param.length) {
-                const data = decodeURIComponent(param);
-                p = JSON.parse(data);
-            }
-
-            homeGeo = (isNaN(parseFloat(p.lat)) || isNaN(parseFloat(p.lng)))
-                ? ["55.7", "37.32"] : [p.lat, p.lng];
-
-            console.log("@@ homeGeo",homeGeo)
-
-            zoom = p.zoom || 11;
-            arrOpacity = p.opacity || {}
-            tile_info = p.controls.tile_info || 0;
-
-            initMap();
-
-        });
 
     });
-});
 
 
 function setMapStyler(tval) {
@@ -94,32 +17,11 @@ function setMapStyler(tval) {
         }]
     }];
 
-console.log("@@ mapStyles",mapStyles)
-
-    map.setOptions({styles: mapStyles});
-
+   console.log("@@ mapStyles",mapStyles)
+   map.setOptions({styles: mapStyles});
 }
 
-window.tm = function (s = "") {
-    var output = "";
-
-// Remember when we started
-    if (s == "") {
-        lap = start = new Date().getTime();
-
-        var date = new Date();
-        var str = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-
-        console.log("Старт: %s", str);
-    } else {
-        var end = new Date().getTime();
-        console.log("%s %s %s", end - start, end - lap, s);
-        lap = end;
-    }
-};
-
-
-MERCATOR = {
+const MERCATOR = {
 
     fromLatLngToPoint: function (latLng) {
         var siny = Math.min(Math.max(Math.sin(latLng.lat * (Math.PI / 180)),
@@ -181,27 +83,18 @@ function CoordMapType(tileSize, hist) {
 }
 
 
-function initMap(listener) {
-    console.log("@@ homeGeo 2",homeGeo)
-
-
+export function initMap(listener) {
+    console.log("@@ initMap param",param)
 
 
     var mapOptions = {
-        zoom: zoom,
+        zoom: param.zoom,
 //   mapTypeId: 'satellite',
 //         center: new google.maps.LatLng('55', '37'),
-        center: new google.maps.LatLng(homeGeo[0], homeGeo[1]),
+        center: new google.maps.LatLng(param.homeGeo[0], param.homeGeo[1]),
     };
 
-
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-07'));
-    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-08'));
-    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(256, 256), '2021-07_2021-08'));
-
-    setMapStyler(arrOpacity['map'] * 100 || 100);
 
     google.maps.event.addListener(map, 'zoom_changed', function () {
         $('#zoom_info').html(this.getZoom());
@@ -216,8 +109,8 @@ function initMap(listener) {
     google.maps.event.addListener(map, 'center_changed', function () {
         ifMapChanged();
 
-        lat = this.getCenter().lat().toFixed(5);
-        lng = this.getCenter().lng().toFixed(5);
+        const lat = this.getCenter().lat().toFixed(5);
+        const lng = this.getCenter().lng().toFixed(5);
 
         $('lat').html(lat);
         $('lng').html(lng);
@@ -451,14 +344,14 @@ function initMap(listener) {
 
     $.each(defaultMonth, function(k,v)
     {
-       $(".sliders_control").append("<div class='slider'></div><select class='selector_"+ k +"'>"+monthOptsSelect+"</select>")
-       $(".selector_" + k).val(v).change()
+        $(".sliders_control").append("<div class='slider'></div><select class='selector_"+ k +"'>"+monthOptsSelect+"</select>")
+        $(".selector_" + k).val(v).change()
     })
 
     $.getScript('js/gpx.slider.js', function ()
-    {
-        addSlider($(".slider"))
-    }
+        {
+            addSlider($(".slider"))
+        }
     );
 
 
