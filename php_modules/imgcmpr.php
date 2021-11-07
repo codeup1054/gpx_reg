@@ -3,8 +3,8 @@
 $CONS = [];
 
 $p = [
-    'ms'=> '2021-07',
-    'me'=> '2021-08',
+    'ms'=> '2021-08',
+    'me'=> '2021-11',
     'z' => '16',
     'x' => 39549,
     'y' => 20501,
@@ -46,7 +46,10 @@ else
     $ms_image_path = $root_dir . "/img_cache_history/$ms/all/hot/$z/$x/$y.png";
     $me_image_path = $root_dir . "/img_cache_history/$me/all/hot/$z/$x/$y.png";
 
-//    echo "<pre>".print_r([$ms_image_path, $me_image_path, check_file($ms_image_path) , check_file($me_image_path)],1)."</pre>";
+    echo "<pre>".print_r([$ms_image_path, $me_image_path,
+            check_file($ms_image_path) ,
+            check_file($me_image_path)],
+            1)."</pre>";
     
     
     if (check_file($ms_image_path) && check_file($me_image_path)) {
@@ -69,12 +72,13 @@ else
             '#FFFBD9', 0, $fuzz, false
         );
 
+//  hue = 70 - magenta  0-10 - light blue 120 - orange 160 - green
 
         [$brightness, $saturation, $hue] = [100,100,70];
         $result[0]->modulateImage($brightness, $saturation, $hue);
 
         $result[0]->writeImage($root_dir . $path_comp_relative . $filename_comp);
-//        print $path_comp_relative . $filename_comp;
+        print $path_comp_relative . $filename_comp;
         echo $result[0];
     }
 

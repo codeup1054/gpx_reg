@@ -418,19 +418,29 @@ zoom
     margin: -5px 2px;
 }
 
+.selector
+{
+    font-size: 10px;
+    border-radius:2px;
+    margin: 0 2px;
+}
 
-#slider-panel, .sliders_control
+
+
+.slider_control
 {
     width:310px;
     padding:2px;
-    height: 75px !important;
+    height: 25px !important;
 }
 
-.slider_transparency
+[slider]
 {
     padding: 1px;
+    font-size:9px;
+    margin: 0 5px;
     display: inline-block;
-    width:230px;
+    width:150px;
 }
 
 /*div.slider_transparency span*/
@@ -439,10 +449,10 @@ zoom
 /*    padding:0px;*/
 /*}*/
 
-.slider_transparency span.ui-slider-handle /* ручка регулятора прозрачности */
+[slider] .ui-slider-handle /* ручка регулятора прозрачности */
 {   font-size:9px;
     /*top:-3px;*/
-    margin-top: -3px;
+    margin-top: -1px;
     height:12px;
     width:16px;
     padding:0px;
@@ -455,13 +465,13 @@ zoom
     display: inline-block;
     }
 
-.slider_transparency span.ui-slider-handle div
+[slider] .ui-slider-handle div
 {
-    margin-left: -1px;
-    margin-top: 0px;
+    margin-left: 0px;
+    margin-top: 1px;
     padding:0px;
     left:50%;
-    background-color: rgba(255,255,255,0);
+    background-color: rgba(255,255,5,0);
     text-align: center;
 }
 span.ui-state-active
@@ -474,12 +484,12 @@ span.ui-state-active
     border: red solid 2px;
 }
 
-.slider_transparency.ui-slider-horizontal  /* ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content*/
+[slider] .ui-widget-header  /* ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content*/
 {
     height:1px;
     padding:0px;
     margin: 5px 5px;
-    background-color: #000;
+    background-color: #fff;
 }
 
 /*.ui-slider .ui-slider-range*/
@@ -487,7 +497,7 @@ span.ui-state-active
 /*    background-color: peru;*/
 /*}*/
 
-.slider_transparency span.ui-state-focus { outline:none;}
+.span.ui-state-focus { outline:none;}
 
 .slider_transparency div {
     /*margin:0px 10px;*/
@@ -529,6 +539,8 @@ span.ui-state-active
 div.custom-map-control-div
 {
     padding: 3px 0px;
+    height: 30px !important;
+
 }
 div.custom-map-control-div div
 {

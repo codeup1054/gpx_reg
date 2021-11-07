@@ -12,8 +12,6 @@ $(function () {
 
             // console.log("@@ slider_transparency 3",[target, opacityKey, k , v ]);
 
-
-
         $(v).slider({
             orientation: "horizontal",
             range: "min",

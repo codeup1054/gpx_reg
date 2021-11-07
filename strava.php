@@ -9,16 +9,11 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
 /* 2020-04-10
-
 { "email": "sdsp256@gmail.com" , "password": "652@163Ava" }
-
-*/
 
 
 //header('Content-type: image/jpeg');
-
-
-/*https://heatmap-external-{switch:a,b,c}.strava.com/tiles-auth/running/bluered/{0}/{1}/{3}.png?px=256&Key-Pair-Id={ID}&Signature={Sig}&Policy={P}
+https://heatmap-external-{switch:a,b,c}.strava.com/tiles-auth/running/bluered/{0}/{1}/{3}.png?px=256&Key-Pair-Id={ID}&Signature={Sig}&Policy={P}
 Где:
 {0} = zoom
 {1} = x*
@@ -26,10 +21,10 @@ ini_set("display_errors", 1);
 {ID} = CloudFront-Key-Pair-Id
 {Sig} = CloudFront-Signature
 {P} = CloudFront-Policy
-*/
+
 //$img = 'https://anygis.ru/api/v1/Tracks_Strava_Ride/13/4950/2566.png?px=256';
 //$img_static = 'https://heatmap-external-a.strava.com/tiles-auth/all/hot/14/9901/5132.png?px=256&Signature=dHHhv0RrKOD4J3zmNy31LWJBNoq-eDHqmoy3UWKyvbPc0lWF2CVQO3QnDkW4Mk8MSrIP5C4~bFdhw-ZM7ujk2iaA9UXRlT7nLK0yzjQLTi99VOf-ToFaisg4lmPqfKlbVYoRo6~cSdlZWj5RzMykoxziSsFhY5V4sAdVWQxz732IilR~ROky5h4FTEUIJisCyVQUpuC0fLVehIdteE0Zt9TtN7GKFbNieSkDFm-PibtqTPIoMEeJd1MlYcdnLIzQUSeMPVBNogXv-oZ3yeXMmuJMJTmDdzBJlar-~nAf~HyggeyI92V2WedGa-jgl3DijXHxsiH79rwnNWtSnjiH6Q__&Key-Pair-Id=APKAIDPUN4QMG7VUQPSA&Policy=eyJTdGF0ZW1lbnQiOiBbeyJSZXNvdXJjZSI6Imh0dHBzOi8vaGVhdG1hcC1leHRlcm5hbC0qLnN0cmF2YS5jb20vKiIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTU3ODkyNTQ1MX0sIkRhdGVHcmVhdGVyVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNTc3NzAxNDUxfX19XX0_';
-
+*/
 
 global $heat_activities, $heat_color;
 
@@ -150,51 +145,34 @@ function loadFromStrava($z,$x,$y,$heat_activities_type,$heat_color,$watermark=0)
 
 //    $Signature = "My5Cctgax-eZiSPik8BYr~c79H-UXidiuutFfz9BulmYe0tH~wJnUEA0bFzkQN2Rlo91pN~Mn09JZm2XJfz6LhSJl2a8Az6D5qzoG5TrvFYeWUtzmSRm62~iiJTp7qrQi3ePdxzhRSafeju0F3SFMAMmWBcbZBIbVainHwaPuvNtSiy4FUTb1jIkexX6eXzMEoG1RFFw8Zcexqom3ODyZeGR4b3A7qrYsnZmRoS7PuIqnPnxpox4ZV3kAGIgXOYzsp6HPSft8KbpVnuz63ujReCinUToDdzyAWNH4854IAOw~0FGwga4EAjVUUhM2DuXhTjHz0vxq0bhMzjJUtpm~w__";
 
+/**
+ * 2021-11  get file and make image
+*/
+
     $img_url  = "$strava_url/$z/$x/$y.png?px=256&Signature=$Signature&Key-Pair-Id=$Key_Pair_Id&Policy=$Policy";
+    $image = new Imagick($img_url);
+
 
 //    $img_url = "$strava_url/$z/$x/$y.png?px=256";
 //    $img = "https://anygis.ru/api/v1/Tracks_Strava_Ride/$x/$y/$z";   // c 2020-01-28 не работает
 
     print ("<a href='".$img_url."'>$img_url</a>");
 
+    $check_paths = [$img_cache_path, $img_cache_path_history, $img_cache_path_history_thumb];
 
-
-    $path_parts = pathinfo($img_cache_path);
-
-
-    if (!is_dir($path_parts['dirname'])) {  // ************ 2020 Create directory *****************
-        mkdir($path_parts['dirname'],0777, true);
+    foreach ($check_paths as $path)    {
+        $path_parts = pathinfo($path);
+        if (!is_dir($path_parts['dirname'])) {  // ************ 2020 Create directory *****************
+            mkdir($path_parts['dirname'],0777, true);
+        }
     }
-
-
-    $path_parts_history = pathinfo($img_cache_path_history);
-
-    if (!is_dir($path_parts_history['dirname'])) {  // ************ 2020 Create directory *****************
-        mkdir($path_parts_history['dirname'],0777, true);
-    }
-
-
-    $path_parts_history_thumb = pathinfo($img_cache_path_history_thumb);
-
-    if (!is_dir($path_parts_history_thumb['dirname'])) {  // ************ 2020 Create directory *****************
-        mkdir($path_parts_history_thumb['dirname'],0777, true);
-    }
-
-
-
-
-    $image = new Imagick($img_url);
-
 
     // записываем изображение из Strava
     $image->writeImage($img_cache_path);
     $image->writeImage($img_cache_path_history);
 
     $image->resizeImage(32, 32,Imagick::FILTER_LANCZOS,1 );
-
     $image->writeImage($img_cache_path_history_thumb);
-
-
 
 
     $update_res = update_gpx($z,$x,$y); // записываем в базу
@@ -252,7 +230,6 @@ function update_gpx($z,$x,$y)
             //        $du_size .= "".str_replace("\t./img_cache/","-",$line);
             $p = explode('/',$line);
             //        print ("<pre>".$line." ".print_r($p,1)."</pre>");
-            //        print ("".$line."\n<br />");
             $s = $p[0]; // размер файла
             $d = $p[1]; // время
             $z = $p[3]; // zoom

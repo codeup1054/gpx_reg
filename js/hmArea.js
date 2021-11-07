@@ -50,7 +50,7 @@ $(document).ready(function () {
     $(function () {
         $.getScript('js/gpx.adds.js');
         // $.getScript('js/gpx.slider.js');
-        $.getScript('js/gpx.location.cookie.js', function () {
+        $.getScript('js/gpx.map.location.cookie.js', function () {
 
             console.log("@@ param", param)
 
@@ -183,8 +183,6 @@ function CoordMapType(tileSize, hist) {
 
 function initMap(listener) {
     console.log("@@ homeGeo 2",homeGeo)
-
-
 
 
     var mapOptions = {
@@ -567,7 +565,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     divTile.style.borderColor = '#AAAAAA';
     divTile.style.opacity = arrOpacity[this.hist]
 
-    if (this.hist == '2021-07_2021-08') {
+    if (this.hist == '2021-07_2021-11') {
         divTile.innerHTML = "";
         const srcImage = srcImageStrava = 'http://gpxlab.ru/php_modules/imgcmpr.php?z=' + zoom +
             '&x=' + tile.x +
@@ -609,7 +607,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
 
 function getCacheStat(i) {
-    console.log("@@ getCacheStat", i);
+    // console.log("@@ getCacheStat", i);
 
     $.ajax
     ({

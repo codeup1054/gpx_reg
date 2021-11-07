@@ -56,7 +56,7 @@ $(document).ready(function () {
     $(function () {
         $.getScript('js/gpx.adds.js');
         $.getScript('js/gpx.slider.js');
-        $.getScript('js/gpx.location.cookie.js',function() {
+        $.getScript('js/gpx.map.location.cookie.js',function() {
 
 
             let p = {

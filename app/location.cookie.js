@@ -52,3 +52,5 @@ function ifMapChanged() {
     $.cookie('location-settings'+window.location.pathname, location_search);
 
 } //*** ifMapChanged()
+
+
