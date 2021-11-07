@@ -74,9 +74,12 @@ export let mapControls = {
 
         let controlHTML = ""
 
-        // let defaultMonth = Object.keys(param.mapOverlays)
+        let defaultMonth = Object.keys(param.mapOverlays)
+        
+        
+        console.log ("@@ Object.keys(param.mapOverlays)",Object.keys(param.mapOverlays))
 
-        let defaultMonth = ['2021-07','2021-11']
+        // let defaultMonth = ['2021-08','2021-11']
 
         // console.log ("@@ defaultMonth",defaultMonth)
         const overlaysDetails = Object.keys(overlayDetails)

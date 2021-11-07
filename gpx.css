@@ -532,14 +532,14 @@ span.ui-state-active
     font: 400 12px Roboto, Arial, sans-serif;
     overflow: hidden;
     vertical-align: middle;
-    height: 30px;
+    height: 40px;
     cursor: pointer;
 }
 
 div.custom-map-control-div
 {
     padding: 3px 0px;
-    height: 30px !important;
+    height: 50px !important;
 
 }
 div.custom-map-control-div div

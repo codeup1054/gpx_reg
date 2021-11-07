@@ -22,13 +22,13 @@ let last = now
  / CONST and GLOBALS
  * */
 
-import {model} from '/app/const.js'
+import {model} from '/app/const.js?2'
 
 let mod = model
 
 window.param = model.get();
 
-// console.log("@@ model app.js", param)
+console.log("@@ model app.js", param)
 
 import '/js/jquery/jquery.js'
 import '/js/cookie/jquery.cookie.js'

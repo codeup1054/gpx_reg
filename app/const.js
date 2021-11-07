@@ -14,7 +14,7 @@ model = {
         mapLightess: 50,
         mapOverlays:
             {
-                '2021-07': {opacity: 0.3, overlayDetails: overlayDetails.TILEINFO_XY}, // SIMPLE_TILEINFO,
+                '2021-08': {opacity: 0.3, overlayDetails: overlayDetails.TILEINFO_XY}, // SIMPLE_TILEINFO,
                 '2021-11': {opacity: 0.3, overlayDetails: overlayDetails.TILEINFO_VERBOSE} // 'TILEINFO_VERBOSE'
             },
         heat_map: {heat_activities_type: 'all', heat_color: 'hot'},

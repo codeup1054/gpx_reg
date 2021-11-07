@@ -6,15 +6,14 @@ export function mapOverlay(param) {
     console.log ("@@ param.mapOverlays",Object.keys(param.mapOverlays).join("_"))
 
     // const layerKeys = Object.keys(param.mapOverlays)
-    const layerKeys = ['2021-07','2021-11']
+    const layerKeys = ['2021-08','2021-11']
 
     layerKeys.forEach((k) => {
         param.map.overlayMapTypes.insertAt(0, new CoordMapType(k));
     })
 
-    param.map.overlayMapTypes.insertAt(0, new CoordMapType(layerKeys[0]+"_"+layerKeys[1]));
+    // param.map.overlayMapTypes.insertAt(0, new CoordMapType(layerKeys[0]+"_"+layerKeys[1]));
     param.map.overlayMapTypes.insertAt(0, new CoordMapType(layerKeys[1]+"_"+layerKeys[0]));
-
 }
 
 /** @constructor Mercator */
