@@ -9,7 +9,7 @@ export let mapControls = {
     add_cache_control: function () {
 
         const hmAreaButton = document.createElement("button");
-        hmAreaButton.textContent = "GetHM"; // get hm_tile for cache
+        hmAreaButton.textContent = "Get"; // get hm_tile for cache
         hmAreaButton.classList.add("custom-map-control-button");
         hmAreaButton.addEventListener("click", () => {
             let map_bounds = map.getBounds()
@@ -21,7 +21,7 @@ export let mapControls = {
 
 
         const clearHMButton = document.createElement("button"); // add to map clear HM button
-        clearHMButton.textContent = "ClearHM"
+        clearHMButton.textContent = "Clear"
         clearHMButton.classList.add("custom-map-control-button")
         clearHMButton.addEventListener("click", () => {
             clear_hm_tiles()
@@ -38,15 +38,14 @@ export let mapControls = {
 
         $("#debug").append(mapContrlsDiv);
 
-        const zoomDepthOptsSelect = ['1', '2', '3', '4','5'].map((v, k) => {
+        const zoomDepthOptsSelect = ['1', '2', '3', '4','5','6'].map((v, k) => {
             return "<option value='" + k + "' " +
                 ((p.controls.zoom_depth == v) ? 'selected >' : '>') + v + "</option>"
         }).join("")
 
 
         const innerHTML = `
-        <select id='zoom_depth' class="gpx-controls" title='Zoom depth'>` + zoomDepthOptsSelect + `</select>
-        `;
+        <select id='zoom_depth' class="gpx-controls" title='Zoom depth'>` + zoomDepthOptsSelect + `</select>`;
 
         mapContrlsDiv.innerHTML = "<div class='custom-map-control-div map-controls'>" + innerHTML + "</div>"
 
@@ -63,7 +62,7 @@ export let mapControls = {
         $("#debug").append(mapCtrl)
 
         const monthOptions = []
-        const currMonth = new Date('2021-05-31');
+        const currMonth = new Date('2021-12-31');
         const now = new Date();
 
         now.setMonth(now.getMonth(), 2)
@@ -74,12 +73,12 @@ export let mapControls = {
 
         let controlHTML = ""
 
-        let defaultMonth = Object.keys(param.mapOverlays)
+        // let defaultMonth = Object.keys(param.mapOverlays)
         
         
         console.log ("@@ Object.keys(param.mapOverlays)",Object.keys(param.mapOverlays))
 
-        // let defaultMonth = ['2021-08','2021-11']
+        let defaultMonth = ['2021-08'] //['2021-08','2021-11']
 
         // console.log ("@@ defaultMonth",defaultMonth)
         const overlaysDetails = Object.keys(overlayDetails)
@@ -87,7 +86,6 @@ export let mapControls = {
         const tileOptsSelect = overlaysDetails.map((v, k) => {
             return k + "<option value='" + v + "' " + ((p.controls.overlayDetails == k) ? 'selected >' : '>') + v.substr(9) + "</option>"
         })
-
 
 
         $.each(defaultMonth, function (k, v)
@@ -127,24 +125,22 @@ export let mapControls = {
         // console.log ("@@ defaultMonth",defaultMonth)
 
 
-        const left_layer = '2021-07'
-        const right_layer = '2021-09'
+        const left_layer = ''
+
+        let d = new Date()
+        const right_layer = d.toISOString().substr(0,7) // current month
 
         const controlHTML =
             left_layer +
-            "<div target='" + left_layer +"_" +right_layer+"' class='slider' slider ></div>" +
+            "<div target='"+right_layer+"' class='slider' slider ></div>" +
             right_layer +
-            "<div target = 'map' slider></div>"
+            "</br><div target = 'map' slider></div>Map"
 
-        mapCtrl.innerHTML = "<div class='slider_control' style='height:100px;'>" + controlHTML + "</div>" +
+        mapCtrl.innerHTML = "<div class='slider_control' style='height:100px;'>" + controlHTML + "</div>"
+
         p.map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl);
     }
 }
-
-
-
-
-
 
 
 

@@ -1,7 +1,7 @@
 window.overlayDetails = {}
 window.overlayDetails.TILEINFO_NO = 0;
 window.overlayDetails.TILEINFO_XY = 1;
-window.window.overlayDetails.TILEINFO_VERBOSE = 2;
+window.window.overlayDetails.TILEINFO_VERB = 2;
 
 
 export let model

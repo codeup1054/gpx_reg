@@ -6,14 +6,14 @@ export function mapOverlay(param) {
     console.log ("@@ param.mapOverlays",Object.keys(param.mapOverlays).join("_"))
 
     // const layerKeys = Object.keys(param.mapOverlays)
-    const layerKeys = ['2021-08','2021-11']
+    const layerKeys = ['2021-08','2022-02']
 
     layerKeys.forEach((k) => {
         param.map.overlayMapTypes.insertAt(0, new CoordMapType(k));
     })
 
-    // param.map.overlayMapTypes.insertAt(0, new CoordMapType(layerKeys[0]+"_"+layerKeys[1]));
-    param.map.overlayMapTypes.insertAt(0, new CoordMapType(layerKeys[1]+"_"+layerKeys[0]));
+    param.map.overlayMapTypes.insertAt(0, new CoordMapType('2022-02'));
+    // param.map.overlayMapTypes.insertAt(0, new CoordMapType(layerKeys[1]+"_"+layerKeys[0]));
 }
 
 /** @constructor Mercator */
@@ -46,7 +46,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
                 + zoom + '<br>' + tile.x + '<br>' + tile.y
                 + "</span>";
             break;
-        case overlayDetails.TILEINFO_VERBOSE :
+        case overlayDetails.TILEINFO_VERB :
             TileHtmlContent =
                 `<div class="tile_info " style="font-size:15px; " >`
                 + '<div class="hm t">' + tileBounds.ne.lat.toFixed(7) + '</div>'
@@ -83,11 +83,10 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
         if(this.overlayName.length < 8) {
             srcImage = 'http://gpxlab.ru/app/php/app.strava.php?z=' + zoom +
                 '&x=' + tile.x +
-                '&y=' + tile.y +
-                '&heat_activities_type=' + model.param.heat_map.heat_activities_type +
-                '&heat_color=' + model.param.heat_map.heat_color +
-                '&hist=' + this.overlayName
-            ;
+                '&y=' + tile.y
+                // + '&heat_activities_type=' + model.param.heat_map.heat_activities_type
+                // + '&heat_color=' + model.param.heat_map.heat_color
+                + '&hist=' + this.overlayName;
         }
         else
         {

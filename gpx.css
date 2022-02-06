@@ -204,7 +204,7 @@ td.geocoded {background-color:#ffee00;}
     opacity:1;
     text-align:left;
     width1:130px;
-    height1: 40px;
+    height1: 30px;
     padding:4px 6px;
     z-index: 100;
     background: #fbfbfb;
@@ -216,7 +216,7 @@ td.geocoded {background-color:#ffee00;}
 }
 
 select option1 {
-  margin: 40px;
+  margin: 30px;
   background: rgba(0, 0, 0, 0.3);
   color: #fff;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
@@ -343,7 +343,7 @@ button.sign
 
  #floating-panel {
         position: absolute;
-        margin-top: 40px;
+        margin-top: 30px;
         left: 45%;
         width:100px;
         z-index: 5;
@@ -429,7 +429,7 @@ zoom
 
 .slider_control
 {
-    width:310px;
+    width:150px;
     padding:2px;
     height: 25px !important;
 }
@@ -440,7 +440,7 @@ zoom
     font-size:9px;
     margin: 0 5px;
     display: inline-block;
-    width:150px;
+    width:60px;
 }
 
 /*div.slider_transparency span*/
@@ -532,14 +532,15 @@ span.ui-state-active
     font: 400 12px Roboto, Arial, sans-serif;
     overflow: hidden;
     vertical-align: middle;
-    height: 40px;
+    height: 30px;
+    /*width:100px;*/
     cursor: pointer;
 }
 
 div.custom-map-control-div
 {
     padding: 3px 0px;
-    height: 50px !important;
+    height: 30px !important;
 
 }
 div.custom-map-control-div div

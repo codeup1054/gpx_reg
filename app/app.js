@@ -64,9 +64,9 @@ function sync_import()
             // console.log ("@@ param",param)
             setMapStyler(param)
             mapOverlay(param)
+            mapControls.add_cache_control()
             mapInformer.add()
             mapControls.add_layers_controls()
-            mapControls.add_cache_control()
             mapEvents.add()
 
         }

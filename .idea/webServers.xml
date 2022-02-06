@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="478b93de-d92a-42fb-ba3f-f5ec6d4957b1" name="noto" url="http://notorestaurant.com">
+        <fileTransfer rootFolder="/var/www/vhosts/notorestaurant.com" accessType="SFTP" host="31.31.196.98" port="22" sshConfigId="42387d1f-602b-41c2-bd89-211748d169bf" sshConfig="u1371051@31.31.196.98:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>
