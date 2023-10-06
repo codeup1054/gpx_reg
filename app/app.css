@@ -3,3 +3,27 @@
     width:256px;
     height:256px;
 }
+
+.row-gray
+{
+    color:#999;
+}
+
+.row-black
+{
+    color:#000;
+    background-color: #d7e7ff;
+}
+
+.stab{
+    border-collapse: collapse;
+}
+
+.stab td{
+    border: 1px solid #aaaaaa;
+    padding: 2 5px;
+    font: 400 12px Roboto, Arial, sans-serif;
+}
+.stab tr.selected{
+    background: #d7e7ff;
+}

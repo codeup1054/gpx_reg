@@ -1,25 +1,56 @@
 import {model} from '/app/const.js'
 
+
+
 export function mapOverlay(param) {
 
 
     console.log ("@@ param.mapOverlays",Object.keys(param.mapOverlays).join("_"))
 
     // const layerKeys = Object.keys(param.mapOverlays)
-    const layerKeys = ['2021-08','2022-02']
+    const layerKeys = ['2021-08'] // '2021-08'
 
     layerKeys.forEach((k) => {
-        param.map.overlayMapTypes.insertAt(0, new CoordMapType(k));
+        param.map.overlayMapTypes.insertAt(0, new CoordMapType(k,''));
     })
 
-    param.map.overlayMapTypes.insertAt(0, new CoordMapType('2022-02'));
+    let d = new Date()
+    const current_map = d.toISOString().substr(0,7)
+
+
+    $.getJSON("/data/apify.dat", function(json) {
+        const strava_cred = json[Object.keys(json)[0]]
+
+        // const queryString = Object.entries(strava_cred).map(([key, value]) => {
+        //     return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+        // }).join('&');
+
+
+        const  queryString = '&Signature='+strava_cred['CloudFront-Signature'] +
+                             '&Policy='+strava_cred['CloudFront-Policy'] +
+                             '&Key-Pair-Id='+strava_cred['CloudFront-Key-Pair-Id'] ;
+
+
+        const strava_url = 'https://heatmap-external-a.strava.com/tiles-auth/all/hot'
+
+        const strava_php_direct ='http://gpxlab.ru/app/php/app.strava.direct.php'
+
+        // console.log("@@ sig",strava_cred, queryString)
+
+        param.map.overlayMapTypes.insertAt(0, new CoordMapType(current_map, queryString));
+
+        });
+
+
+
     // param.map.overlayMapTypes.insertAt(0, new CoordMapType(layerKeys[1]+"_"+layerKeys[0]));
 }
 
 /** @constructor Mercator */
-function CoordMapType(overlayName) {
+function  CoordMapType(overlayName, queryString='') {
     this.tileSize = new google.maps.Size(256, 256);
     this.overlayName = overlayName;
+    this.queryString = queryString;
 }
 
 
@@ -29,6 +60,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
         tileBounds = MERCATOR.getTileBounds(tile);
 
     let overlayName = this.overlayName
+    let queryString = this.queryString
 
     let divTile = ownerDocument.createElement('div');
 
@@ -79,15 +111,47 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
         // ODH strava
 
         let srcImage
+        var now = new Date().getTime()
+        // console.log ("@@ stravaCred",queryString, this.overlayName)
+        if (queryString != '')
+        {
 
-        if(this.overlayName.length < 8) {
-            srcImage = 'http://gpxlab.ru/app/php/app.strava.php?z=' + zoom +
+            const imgCache = 'https://gpxlab.ru/app/php/app.strava.php?'+
+                'z=' + zoom +
+                '&x=' + tile.x +
+                '&y=' + tile.y
+                // + '&heat_activities_type=' + model.param.heat_map.heat_activities_type
+                // + '&heat_color=' + model.param.heat_map.heat_color
+                + '&' + queryString;
+                // console.log ("@@ img_src",srcImage)
+
+            $.getJSON(imgCache, function(json) {})
+
+            srcImage = 'https://heatmap-external-a.strava.com/tiles-auth/all/hot/13/4931/2572.png?px=256&Signature=dwfXqxVwmJz66P2AwcUwzJYe7dUfslTGQbz9h-HCYdS15TbZEUswfLS0~S' +
+                'WQAnaqFDpVUNO6-IVdNolsReMuS2OeatzbgJwB0LnZJL5GCLBS1WX8-lF3-2TfMLliItLq7bwzr7jOBvrp8lx2zdLJwIaxRg1bXErO0TCUkOX4YdqBPdp9wBbun7GutoeG6mPYfZMOhusQwEd4pgKK1TwhxZ~MKyOLGPXVAXRqwe' +
+                'Ggwu1rFhRuQcyW7MS~oVGCUeGrv14yYZJdhhnUgX~SbTuRbcgWeYoIogEeTA-5s6cLBfXNHdmIT4IdPi2DNRTjUihHDMlqQNx3d~JYIcCy7-YCmw__' +
+                '&Key-Pair-Id=APKAIDPUN4QMG7VUQPSA' +
+                '&Policy=eyJTdGF0ZW1lbnQiOiBbeyJSZXNvdXJjZSI6Imh0dHBzOi8vaGVhdG1hcC1leHRlcm5hbC0qLnN0cmF2YS5jb20vKiIsIkNvbmRpdGlvbiI6eyJEYX' +
+                'RlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTY2MTIzODA4MX0sIkRhdGVHcmVhdGVyVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNjYwMDE0MDgxfX19XX0_'
+
+            srcImage = 'https://heatmap-external-a.strava.com/tiles-auth/all/hot/'+ zoom +'/'+tile.x+'/'+ tile.y+'.png?px=256&'+ queryString;
+
+        }
+        else if(1) {
+            // srcImage = strava_url + '?z=' + zoom +
+            //     '&x=' + tile.x +
+            //     '&y=' + tile.y +
+            //     '&px=256'+
+            //     '&Signature='+ last_strava_cookie["CloudFront-Signature"] +
+            //     '&KeyPairId='+last_strava_cookie["CloudFront-Key-Pair-Id"] +
+            //     '&Policy=' + last_strava_cookie["CloudFront-Policy"]
+            srcImage = 'https://gpxlab.ru/app/php/app.strava.php?z=' + zoom +
                 '&x=' + tile.x +
                 '&y=' + tile.y
                 // + '&heat_activities_type=' + model.param.heat_map.heat_activities_type
                 // + '&heat_color=' + model.param.heat_map.heat_color
                 + '&hist=' + this.overlayName;
-        }
+                }
         else
         {
             const [ms,me] = this.overlayName.split("_")
@@ -103,6 +167,7 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
         }
 
         divTile.style.backgroundImage = "url('" + srcImage + "')";
+        // divTile.innerHTML = overlayName;
     }
 
     return divTile;

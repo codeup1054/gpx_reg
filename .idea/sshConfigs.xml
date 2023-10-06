@@ -2,7 +2,12 @@
 <project version="4">
   <component name="SshConfigs">
     <configs>
-      <sshConfig authType="PASSWORD" host="31.31.196.98" id="42387d1f-602b-41c2-bd89-211748d169bf" port="22" nameFormat="DESCRIPTIVE" username="u1371051" />
+      <sshConfig authType="PASSWORD" host="31.31.196.98" id="42387d1f-602b-41c2-bd89-211748d169bf" port="22" customName="u1371051@31.31.196.98:22" nameFormat="CUSTOM" username="u1371051">
+        <option name="customName" value="u1371051@31.31.196.98:22" />
+      </sshConfig>
+      <sshConfig authType="PASSWORD" host="31.31.196.98" id="6e3779ec-f705-45cf-99d6-649d49a413fc" port="22" customName="u1371051@31.31.196.98:22     2023-03-25 new" nameFormat="CUSTOM" username="u1371051">
+        <option name="customName" value="u1371051@31.31.196.98:22     2023-03-25 new" />
+      </sshConfig>
     </configs>
   </component>
 </project>

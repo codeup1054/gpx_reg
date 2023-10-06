@@ -28,13 +28,11 @@ let mod = model
 
 window.param = model.get();
 
-console.log("@@ model app.js", param)
+// console.log("@@ model app.js", param)
 
 import '/js/jquery/jquery.js'
 import '/js/cookie/jquery.cookie.js'
 import {clearCookie} from '/app/map/map.location.cookie.js?2'
-
-console.log ("@@ clearCookie")
 
 import {initMap, setMapStyler} from '/app/map/map.init.js?1'
 import {mapOverlay,MERCATOR} from '/app/map/map.overlay.js?1'
@@ -67,8 +65,8 @@ function sync_import()
             mapControls.add_cache_control()
             mapInformer.add()
             mapControls.add_layers_controls()
-            mapEvents.add()
-
+            mapControls.add_geozone_control()
+            mapControls.add_polyline_control()
         }
     })
 }

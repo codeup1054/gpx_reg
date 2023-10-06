@@ -20,21 +20,20 @@
 
 <script type="module">
 </script>
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqtLzdiGvGIu85wF1C7w4UKdUncnwgF0M">
+<script async defer type = "text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqtLzdiGvGIu85wF1C7w4UKdUncnwgF0M&libraries=drawing">
 </script>
+
+<!--<script type="text/javascript"-->
+<!--        src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing"></script>-->
+<!--</script>-->
 
 
 <script id="app" type="module"  src="app/app.js?2"></script>
 
 
-
 <div id="debug" class="hide" style="position:fixed; height:150px; top:80%;"><div slider1>w</div><button onclick='$("#debug").addClass("hide");'>Закрыть</button></div>
-<script>
 
-
-
-</script>
 
 </body>
 </html>

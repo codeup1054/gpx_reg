@@ -51,9 +51,6 @@ br1, .color, .lat, .lng, .time, .color, .idx
 
 
 
-
-
-
 .baloon, .baloon input
 {
     font-size: 8px;
@@ -540,9 +537,20 @@ span.ui-state-active
 div.custom-map-control-div
 {
     padding: 3px 0px;
-    height: 30px !important;
-
+    min-height: 30px !important;
 }
+
+div.custom-map-control-div.h200
+{
+    padding: 3px 0px;
+    min-height: 75px !important;
+    min-width: 200px !important;
+}
+
+.hflex { height: auto !important; }
+.vflex { width: auto !important;  }
+
+
 div.custom-map-control-div div
 {
     padding: 0px 4px;

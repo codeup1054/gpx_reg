@@ -2,15 +2,15 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="ce4da9d6-437c-4e02-8766-fff540c4a153" name="gpxlab_reg" url="http://gpxlab.ru">
-        <fileTransfer rootFolder="/var/www/u1371051/data" accessType="SFTP" host="31.31.196.98" port="22" sshConfigId="42387d1f-602b-41c2-bd89-211748d169bf" sshConfig="u1371051@31.31.196.98:22 password">
+      <webServer id="478b93de-d92a-42fb-ba3f-f5ec6d4957b1" name="noto" url="http://notorestaurant.com">
+        <fileTransfer rootFolder="/var/www/vhosts/notorestaurant.com" accessType="SFTP" host="31.31.196.98" port="22" sshConfigId="6e3779ec-f705-45cf-99d6-649d49a413fc" sshConfig="u1371051@31.31.196.98:22     2023-03-25 new">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
         </fileTransfer>
       </webServer>
-      <webServer id="478b93de-d92a-42fb-ba3f-f5ec6d4957b1" name="noto" url="http://notorestaurant.com">
-        <fileTransfer rootFolder="/var/www/vhosts/notorestaurant.com" accessType="SFTP" host="31.31.196.98" port="22" sshConfigId="42387d1f-602b-41c2-bd89-211748d169bf" sshConfig="u1371051@31.31.196.98:22 password">
+      <webServer id="5113e50f-3409-43aa-981e-224a454efa40" name="gpxlab" url="http://31.31.196.98">
+        <fileTransfer rootFolder="/www/gpxlab.ru" accessType="FTPS" host="31.31.196.98" port="21">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

@@ -4,12 +4,17 @@ export function initMap(param) {
 
     // console.log ("@@ initMap param 2", param)
 
+
+
     const mapOptions = {
         zoom: param.zoom || 11,
         center: new google.maps.LatLng(param.homeGeo.lat, param.homeGeo.lng),
+        scaleControl: true,
     };
 
     let map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+
     param.map = map
     window.map = map
 
@@ -118,22 +123,23 @@ export function initMap(param) {
     }
 
 
-
     addMapListener(param);
 
     return map;
 }
 
+
+
+
+
 export function setMapStyler(param) {
 
     const lightness = param.mapLightess
-
     const mapStyles = [{
         "stylers": [{
             "lightness": 2 * lightness - 90
         }]
     }];
-
     map.setOptions({styles: mapStyles});
 }
 
@@ -164,6 +170,30 @@ function addMapListener(param) {
         $('lng').html(lng);
         // console.log("@@ lng ",lng,lat);
     });
+
+
+    // define getBounds
+
+    if (!google.maps.Polyline.prototype.getBounds)
+        google.maps.Polyline.prototype.getBounds = function() {
+
+            var bounds = new google.maps.LatLngBounds();
+
+            this.getPath().forEach( function(latlng) { bounds.extend(latlng); } );
+
+            return bounds;
+        }
+
+    google.maps.Polyline.prototype.inKm = function(n) {
+        var a = this.getPath(n),
+            len = a.getLength(),
+            dist = 0;
+        for (var i = 0; i < len - 1; i++) {
+            dist += google.maps.geometry.spherical.computeDistanceBetween(a.getAt(i), a.getAt(i + 1));
+        }
+        return dist / 1000;
+    }
+
 }
 
 

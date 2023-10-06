@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>z16_МКАД_5км </name>
+    <Style id="poly-CE93D8-1200-77-nodesc-normal">
+      <LineStyle>
+        <color>ff9953aa</color>
+        <width>1.2</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>4dd893ce</color>
+        <fill>1</fill>
+        <outline>1</outline>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="poly-CE93D8-1200-77-nodesc-highlight">
+      <LineStyle>
+        <color>ffd893ce</color>
+        <width>1.8</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>4dd893ce</color>
+        <fill>1</fill>
+        <outline>1</outline>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="poly-CE93D8-1200-77-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#poly-CE93D8-1200-77-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#poly-CE93D8-1200-77-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Placemark>
+      <name>z15_МКАД_5км</name>
+      <styleUrl>#poly-CE93D8-1200-77-nodesc</styleUrl>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <tessellate>1</tessellate>
+            <coordinates>
+              37.3248035,55.8655966,0
+              37.2971616,55.8054406,0
+              37.1780806,55.7217486,0
+              37.1270495,55.6565885,0
+              37.1773424,55.578837,0
+              37.273305,55.4702079,0
+              37.3365676,55.4239128,0
+              37.4182462,55.4024749,0
+              37.5385574,55.4028011,0
+              37.6101195,55.4178906,0
+              37.6935321,55.504055,0
+              37.8308612,55.5732149,0
+              37.9316828,55.6464509,0
+              37.9256182,55.7312801,0
+              37.8926593,55.8894779,0
+              37.7801571,55.9852946,0
+              37.6159412,56.001754,0
+              37.5444469,56.0037202,0
+              37.4661397,55.9741524,0
+              37.3248035,55.8655966,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Document>
+</kml>

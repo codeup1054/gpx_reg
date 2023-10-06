@@ -104,7 +104,7 @@ function overlayClickListener(overlay) {
     });
 }
 
-google.maps.event.addDomListener(window, 'load', initialize);
+// google.maps.event.addDomListener(window, 'load', initialize);
 
 function copyTextToClipBoard(text) {
 
@@ -291,12 +291,16 @@ function addVertix(polygon_path,globalPolyId)
     }
 }
 
-function controlPanel() {
+export function controlPanel(parent_element) {
+
+
+    console.log ("@@ contrlPanel", $("#control_panel").innerHTML);
 
     /** 2021-11-18 чтение полигонов из файла*/
 
+
     const polyLoaderBtn = '<input type="button" value="polyloader" id="polyloader" />';
-    $("#control_panel").append(polyLoaderBtn)
+    parent_element.append(polyLoaderBtn)
 
     $('#polyloader').on('click', (e) => {
         polyLoaderFile()
@@ -305,10 +309,10 @@ function controlPanel() {
 
     /** 2021-11-18 копирование в буфер обмена*/
 
-    const textresTxt = `<div><button textresBtnCopy>CopyToClbrd</button></br>
-                        <textarea id="textres"></textarea></div>`;
+    const textresTxt = `<button textresBtnCopy>CopyTo</button>
+                        <textarea id="textres"></textarea>`;
 
-    $("#control_panel").append(textresTxt)
+    parent_element.append(textresTxt)
 
 
     $('[textresBtnCopy]').on('click', () => {

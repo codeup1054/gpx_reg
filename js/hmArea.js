@@ -34,7 +34,7 @@ let param
 
 let arrOpacity =
     {
-        'map': 0.2,
+        'now': 0.2,
         '2021-08': 0.5,
         '2021-06': 0.7
     }
@@ -60,7 +60,7 @@ $(document).ready(function () {
                 zoom: 11,
                 opacity: {},
                 controls: {
-                    tileDetails: 1,
+                    tileDetails: 0,
                     zoom_depth: $("#zoom_depth").val() * 1
                 }
             }

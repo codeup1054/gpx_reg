@@ -1,5 +1,10 @@
 import {ifMapChanged} from "/app/map/map.location.cookie.js";
 import {MERCATOR} from '/app/map/map.overlay.js?1'
+import {polyLoader} from "../polygon_test/polyloader.js";
+import {controlPanel} from "../polygon_test/app.polygon_test.js";
+import {geoZoneTools} from "./controls/geo_zones.js";
+import {polylineTools} from "./controls/gpx.polyline.edit.js";
+
 // import {USGSOverlay} from "/app/map/map.usgsoverlay.js";
 
 const hm_tiles ={}
@@ -74,8 +79,7 @@ export let mapControls = {
         let controlHTML = ""
 
         // let defaultMonth = Object.keys(param.mapOverlays)
-        
-        
+
         console.log ("@@ Object.keys(param.mapOverlays)",Object.keys(param.mapOverlays))
 
         let defaultMonth = ['2021-08'] //['2021-08','2021-11']
@@ -139,7 +143,19 @@ export let mapControls = {
         mapCtrl.innerHTML = "<div class='slider_control' style='height:100px;'>" + controlHTML + "</div>"
 
         p.map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl);
+    },
+
+    add_geozone_control: function(mapCtrl)
+    {
+        let p = param
+        geoZoneTools({}, mapCtrl, p.map);
+    },
+
+    add_polyline_control: function(mapCtrl)
+    {
+        polylineTools();
     }
+
 }
 
 
@@ -182,7 +198,7 @@ function addSlider() {
                 } else {
                     $('.' + target).css('opacity', tval/100);
                     // $('.map-tile').css('opacity', tval/100);
-                    // console.log ("@@ arrOpacity1",[target,tval,$('.map-tile'), $('.' + target).css('opacity')])
+                    // console.log ("@@ arrOpacity1",[target,tval, $('.' + target).css('opacity')])
                 }
 
                 $('[target=' + sliderId + '] span.ui-slider-handle').html("<div>" + tval + "</div>");
