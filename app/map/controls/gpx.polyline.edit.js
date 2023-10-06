@@ -363,23 +363,6 @@ function new_markers(id)
 
             po = p;
 
-            const icon = {
-                path: 'M-20,0a20,20 0 1,0 40,0a20,20 0 1,0 -40,0',
-                fillColor: _geos[id].meta.color,
-                fillOpacity: .6,
-                anchor: new google.maps.Point(0,0),
-                strokeWeight: 0,
-                scale: 1
-            }
-
-            // <circle stroke="${_geos[id].meta.color}" opacity="0.5" fill="#fff" cx="21" cy="21" r="20"/>
-            // <rect width="36" height="18"
-            //       opacity="0.7"
-            //       rx="5" ry="5"
-            //       style="fill:rgb(255,255,255);
-            //         stroke-width:1;
-            //         stroke:${_geos[id].meta.color}" />
-
             const svg_width = total_dist.toFixed(2).length*8;
 
 
