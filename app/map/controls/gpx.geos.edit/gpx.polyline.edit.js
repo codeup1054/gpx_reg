@@ -1,9 +1,14 @@
+// 2023-10-07 add Geos form
 // 2023-09-28 https://github.com/zhenyanghua/MeasureTool-GoogleMaps-V3
 // 2023-09-27  https://www.youtube.com/watch?v=nUdt9aMcg0M
 
+import {geoZoneTools} from "./controls/geo_zones.js";
+
+
 let mapObjects = {
     polyLines: {},
-    markers: {}
+    markers: {},
+    polyPoints:{}
 };
 
 function distance(lat1, lon1, lat2, lon2, precision = 3, unit = "K") {
@@ -71,6 +76,8 @@ export async function polylineTools() {
     mapCtrl.appendChild(polyLineTable);
 
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl)
+
+    // google.maps.event.clearListeners(map, 'click');
 
     waitElement("#polylineTools", 1, drawPolyLineTable, 0)
 
@@ -195,6 +202,7 @@ function setActive(_eid,e = null){
     console.log("@@ ",_geos);
 
     showPolyLineOnMap();
+    mileage_markers();
 }
 
 function addAction() {
@@ -273,6 +281,7 @@ function addAction() {
 let action = {
     save: function (_eid) {
         console.log("@@ _action save", _eid)
+        updateGeos(_geos[_eid]);
     },
     cancel: function (_eid) {
         console.log("@@ _action cancel", _eid)
@@ -292,53 +301,48 @@ let action = {
 function showPolyLineOnMap() {
 
     Object.keys(_geos).map((id) => {
-        console.log("@@ 01. showPolyLineOnMap", id, _geos, mapObjects.polyLines);
+        console.log("@@ 01. showPolyLineOnMap", id, _geos, mapObjects.polyLines[id]);
 
         if (_geos[id].showOnMap) {
+            if (mapObjects.polyLines[id] !== undefined)
+                mapObjects.polyLines[id].setMap(null);
 
-            if (mapObjects.polyLines[id] === undefined) {
+            if (mapObjects.polyLines[id] === undefined || 1) {
                 let polyOption = {
                     geodesic: true,
                     strokeColor: _geos[id].meta.color,
                     strokeWeight: 3,
+                    map:map,
                     path: _geos[id].geojson.map(p => {
                         return {lat: p[0], lng: p[1]}
                     })
                 };
 
-
-
                 mapObjects.polyLines[id] = new google.maps.Polyline(polyOption);
+                mapObjects.polyLines[id].setEditable(_geos[id].active);
 
                 mapObjects.polyLines[id].addListener("click", (e) => {
                     console.log("@@ polyLines click");
                     setActive(id,false);
                 });
-                mapObjects.polyLines[id].getPath().addListener("insert_at", (e) => {
-                    _geos[id].geojson = mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
-                    drawPolyLineTable();
-                });
 
-                ['remove_at', 'set_at'].map((event) => {
+
+                ['remove_at', 'set_at', 'dragend',"insert_at"].map((event) => {
                         mapObjects.polyLines[id].getPath().addListener(event, e => {
                             _geos[id].geojson = mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
+                            console.log("@@ event",event);
                             drawPolyLineTable();
+                            mileage_markers();
                         })
                     }
                 );
+
             }
 
-            Object.keys(mapObjects.markers).map(id => {
-                 mapObjects.markers[id].map(m=>m.setMap(null))
-            });
+            else
+            {console.log("@@ else ",id, mapObjects.polyLines[id].getPath().length);}
 
-           if (_geos[id].active)  //  || _geos[id].showDistance
-               new_markers(id)
-
-            mapObjects.polyLines[id].setEditable(_geos[id].active);
-            mapObjects.polyLines[id].setMap(map);
             // console.log("@@ 11 geoLayers.mapPolylines[id]", id, newPoly);
-
 
         } else {
             if (mapObjects.polyLines[id] !== undefined)
@@ -351,50 +355,117 @@ function showPolyLineOnMap() {
 
 } //>>> showPolyLineOnMap
 
+function createPolyLine() {
 
-function new_markers(id)
+    const id = Math.max(...Object.keys(_geos).map(k => _geos[k].id))+1
+
+    _geos[id] = {
+        id: id,
+        name: 'new',
+        desc: 'new 2',
+        meta: {color: '#ff22bbaa'},
+        geojson: [],
+        showOnMap: true,
+    }
+
+    drawPolyLineTable();
+    setActive(id);
+
+    let polyOption = {
+        geodesic: true,
+        strokeColor: '#ff22bbaa',
+        strokeOpacity: 0.9,
+        strokeWeight: 3,
+        map:map,
+        editable: true
+    }
+
+    console.log("@@ 02 polyOption, newGeosPoly", _geos, polyOption);
+
+    google.maps.event.addListener(map, "click", (e) => {
+        console.log("@@ 07 click",e.latLng);
+        const id = Object.entries(_geos).find(item => item[1].active == true)[0];
+
+        _geos[id].geojson.push([e.latLng.lat(), e.latLng.lng()]);
+        showPolyLineOnMap();
+        drawPolyLineTable();
+        mileage_markers();
+    });
+    // showPolyLineOnMap();
+
+}
+
+function mileage_markers()
 {
-        let po;
-        let dist = 0;
-        let total_dist = 0;
+    let po;
+    let dist = 0;
+    let total_dist = 0;
 
-        mapObjects.markers[id] = _geos[id].geojson.map((p,i) => {
-            if (i > 0) total_dist += distance(po[0],po[1],p[0],p[1]);
+    Object.keys(mapObjects.markers).map(id => {
+        mapObjects.markers[id].map(m=>m.setMap(null));
+        mapObjects.markers[id] = [];
+    });
 
-            po = p;
-
-            const svg_width = total_dist.toFixed(2).length*8;
+    let id = Object.entries(_geos).find(item => item[1].active == true)[0];
 
 
-            const svg = `<?xml version="1.0"?>
-                    <svg width="${svg_width}px" height="15px" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    mapObjects.markers[id] = [];
 
-                    <text x="5" y="14" 
-                    font-size="13" 
-                    font-family="Helvetica, sans-serif"
-                    
-                    style="
-                    font-weight:bold;
-                    paint-order: stroke;
-                    fill:${_geos[id].meta.color};
-                    stroke:rgb(255,255,255);
-                    stroke-width:3;">${total_dist.toFixed(2)}</text>
-                    </svg>`;
+    _geos[id].geojson.map((p,i) => {
 
-            const svg_icon = {
-                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-                anchor: new google.maps.Point(7, 22),
-            }
+        if (i > 0) total_dist += distance(po[0],po[1],p[0],p[1]);
+        po = p;
 
-            let markerOption = {
-                position: {lat: p[0], lng: p[1]},
-                map: map,
-                title: total_dist.toFixed(2),
-                icon: svg_icon
-            }
+        // console.log("@@ >>> mileage_markers()",id, _geos[id], mapObjects.markers[id]);
 
-            return new google.maps.Marker(markerOption);
-        })
+        const svg_width = total_dist.toFixed(2).length*8;
+
+        const svg = `<?xml version="1.0"?>
+                <svg width="${svg_width}px" height="15px" version="1.1" xmlns="http://www.w3.org/2000/svg">
+
+                <text x="5" y="14" 
+                font-size="13" 
+                font-family="Helvetica, sans-serif"
+                
+                style="
+                font-weight:bold;
+                paint-order: stroke;
+                fill:${_geos[id].meta.color};
+                stroke:rgb(255,255,255);
+                stroke-width:3;">${total_dist.toFixed(2)}</text>
+                </svg>`;
+
+        const svg_icon = {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+            anchor: new google.maps.Point(7, 22),
+        }
+
+
+        let markerOption = {
+            position: {lat: p[0], lng: p[1]},
+            map: map,
+            title: `${p[0].toFixed(3)}, ${p[1].toFixed(3)}`, // {total_dist.toFixed(2)},
+            icon: svg_icon
+        }
+
+        const marker = new google.maps.Marker(markerOption);
+
+        mapObjects.markers[id].push( marker);
+
+        google.maps.event.addListener(marker, 'click', function (event) {
+            console.log("@@ delete marker",id,i);
+            mapObjects.markers[id][i].setMap(null);
+            mapObjects.markers[id].splice(i, 1);
+            _geos[id].geojson.splice(i, 1);
+            mapObjects.polyLines[id].getPath().removeAt(i);
+        });
+
+
+        // console.log("@@ mileage_markers() markerOption=",id, markerOption, new_marker);
+
+    })
+
+
 }
 
 function getGeos(geo_type = 'polyline') {
@@ -412,57 +483,7 @@ function getGeos(geo_type = 'polyline') {
 
 }
 
-function createPolyLine() {
-    // const _map = param.map;
-    const id = Math.max(...Object.keys(_geos).map(k => _geos[k].id))+1
-    _geos[id] = {
-        id: id,
-        name: 'new',
-        desc: 'new 2',
-        meta: {color: '#ff22bbaa'},
-        geojson: [],
-        showOnMap: true
-    }
 
-    drawPolyLineTable();
-
-    let polyOption = {
-        geodesic: true,
-        strokeColor: '#ff22bbaa',
-        strokeOpacity: 0.9,
-        strokeWeight: 3,
-        editable: true
-    }
-
-    console.log("@@ 02 polyOption, newGeosPoly", _geos, polyOption);
-
-    // geoLayers.mapPolylines[id] = new google.maps.Polyline(polyOption);
-    mapObjects.polyLines[id] = new google.maps.Polyline(polyOption);
-    mapObjects.polyLines[id].setMap(map);
-    setActive(id);
-
-    google.maps.event.addListener(map, "click", (e) => {
-        mapObjects.polyLines[id].getPath().push(e.latLng);
-
-        console.log("@@ 03 event click", _geos, "\n***", mapObjects.polyLines[id].getPath(), e.latLng);
-
-        _geos[id].geojson = mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
-
-        if (_geos[id].geojson.length > 2) {
-
-            console.log("@@ > 2 createPolyLine ", _geos[id]);
-
-            drawPolyLineTable();
-            return;
-        }
-
-        // newPolyLine.getPath().addListener( "insert_at", polyLineAfterDraw(id));
-        // newPolyLine.getPath().addListener( "set_at", polyLineAfterDraw(id));
-    });
-
-    // showPolyLineOnMap();
-    // poly.setMap(null);
-}
 
 
 function apiRequest(req) {
@@ -482,7 +503,9 @@ function apiRequest(req) {
 
 
 function updateGeos(geodata) {
-    let xhr = new XMLHttpRequest();
+    let xhr = new XMLHttpRequest()+;
+
+    console.log("@@ update Geos");
 
     let body = {
         id: 1,

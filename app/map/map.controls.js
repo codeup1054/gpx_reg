@@ -3,7 +3,7 @@ import {MERCATOR} from '/app/map/map.overlay.js?1'
 import {polyLoader} from "../polygon_test/polyloader.js";
 import {controlPanel} from "../polygon_test/app.polygon_test.js";
 import {geoZoneTools} from "./controls/geo_zones.js";
-import {polylineTools} from "./controls/gpx.polyline.edit.js";
+import {polylineTools} from "./controls/gpx.geos.edit/gpx.polyline.edit.js";
 
 // import {USGSOverlay} from "/app/map/map.usgsoverlay.js";
 
