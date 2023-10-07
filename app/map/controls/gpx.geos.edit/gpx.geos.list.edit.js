@@ -2,7 +2,7 @@
 // 2023-09-28 https://github.com/zhenyanghua/MeasureTool-GoogleMaps-V3
 // 2023-09-27  https://www.youtube.com/watch?v=nUdt9aMcg0M
 
-import {geoZoneTools} from "./controls/geo_zones.js";
+import {geoForm} from "./gpx.geos.form.js";
 
 
 let mapObjects = {
@@ -79,11 +79,11 @@ export async function polylineTools() {
 
     // google.maps.event.clearListeners(map, 'click');
 
-    waitElement("#polylineTools", 1, drawPolyLineTable, 0)
+    waitElement("#polylineTools", 1, initGeoEdit, 0)
 
 }
 
-function waitElement(selector, time, callback = drawPolyLineTable, lap = 0) {
+function waitElement(selector, time, callback = initGeoEdit, lap = 0) {
     if (document.querySelector(selector) != null) {
         console.log("@@ lap", lap);
         callback();
@@ -124,7 +124,17 @@ function zoom_polyline(_eid) {
 }
 
 
-function drawPolyLineTable() {
+function initGeoEdit()
+{
+    drawPolyLineTable();
+    addMapListener();
+    showPolyLineOnMap();
+    showMileageMarkers();
+
+    // waitElement("#polyLineTable", 1, addAction, 0)
+}
+
+function drawPolyLineTable(callback = addAction) {
 
     let rows = `<tr>
         <td>ID</td>
@@ -176,8 +186,8 @@ function drawPolyLineTable() {
 
     $("#polyLineTable").html(rows);
 
-    showPolyLineOnMap();
-    addAction();
+    if(callback) callback();
+
     // console.log("@@ polylineList _geos e =", _geos);
 }
 
@@ -202,10 +212,27 @@ function setActive(_eid,e = null){
     console.log("@@ ",_geos);
 
     showPolyLineOnMap();
-    mileage_markers();
+    showMileageMarkers();
+}
+
+
+function addMapListener()
+{
+    // 05. 2023-10-07 add point on polyline
+
+    google.maps.event.addListener(map, "click", (e) => {
+        console.log("@@ 07. click",e.latLng);
+        const id = Object.entries(_geos).find(item => item[1].active == true)[0];
+        _geos[id].geojson.push([e.latLng.lat(), e.latLng.lng()]);
+        showPolyLineOnMap();
+        drawPolyLineTable();
+        showMileageMarkers();
+    });
+
 }
 
 function addAction() {
+
 
     // 04. 2023-10-05 select row and set mapGeo active
 
@@ -301,7 +328,7 @@ let action = {
 function showPolyLineOnMap() {
 
     Object.keys(_geos).map((id) => {
-        console.log("@@ 01. showPolyLineOnMap", id, _geos, mapObjects.polyLines[id]);
+        // console.log("@@ 01. showPolyLineOnMap", id, _geos, mapObjects.polyLines[id]);
 
         if (_geos[id].showOnMap) {
             if (mapObjects.polyLines[id] !== undefined)
@@ -332,7 +359,7 @@ function showPolyLineOnMap() {
                             _geos[id].geojson = mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
                             console.log("@@ event",event);
                             drawPolyLineTable();
-                            mileage_markers();
+                            showMileageMarkers();
                         })
                     }
                 );
@@ -382,20 +409,12 @@ function createPolyLine() {
 
     console.log("@@ 02 polyOption, newGeosPoly", _geos, polyOption);
 
-    google.maps.event.addListener(map, "click", (e) => {
-        console.log("@@ 07 click",e.latLng);
-        const id = Object.entries(_geos).find(item => item[1].active == true)[0];
 
-        _geos[id].geojson.push([e.latLng.lat(), e.latLng.lng()]);
-        showPolyLineOnMap();
-        drawPolyLineTable();
-        mileage_markers();
-    });
     // showPolyLineOnMap();
 
 }
 
-function mileage_markers()
+function showMileageMarkers()
 {
     let po;
     let dist = 0;
@@ -503,7 +522,7 @@ function apiRequest(req) {
 
 
 function updateGeos(geodata) {
-    let xhr = new XMLHttpRequest()+;
+    let xhr = new XMLHttpRequest();
 
     console.log("@@ update Geos");
 

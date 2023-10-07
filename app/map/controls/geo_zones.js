@@ -8,11 +8,43 @@ let geoZones = [
 
 let ctaLayer = {};
 
+
 let _map;
 
-let geoZonesShowHide = function ()
+export function geoZoneTools() {
+
+    // console.log("@@  routeTools 01", param);
+    // _map = param.map;
+    let mapCtrl = document.createElement("div");
+    mapCtrl.classList.add("custom-map-control");
+    // param.map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl);
+
+    console.log("@@ 08. geoZoneTools");
+
+    let htmL = "";
+
+    htmL += `<div id=control_panel class="custom-map-control">Routes, Zones</div>`;
+    htmL += ['Добавить', 'Изменить', 'Скачать'].map( b => `<button>${b}</button>`).join("");
+    mapCtrl.innerHTML = htmL;
+
+    geoZones.map((b, i) => {
+        const row = document.createElement("div");
+        row.innerHTML = `<div id="${i}" class="gpx-tb-row">${b}</div>`;
+        row.addEventListener("click", (e) => {
+            console.log("@@ 09. listener geoZonesShowHide ");
+            geoZonesShowHide(i);
+        });
+        mapCtrl.appendChild(row);
+    });
+
+    // .on('click',geoZonesShowHide);
+
+    return mapCtrl;
+}
+
+
+let geoZonesShowHide = function (zoneId)
 {
-    const zoneId = this.id;
 
     console.log("@@ 0", [zoneId, ctaLayer, param.map, _map]);
 
@@ -51,55 +83,4 @@ let geoZonesShowHide = function ()
 }
 
 
-export function geoZoneTools(params, mapCtrl_, map_) {
 
-    console.log("@@  routeTools 01", param);
-
-    _map = param.map;
-
-    let mapCtrl = document.createElement("div");
-
-    mapCtrl.classList.add("custom-map-control-div");
-
-    param.map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl);
-
-    let buttons = ['Добавить', 'Изменить', 'Скачать']
-
-    const htmButtons  = buttons.map( b => `<button>${b}</button>`).join("");
-
-    mapCtrl.innerHTML = `<div id=control_panel>Routes, Zones</div>${htmButtons}`;
-
-    geoZones.map((b, i) => {
-        const geoRow = document.createElement("div")
-        geoRow.innerHTML = `${b}`;
-        geoRow.onclick = geoZonesShowHide;
-        geoRow.id = i;
-        geoRow.classList.add("row-gray");
-        mapCtrl.appendChild(geoRow);
-        }
-    );
-
-    mapCtrl.classList.add("hflex");
-
-
-    // const polyline = new google.maps.Polyline({
-    //     map: p.map,
-    //     path: [
-    //         new google.maps.LatLng(55.77153,37.97722),
-    //         new google.maps.LatLng(55.87803,38.86657)
-    //     ]
-    // });
-
-
-    // for( let i in geoZones) {
-    //
-    //     const geoZone = `https://gpxlab.ru/app/geodata/kml/${geoZones[i]}`;
-    //     ctaLayer[i] = new google.maps.KmlLayer({
-    //         url: geoZone,
-    //         map: p.map,
-    //     });
-    //     console.log(`@@ geodata = `, geoZone, ctaLayer);
-    // }
-
-    // controlPanel($(mapCtrl)) ;
-}

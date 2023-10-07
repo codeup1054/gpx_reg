@@ -4,12 +4,35 @@ export function initMap(param) {
 
     // console.log ("@@ initMap param 2", param)
 
-
-
     const mapOptions = {
         zoom: param.zoom || 11,
         center: new google.maps.LatLng(param.homeGeo.lat, param.homeGeo.lng),
         scaleControl: true,
+
+        streetViewControl: true,
+        streetViewControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: google.maps.ControlPosition.RIGHT_BOTTOM,
+        },
+
+        mapTypeControlOptions: {
+            // style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: google.maps.ControlPosition.RIGHT_TOP,
+            mapTypeIds: ["roadmap", "terrain", "satellite", "hybrid"],
+        },
+
+        zoomControl: true,
+        zoomControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_BOTTOM,
+        },
+
+        fullscreenControl: false,
+        fullscreenControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_BOTTOM,
+        },
+
+
     };
 
     let map = new google.maps.Map(document.getElementById('map'), mapOptions);
@@ -127,9 +150,6 @@ export function initMap(param) {
 
     return map;
 }
-
-
-
 
 
 export function setMapStyler(param) {

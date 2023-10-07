@@ -1,16 +1,54 @@
 import {ifMapChanged} from "/app/map/map.location.cookie.js";
 import {MERCATOR} from '/app/map/map.overlay.js?1'
-import {polyLoader} from "../polygon_test/polyloader.js";
-import {controlPanel} from "../polygon_test/app.polygon_test.js";
 import {geoZoneTools} from "./controls/geo_zones.js";
-import {polylineTools} from "./controls/gpx.geos.edit/gpx.polyline.edit.js";
+import {polylineTools} from "./controls/gpx.geos.edit/gpx.geos.list.edit.js";
+
+
+let cssId = 'myCss';  // you could encode the css path itself to generate id..
+if (!document.getElementById(cssId))
+{
+    let head  = document.getElementsByTagName('head')[0];
+    let link  = document.createElement('link');
+    link.href = 'app/map/map.controls.css';
+    link.type = 'text/css';
+    link.id   = cssId;
+    link.rel  = 'stylesheet';
+    link.media = 'all';
+    head.appendChild(link);
+    console.log("@@ 08. init css");
+}
 
 // import {USGSOverlay} from "/app/map/map.usgsoverlay.js";
 
 const hm_tiles ={}
 
 
+function add_geo_zones() {
+    const customControlPanel = $("<div/>", {
+        "class": "custom-map-control",
+        "css": {"border": "red 1px solid;"}
+    });
+    customControlPanel.text("13`13`1");
+    return customControlPanel
+}
+
+
 export let mapControls = {
+    add_custom_control_panel: function () {
+        // console.log("@@ add_custom_control_panel ");
+        // const customControlPanel = $("<div/>", {
+        //         "class": "custom-map-control-button-panel",
+        //         "css": {"border": "red 1px solid;"}
+        //     }
+        // );
+        const customControlPanel = document.createElement("div");
+
+        customControlPanel.appendChild(geoZoneTools()) ;
+
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(customControlPanel);
+
+    },
+
     add_cache_control: function () {
 
         const hmAreaButton = document.createElement("button");
@@ -22,6 +60,7 @@ export let mapControls = {
             // console.log("@@ zoom depth=", map.getZoom(), z, $("#zoom_depth").val())
             hm_area(map_bounds, z)
         });
+
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(hmAreaButton);
 
 

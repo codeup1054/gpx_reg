@@ -538,6 +538,7 @@ div.custom-map-control-div
 {
     padding: 3px 0px;
     min-height: 30px !important;
+    display: inline;
 }
 
 div.custom-map-control-div.h200

@@ -43,6 +43,7 @@ import {mapEvents} from '/app/gpxevents.js?1'
 
 let next_script = 0;
 
+
 function sync_import()
 {
     import(gpx_js[next_script]+"?" + now).then(() => {
@@ -62,6 +63,7 @@ function sync_import()
             // console.log ("@@ param",param)
             setMapStyler(param)
             mapOverlay(param)
+            mapControls.add_custom_control_panel()
             mapControls.add_cache_control()
             mapInformer.add()
             mapControls.add_layers_controls()
