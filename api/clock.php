@@ -5,7 +5,8 @@
 function get_content($file, $url, $minutes = 30, $fn = '', $fn_args = '') {
     //vars
     $current_time = time(); $expire_time = $minutes * 60; $file_time = filemtime($file);
-    //decisions, decisions
+
+
     if(file_exists($file) && ($current_time - $expire_time < $file_time)) {
 //        echo 'returning from cached file';
         return file_get_contents($file);
@@ -14,10 +15,12 @@ function get_content($file, $url, $minutes = 30, $fn = '', $fn_args = '') {
         $content = get_url($url);
         if($fn) { $metric = $fn($content,$fn_args);
         }
-//        $content.= '<!-- cached:  '.time().'-->';
+
         file_put_contents($file,$content);
-//        file_put_contents(str_replace("yan", $current_time.'_'."yan", $file),$content);
-//        echo 'retrieved fresh from '.$url.':: '.$content;
+        file_put_contents(str_replace("yan",
+            "bu/".(new DateTime())->format("Y-m-d H-m-s").'_'."yan",
+            $file),$content);
+
         return $content;
     }
 }
@@ -38,16 +41,16 @@ function get_url($url) {
 
 
 $TWITTER_FOLLOWERS_FILE_NAME = 'cache_clock/yandex_weather_cache.json';
-$HISTORY_WEATHER_FILE_NAME = 'cache_clock/yandex_weather_history.csv';
+$HISTORY_WEATHER_FILE_NAME_CSV = 'cache_clock/yandex_weather_history.csv';
 $HISTORY_WEATHER_FILE_NAME_JSON = 'cache_clock/json_yandex_weather_history.json';
 
 $YANDEX_WEATHER_URL = 'https://api.weather.yandex.ru/v2/informers?lat=55.692&lon=37.347';
 $TWITTER_FOLLOWERS_URL = 'https://gpxlab.ru/data/yandex_weather_forecast.json';
 
 $TWITTER_FOLLOWERS = get_content($TWITTER_FOLLOWERS_FILE_NAME,$YANDEX_WEATHER_URL,
-    29,
+    30,
     'format_followers',
-    array('file'=>$HISTORY_WEATHER_FILE_NAME,
+    array('file_csv'=>$HISTORY_WEATHER_FILE_NAME_CSV,
           'file_json'=>$HISTORY_WEATHER_FILE_NAME_JSON));
 /* utility function */
 
@@ -62,10 +65,11 @@ function format_followers($content,$args) {
 
 //    print ($weather_metric);
 
+
     if($weather_metric) {
 //        $weather_metric = number_format($weather_metric,0,'',',');
-        file_put_contents($args['file'],time()."\t".$weather_metric."\n",FILE_APPEND);
-        file_put_contents($args['file_json'],"".time().":".json_encode($content).",\n",FILE_APPEND);
+        file_put_contents($args['file_csv'],(new DateTime())->format("Y-m-d H:m:s")."\t".$weather_metric."\n",FILE_APPEND);
+        file_put_contents($args['file_json'],"\"".time()."\":".json_encode($content).",\n",FILE_APPEND);
         return $weather_metric;
     }
 }

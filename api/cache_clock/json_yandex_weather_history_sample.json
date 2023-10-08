@@ -1,0 +1,77 @@
+{
+  "1696600456": {
+    "now": 1696600456,
+    "now_dt": "2023-10-06T13:54:16.452683Z",
+    "info": {
+      "url": "https:\/\/yandex.ru\/pogoda\/213?lat=55.692&lon=37.347",
+      "lat": 55.692,
+      "lon": 37.347
+    },
+    "fact": {
+      "obs_time": 1696600456,
+      "temp": 10,
+      "feels_like": 6,
+      "icon": "ovc_ra",
+      "condition": "rain",
+      "wind_speed": 5.3,
+      "wind_dir": "w",
+      "pressure_mm": 735,
+      "pressure_pa": 979,
+      "humidity": 88,
+      "daytime": "d",
+      "polar": false,
+      "season": "autumn",
+      "wind_gust": 15.6
+    },
+    "forecast": {
+      "date": "2023-10-06",
+      "date_ts": 1696539600,
+      "week": 40,
+      "sunrise": "06:42",
+      "sunset": "17:55",
+      "moon_code": 4,
+      "moon_text": "moon-code-4",
+      "parts": [
+        {
+          "part_name": "evening",
+          "temp_min": 5,
+          "temp_avg": 5,
+          "temp_max": 6,
+          "wind_speed": 5.9,
+          "wind_gust": 16.8,
+          "wind_dir": "nw",
+          "pressure_mm": 738,
+          "pressure_pa": 984,
+          "humidity": 83,
+          "prec_mm": 0.3,
+          "prec_prob": 90,
+          "prec_period": 240,
+          "icon": "ovc_-ra",
+          "condition": "light-rain",
+          "feels_like": -1,
+          "daytime": "n",
+          "polar": false
+        },
+        {
+          "part_name": "night",
+          "temp_min": 0,
+          "temp_avg": 2,
+          "temp_max": 5,
+          "wind_speed": 5,
+          "wind_gust": 13.3,
+          "wind_dir": "nw",
+          "pressure_mm": 740,
+          "pressure_pa": 986,
+          "humidity": 82,
+          "prec_mm": 0,
+          "prec_prob": 0,
+          "prec_period": 480,
+          "icon": "bkn_n",
+          "condition": "cloudy",
+          "feels_like": -4,
+          "daytime": "n",
+          "polar": false
+        }
+        }
+      }
+      }

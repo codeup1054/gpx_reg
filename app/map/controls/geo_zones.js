@@ -30,10 +30,8 @@ export function geoZoneTools() {
     geoZones.map((b, i) => {
         const row = document.createElement("div");
         row.innerHTML = `<div id="${i}" class="gpx-tb-row">${b}</div>`;
-        row.addEventListener("click", (e) => {
-            console.log("@@ 09. listener geoZonesShowHide ");
-            geoZonesShowHide(i);
-        });
+        row.onclick = geoZonesShowHide;
+        row.id = i;
         mapCtrl.appendChild(row);
     });
 
@@ -43,8 +41,9 @@ export function geoZoneTools() {
 }
 
 
-let geoZonesShowHide = function (zoneId)
+let geoZonesShowHide = function ()
 {
+    const zoneId = this.id;
 
     console.log("@@ 0", [zoneId, ctaLayer, param.map, _map]);
 
