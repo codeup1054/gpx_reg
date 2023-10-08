@@ -45,7 +45,7 @@ $graph->ClearTheme();
 //$graph->title->Set($title_text);
 //$graph->SetBox(false);
 
-$graph->SetMargin(25,110,20,10);
+$graph->SetMargin(25,120,20,10);
 
 $graph->SetBackgroundGradient('black@0','black@0',BGRAD_FRAME);
 //$graph->img->SetTransparent('black');
@@ -85,7 +85,7 @@ $per1 = array_slice (array_values($dt_ticks),
     $data_depth+6
 );
 
-$per2 = array_map( fn($v) => ($last_dt+$v)%24, range(0,24));
+$per2 = array_map( fn($v) => ($last_dt+$v+3)%24, range(0,24));
 
 $per = array_merge($per1,$per2);
 
@@ -151,9 +151,19 @@ foreach ($metrics as $i => $mk) {
             $y_max = 100;
             $y_min = 30;
             break;
+
+        case 'prec_prob':
+            $y_max = 50;
+            $y_min = 0;
+            break;
         case 'temp':
             $y_max = 30;
             $y_min = -10;
+            break;
+
+        case 'wind_speed':
+            $y_max = 10;
+            $y_min = 2;
             break;
 
         default:
@@ -200,7 +210,7 @@ foreach ($metrics as $i => $mk) {
         $graph->ynaxis[$i-1]->SetColor($axcolor[$i+1]);
         $graph->ynaxis[$i-1]->SetFont(FF_ARIAL,FS_NORMAL,$font_size);
         $graph->ynaxis[$i-1]->SetLabelAlign('left','top');
-        $graph->ynaxis[$i-1]->SetLabelFormatString("%-02.0f");
+        $graph->ynaxis[$i-1]->SetLabelFormatString("%02.0f");
         $graph->ynaxis[$i-1]->SetLabelMargin($label_margin);
 //        $graph->ynaxis[$i-1]->scale->SetGrace(50);
 
