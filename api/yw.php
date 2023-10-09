@@ -19,8 +19,8 @@ $font_size = 11;
 $label_margin = 3;
 $axis_shift = 30;
 $lw = [3,3,3,2,5,2];
-$color = ['#cba',"#f40",'#4bf',"#ef7","#3fa", "#f5e" ];
-$axcolor = ['#cba',"#f65",'#9df',"#ff9","#4fb", "#f5e"];
+$color = ['#cba',"#f24",'#4bf',"#ef7","#3fa", "#f5e" ];
+$axcolor = ['#cba',"#f44",'#9df',"#ff9","#4fb", "#f5e"];
 $metrics = ['temp','humidity','prec_prob','pressure_mm','wind_speed']; //,'prec_mm'];
 
 $title_text = (new DateTime())->format("Y-m-d H:m:s");
@@ -38,7 +38,7 @@ $metric_json_data = array_filter($metric_json_data, create_function('$value', 'r
 
 // Setup the graph https://jpgraph.net/download/manuals/chunkhtml/ch14s06.html
 $graph = new Graph(300,220);
-$graph = new Graph(450,330);
+$graph = new Graph(450,350);
 
 $graph->ClearTheme();
 
@@ -85,7 +85,7 @@ $per1 = array_slice (array_values($dt_ticks),
     $data_depth+6
 );
 
-$per2 = array_map( fn($v) => ($last_dt+$v+3)%24, range(0,24));
+$per2 = array_map( fn($v) => (($last_dt+3 + $v/2)%24), range(0,24));
 
 $per = array_merge($per1,$per2);
 
@@ -179,13 +179,13 @@ foreach ($metrics as $i => $mk) {
         $graph->SetScale('intlin',$y_min, $y_max);
         $graph->xaxis->SetTickLabels($per);
         $graph->xaxis->SetLabelSide('SIDE_BOTTOM');
-        $graph->xaxis->SetFont(FF_ARIAL,FS_NORMAL,10);
+        $graph->xaxis->SetFont(FF_ARIAL,FS_NORMAL,11);
 //        $graph->yscale->SetAutoTicks();
-        $graph->xaxis->SetColor("#fff","#fff@0");
+        $graph->xaxis->SetColor("#f35","#fff@0");
         $graph->xaxis->SetLabelAngle(45);
 //        $graph->xaxis->scale->ticks->SetTextLabelStart(10);
         $graph->xaxis->SetTextTickInterval(2,3);
-        $graph->xaxis->SetLabelMargin(15);
+        $graph->xaxis->SetLabelMargin(200);
 //        $graph->xaxis->SetTextLabelInterval(2);
 
         $graph->SetYDeltaDist($axis_shift);
@@ -198,6 +198,10 @@ foreach ($metrics as $i => $mk) {
         $graph->yaxis->SetLabelFormatString("%-01.0f");
         $graph->yaxis->SetColor($axcolor[$i+1]);
         $graph->yaxis->SetFont(FF_ARIAL,FS_NORMAL,$font_size);
+        $graph->xgrid->Show();
+        $graph->xgrid->SetColor('#333');
+        $graph->ygrid->Show();
+        $graph->ygrid->SetColor('#333');
 
     }
     else {
