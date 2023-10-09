@@ -1,17 +1,16 @@
 import {model} from '/app/const.js'
-
-
+import {mapObjects} from "../geodata/geo_model.js";
+// let _map = mapObjects._map;
 
 export function mapOverlay(param) {
 
-
-    console.log ("@@ param.mapOverlays",Object.keys(param.mapOverlays).join("_"))
+    console.log ("@@ param.mapOverlays",Object.keys(param.mapOverlays).join("_"), _map)
 
     // const layerKeys = Object.keys(param.mapOverlays)
     const layerKeys = ['2021-08'] // '2021-08'
 
     layerKeys.forEach((k) => {
-        param.map.overlayMapTypes.insertAt(0, new CoordMapType(k,''));
+        _map.overlayMapTypes.insertAt(0, new CoordMapType(k,''));
     })
 
     let d = new Date()
@@ -37,7 +36,7 @@ export function mapOverlay(param) {
 
         // console.log("@@ sig",strava_cred, queryString)
 
-        param.map.overlayMapTypes.insertAt(0, new CoordMapType(current_map, queryString));
+        _map.overlayMapTypes.insertAt(0, new CoordMapType(current_map, queryString));
 
         });
 
@@ -68,8 +67,8 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     
     // console.log("@@ this.overLay.tileInfoType",[overlayName, param.mapOverlays[overlayName]])
 
-    const overlayDetailsSwitch = (param.mapOverlays[overlayName] !== undefined)
-        ? param.mapOverlays[overlayName].overlayDetails
+    const overlayDetailsSwitch = (_param.mapOverlays[overlayName] !== undefined)
+        ? _param.mapOverlays[overlayName].overlayDetails
         : overlayDetails.TILEINFO_NO
 
     switch (overlayDetailsSwitch) {
@@ -100,8 +99,8 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
     // console.log ("@@ param.mapOverlays,overlayName",[tileHtml,param.mapOverlays])
     
 
-    divTile.style.opacity = (param.mapOverlays[overlayName] !== undefined)
-        ? param.mapOverlays[overlayName].opacity
+    divTile.style.opacity = (_param.mapOverlays[overlayName] !== undefined)
+        ? _param.mapOverlays[overlayName].opacity
         : 0.5
 
 

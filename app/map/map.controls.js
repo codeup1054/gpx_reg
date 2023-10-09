@@ -2,7 +2,9 @@ import {ifMapChanged} from "/app/map/map.location.cookie.js";
 import {MERCATOR} from '/app/map/map.overlay.js?1'
 import {geoZoneTools} from "./controls/geo_zones.js";
 import {polylineTools} from "./controls/gpx.geos.edit/gpx.geos.list.edit.js";
+import {mapObjects, geoZonesFiles,_geos}  from "/app/geodata/geo_model.js";
 
+console.log("@@ mapObjects, geoZonesFiles,_geos ",[mapObjects, geoZonesFiles,_geos]);
 
 let cssId = 'myCss';  // you could encode the css path itself to generate id..
 if (!document.getElementById(cssId))
@@ -45,7 +47,7 @@ export let mapControls = {
 
         customControlPanel.appendChild(geoZoneTools()) ;
 
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(customControlPanel);
+        _map.controls[google.maps.ControlPosition.TOP_LEFT].push(customControlPanel);
 
     },
 
@@ -56,12 +58,12 @@ export let mapControls = {
         hmAreaButton.classList.add("custom-map-control-button");
         hmAreaButton.addEventListener("click", () => {
             let map_bounds = map.getBounds()
-            let z = map.getZoom() * 1 + $("#zoom_depth").val() * 1 + 1; // addzoom
+            let z = _map.getZoom() * 1 + $("#zoom_depth").val() * 1 + 1; // addzoom
             // console.log("@@ zoom depth=", map.getZoom(), z, $("#zoom_depth").val())
             hm_area(map_bounds, z)
         });
 
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(hmAreaButton);
+        _map.controls[google.maps.ControlPosition.TOP_LEFT].push(hmAreaButton);
 
 
         const clearHMButton = document.createElement("button"); // add to map clear HM button
@@ -71,9 +73,7 @@ export let mapControls = {
             clear_hm_tiles()
         });
 
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearHMButton);
-
-        let p = param
+        _map.controls[google.maps.ControlPosition.TOP_LEFT].push(clearHMButton);
 
         // console.log ("@@ add_cache_controls",p)
 
@@ -84,7 +84,7 @@ export let mapControls = {
 
         const zoomDepthOptsSelect = ['1', '2', '3', '4','5','6'].map((v, k) => {
             return "<option value='" + k + "' " +
-                ((p.controls.zoom_depth == v) ? 'selected >' : '>') + v + "</option>"
+                ((_param.controls.zoom_depth == v) ? 'selected >' : '>') + v + "</option>"
         }).join("")
 
 
@@ -93,12 +93,12 @@ export let mapControls = {
 
         mapContrlsDiv.innerHTML = "<div class='custom-map-control-div map-controls'>" + innerHTML + "</div>"
 
-        p.map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapContrlsDiv);
+        _map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapContrlsDiv);
 
     },
 
     add_layers_controls: function () {
-        let p = param
+
 
         let mapCtrl = document.createElement("div");
         mapCtrl.classList.add("custom-map-control-div");
@@ -119,7 +119,7 @@ export let mapControls = {
 
         // let defaultMonth = Object.keys(param.mapOverlays)
 
-        console.log ("@@ Object.keys(param.mapOverlays)",Object.keys(param.mapOverlays))
+        console.log ("@@ Object.keys(param.mapOverlays)",Object.keys(_param.mapOverlays))
 
         let defaultMonth = ['2021-08'] //['2021-08','2021-11']
 
@@ -127,7 +127,7 @@ export let mapControls = {
         const overlaysDetails = Object.keys(overlayDetails)
 
         const tileOptsSelect = overlaysDetails.map((v, k) => {
-            return k + "<option value='" + v + "' " + ((p.controls.overlayDetails == k) ? 'selected >' : '>') + v.substr(9) + "</option>"
+            return k + "<option value='" + v + "' " + ((_param.controls.overlayDetails == k) ? 'selected >' : '>') + v.substr(9) + "</option>"
         })
 
 
@@ -142,13 +142,13 @@ export let mapControls = {
                 "<div target='"+v+"' class='slider' slider ></div>" +
                     "<select class='selector' map_overlay='" + k + "'>"+ monthOptsSelect + "</select>" +
                     "<select class='selector gpx-controls' id='mapOverlays' title='tile_info' " +
-                    "onchange='param.mapOverlays[k]'>" + tileOptsSelect + "</select>"
+                    "onchange='_param.mapOverlays[k]'>" + tileOptsSelect + "</select>"
                 $(".selector_" +k).val(v).change()
     })
 
         mapCtrl.innerHTML = "<div class='slider_control' style='height:100px;'>" + controlHTML + "</div>"
 
-        p.map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl);
+        _map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl);
 
         this.add_compare_control()
 
@@ -158,15 +158,10 @@ export let mapControls = {
 
     add_compare_control: function()
     {
-        let p = param
-
         let mapCtrl = document.createElement("div");
         mapCtrl.classList.add("custom-map-control-div");
 
         $("#debug").append(mapCtrl)
-
-        // console.log ("@@ defaultMonth",defaultMonth)
-
 
         const left_layer = ''
 
@@ -181,13 +176,12 @@ export let mapControls = {
 
         mapCtrl.innerHTML = "<div class='slider_control' style='height:100px;'>" + controlHTML + "</div>"
 
-        p.map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl);
+        _map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl);
     },
 
     add_geozone_control: function(mapCtrl)
     {
-        let p = param
-        geoZoneTools({}, mapCtrl, p.map);
+       geoZoneTools({}, mapCtrl, _map);
     },
 
     add_polyline_control: function(mapCtrl)
@@ -210,7 +204,7 @@ function addSlider() {
 
         // console.log("@@ addSlider k v ",[ k, v, sliderId, els, (param.mapOverlays[sliderId] !== undefined)]);
 
-        let el_opacity = (param.mapOverlays[sliderId] !== undefined ) ? param.mapOverlays[sliderId].opacity : 0.5
+        let el_opacity = (_param.mapOverlays[sliderId] !== undefined ) ? _param.mapOverlays[sliderId].opacity : 0.5
 
         $(v).slider({
             orientation: "horizontal",
@@ -230,7 +224,7 @@ function addSlider() {
             slide: function (event, ui) {
                 let tval = ui.value;
 
-                param.mapOverlays[sliderId] = {"opacity" :  tval / 100};
+                _param.mapOverlays[sliderId] = {"opacity" :  tval / 100};
 
                 if (target === 'map') {
                     setMapStyler(tval)
@@ -424,8 +418,8 @@ function setMapStyler(tval) {
         }]
     }];
 
-    // console.log("@@ mapStyles",mapStyles)
+    console.log("@@ 22 mapStyles",mapStyles)
 
-    map.setOptions({styles: mapStyles});
+    // _map.setOptions({styles: mapStyles});
 
 }

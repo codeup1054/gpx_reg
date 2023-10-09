@@ -3,13 +3,8 @@
 // 2023-09-27  https://www.youtube.com/watch?v=nUdt9aMcg0M
 
 import {geoForm} from "./gpx.geos.form.js";
+import {mapObjects, _geos}  from "/app/geodata/geo_model.js";
 
-
-let mapObjects = {
-    polyLines: {},
-    markers: {},
-    polyPoints:{}
-};
 
 function distance(lat1, lon1, lat2, lon2, precision = 3, unit = "K") {
     var radlat1 = Math.PI * lat1 / 180
@@ -27,33 +22,6 @@ function distance(lat1, lon1, lat2, lon2, precision = 3, unit = "K") {
         dist = dist * 0.8684
     }
     return dist;
-}
-
-const _geos = {
-    1: {
-        id: 1,
-        name: 'name1',
-        desc: 'Описание 1',
-        meta: {color: '#7700aa99'},
-        geojson: [[55.723, 37.45], [55.73, 37.501], [55.72, 37.51]],
-        active: true,
-        showDistance: true,
-        showOnMap: true
-    },
-    2: {
-        id: 2,
-        name: 'n2',
-        desc: 'Другой текст 2',
-        meta: {color: '#ff330099'},
-        geojson: [[55.73, 37.459], [55.710, 37.544], [55.71, 37.524]]
-    },
-    3: {
-        id: 3,
-        name: 'Путь 3',
-        desc: 'Описание 3',
-        meta: {color: '#00449999'},
-        geojson: [[55.67, 37.35], [55.70, 37.50], [55.72, 37.52]]
-    },
 }
 
 export async function polylineTools() {
@@ -75,7 +43,7 @@ export async function polylineTools() {
 
     mapCtrl.appendChild(polyLineTable);
 
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl)
+    _map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl)
 
     // google.maps.event.clearListeners(map, 'click');
 
@@ -115,12 +83,12 @@ function waitElement(selector, time, callback = initGeoEdit, lap = 0) {
 
 
 function zoom_polyline(_eid) {
-    console.log("@@ polyBound 1 =", map, param, map);
-    mapObjects.polyLines[_eid].setMap(map);
+    console.log("@@ polyBound 1 =", _map, _param);
+    mapObjects.polyLines[_eid].setMap(_map);
     const polyBound = mapObjects.polyLines[_eid].getBounds();
     console.log("@@ polyBound 2 =", polyBound, this);
     // center = bounds.getCenter();
-    map.fitBounds(polyBound);
+    _map.fitBounds(polyBound);
 }
 
 
@@ -220,7 +188,7 @@ function addMapListener()
 {
     // 05. 2023-10-07 add point on polyline
 
-    google.maps.event.addListener(map, "click", (e) => {
+    google.maps.event.addListener(_map, "click", (e) => {
         console.log("@@ 07. click",e.latLng);
         const id = Object.entries(_geos).find(item => item[1].active == true)[0];
         _geos[id].geojson.push([e.latLng.lat(), e.latLng.lng()]);
@@ -339,7 +307,7 @@ function showPolyLineOnMap() {
                     geodesic: true,
                     strokeColor: _geos[id].meta.color,
                     strokeWeight: 3,
-                    map:map,
+                    map:_map,
                     path: _geos[id].geojson.map(p => {
                         return {lat: p[0], lng: p[1]}
                     })
@@ -403,7 +371,7 @@ function createPolyLine() {
         strokeColor: '#ff22bbaa',
         strokeOpacity: 0.9,
         strokeWeight: 3,
-        map:map,
+        map:_map,
         editable: true
     }
 
@@ -462,7 +430,7 @@ function showMileageMarkers()
 
         let markerOption = {
             position: {lat: p[0], lng: p[1]},
-            map: map,
+            map: _map,
             title: `${p[0].toFixed(3)}, ${p[1].toFixed(3)}`, // {total_dist.toFixed(2)},
             icon: svg_icon
         }

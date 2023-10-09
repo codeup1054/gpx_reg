@@ -11,11 +11,11 @@ import {model} from '/app/const.js'
 
 export function ifMapChanged() {
 
-    delete param["map"]
+    delete _param["map"]
 
-    const location_search = encodeURIComponent(JSON.stringify(param));
+    const location_search = encodeURIComponent(JSON.stringify(_param));
 
-    // console.log("@@ ifMapChanged model", [param, location_search, location_search.length])
+    // console.log("@@ ifMapChanged model", [_param, location_search, location_search.length])
 
     let href
     href = window.location.origin + window.location.pathname + "#" + location_search;
@@ -53,8 +53,8 @@ function getString(o) {
 
 export function clearCookie() {
 
-    console.log ("@@ clearCookie()!!!")
-    let href
+    console.log ("@@ clearCookie()!!!");
+    let href;
     href = window.location.origin + window.location.pathname;
     window.location.href = href;
 

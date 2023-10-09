@@ -1,3 +1,19 @@
+/**
+ * CONST and GLOBALS
+ * */
+
+import {model} from '/app/const.js?2'
+// import '/js/jquery/jquery.js'
+// import '/js/cookie/jquery.cookie.js'
+import {clearCookie} from '/app/map/map.location.cookie.js?2'
+
+
+import {initMap, setMapStyler} from '/app/map/map.init.js?1'
+import {mapOverlay,MERCATOR} from '/app/map/map.overlay.js?1'
+import {mapInformer} from '/app/map/map.informer.js?2'
+import {mapControls} from '/app/map/map.controls.js?2'
+import {mapObjects}  from "/app/geodata/geo_model.js";
+
 const gpx_js = [
     // '/app/const.js',
     '/js/jquery/jquery.js',
@@ -11,37 +27,21 @@ const gpx_js = [
     // '/app/test.js'
 ]
 
-/**
- * CONST and GLOBALS
- * */
-
-let now = Date.now();
-let last = now
 
 /**
  / CONST and GLOBALS
  * */
 
-import {model} from '/app/const.js?2'
+let now = Date.now();
+let last = now
 
-let mod = model
-
-window.param = model.get();
-
-// console.log("@@ model app.js", param)
-
-import '/js/jquery/jquery.js'
-import '/js/cookie/jquery.cookie.js'
-import {clearCookie} from '/app/map/map.location.cookie.js?2'
-
-import {initMap, setMapStyler} from '/app/map/map.init.js?1'
-import {mapOverlay,MERCATOR} from '/app/map/map.overlay.js?1'
-import {mapInformer} from '/app/map/map.informer.js?2'
-import {mapControls} from '/app/map/map.controls.js?2'
-
-import {mapEvents} from '/app/gpxevents.js?1'
+window._map = mapObjects._map;  /** set global for all modules **/
+window._param = model.get();    /** get param from cookie      **/
 
 let next_script = 0;
+
+
+
 
 
 function sync_import()
@@ -58,11 +58,10 @@ function sync_import()
         }
         else
         {
-            // console.log ("@@ $.cookie('location-settings'+window.location.pathname)",$.cookie('location-settings'+window.location.pathname))
-            param.map = initMap(param)
-            // console.log ("@@ param",param)
-            setMapStyler(param)
-            mapOverlay(param)
+            // console.log ("@@ _param",_param)
+            initMap(_param)
+            setMapStyler(_param)
+            mapOverlay(_param)
             mapControls.add_custom_control_panel()
             mapControls.add_cache_control()
             mapInformer.add()
@@ -75,9 +74,3 @@ function sync_import()
 
 sync_import()
 
-// window.onload = function() {
-//     param.map = initMap(param)
-//     setMapStyler(param.mapLightess)
-//     mapOverlay(param)
-//     // sync_import();
-// };

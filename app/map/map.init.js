@@ -1,8 +1,10 @@
 import {ifMapChanged} from '/app/map/map.location.cookie.js'
+import {mapObjects}  from "/app/geodata/geo_model.js";
+console.log ("@@ 01 map.init ", mapObjects);
 
 export function initMap(param) {
 
-    // console.log ("@@ initMap param 2", param)
+    console.log ("@@ 01 initMap(param) ", _map);
 
     const mapOptions = {
         zoom: param.zoom || 11,
@@ -32,14 +34,14 @@ export function initMap(param) {
             position: google.maps.ControlPosition.RIGHT_BOTTOM,
         },
 
-
     };
 
-    let map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
+    console.log("@@ 02 _map",_map);
 
-    param.map = map
-    window.map = map
+    _map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+    console.log("@@ 03 _map",_map);
 
     class USGSOverlay extends google.maps.OverlayView {
         bounds;
@@ -145,10 +147,8 @@ export function initMap(param) {
         }
     }
 
-
-    addMapListener(param);
-
-    return map;
+    addMapListener();
+    // return _map;
 }
 
 
@@ -160,31 +160,31 @@ export function setMapStyler(param) {
             "lightness": 2 * lightness - 90
         }]
     }];
-    map.setOptions({styles: mapStyles});
+    _map.setOptions({styles: mapStyles});
 }
 
 
-function addMapListener(param) {
+function addMapListener() {
 
-    // console.log ("@@ addMapListener", param)
+    console.log ("@@ 01 addMapListener", _map)
 
-    const map = param.map
+    // const map = param.map
 
-    google.maps.event.addListener(map, 'zoom_changed', function () {
-        const z = map.getZoom()
+    google.maps.event.addListener(_map, 'zoom_changed', function () {
+        const z = _map.getZoom()
         $('zoom').html(z);
-        param.zoom = z
+        _param.zoom = z
         ifMapChanged();
     });
 
 
-    google.maps.event.addListener(map, 'center_changed', function () {
+    google.maps.event.addListener(_map, 'center_changed', function () {
         ifMapChanged();
         const lat = this.getCenter().lat().toFixed(5);
         const lng = this.getCenter().lng().toFixed(5);
 
-        param.homeGeo.lat= lat
-        param.homeGeo.lng= lng
+        _param.homeGeo.lat= lat
+        _param.homeGeo.lng= lng
 
         $('lat').html(lat);
         $('lng').html(lng);
