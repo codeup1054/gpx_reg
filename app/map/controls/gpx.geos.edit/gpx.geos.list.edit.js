@@ -2,33 +2,15 @@
 // 2023-09-28 https://github.com/zhenyanghua/MeasureTool-GoogleMaps-V3
 // 2023-09-27  https://www.youtube.com/watch?v=nUdt9aMcg0M
 
-import {geoForm} from "./gpx.geos.form.js";
 import {mapObjects, _geos}  from "/app/geodata/geo_model.js";
+import {editGeoForm} from '/app/map/controls/gpx.geos.edit/gpx.geos.form.js';
+import {geo_distance} from '/app/lib/geo.js';
 
-
-function distance(lat1, lon1, lat2, lon2, precision = 3, unit = "K") {
-    var radlat1 = Math.PI * lat1 / 180
-    var radlat2 = Math.PI * lat2 / 180
-    var theta = lon1 - lon2
-    var radtheta = Math.PI * theta / 180
-    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-    dist = Math.acos(dist)
-    dist = dist * 180 / Math.PI
-    dist = dist * 60 * 1.1515
-    if (unit == "K") {
-        dist = dist * 1.609344
-    }
-    if (unit == "M") {
-        dist = dist * 0.8684
-    }
-    return dist;
-}
-
-export async function polylineTools() {
+export function polylineTools() {
 
     let mapCtrl = document.createElement("div");
     mapCtrl.setAttribute("id", "polylineTools");
-    mapCtrl.classList.add("custom-map-control-div");
+    mapCtrl.classList.add("custom-map-control");
     mapCtrl.classList.add("hflex");
     mapCtrl.classList.add("vflex");
 
@@ -37,23 +19,27 @@ export async function polylineTools() {
     addPolyLineButton.innerHTML = '+';
     mapCtrl.appendChild(addPolyLineButton);
 
+    addPolyLineButton = document.createElement("button");
+    addPolyLineButton.innerHTML = '_geos';
+    addPolyLineButton.addEventListener("click", function () {
+        console.log("@@ 65 button", _geos)
+    });
+    mapCtrl.appendChild(addPolyLineButton);
+
+
     let polyLineTable = document.createElement("table");
     polyLineTable.setAttribute("id", "polyLineTable");
     polyLineTable.classList.add("stab");
 
     mapCtrl.appendChild(polyLineTable);
 
-    _map.controls[google.maps.ControlPosition.TOP_LEFT].push(mapCtrl)
-
-    // google.maps.event.clearListeners(map, 'click');
-
     waitElement("#polylineTools", 1, initGeoEdit, 0)
+    return mapCtrl;
 
 }
 
 function waitElement(selector, time, callback = initGeoEdit, lap = 0) {
     if (document.querySelector(selector) != null) {
-        console.log("@@ lap", lap);
         callback();
         return;
     } else {
@@ -62,24 +48,6 @@ function waitElement(selector, time, callback = initGeoEdit, lap = 0) {
         }, time);
     }
 }
-
-// function fieldEdit(){
-//     this.contentEditable = true;
-//     console.log("@@ this.innerText",this.innerText);
-// }
-
-
-// // define getBounds
-//
-// if (!google.maps.Polyline.prototype.getBounds)
-//     google.maps.Polyline.prototype.getBounds = function() {
-//
-//         var bounds = new google.maps.LatLngBounds();
-//
-//         this.getPath().forEach( function(latlng) { bounds.extend(latlng); } );
-//
-//         return bounds;
-//     }
 
 
 function zoom_polyline(_eid) {
@@ -94,6 +62,7 @@ function zoom_polyline(_eid) {
 
 function initGeoEdit()
 {
+    getGeos();
     drawPolyLineTable();
     addMapListener();
     showPolyLineOnMap();
@@ -119,7 +88,7 @@ function drawPolyLineTable(callback = addAction) {
         const e = _geos[k];
         let segs = [];
         for (let i = 0; i < e.geojson.length - 1; i++) {
-            segs.push(distance(e.geojson[i][0], e.geojson[i][1],
+            segs.push(geo_distance(e.geojson[i][0], e.geojson[i][1],
                 e.geojson[i + 1][0], e.geojson[i + 1][1]));
         }
 
@@ -135,15 +104,16 @@ function drawPolyLineTable(callback = addAction) {
                                                type="checkbox" 
                                                ${_geos[k].showOnMap ? 'checked' : ''} >
                                      </td>
-                                     <td>${e.name}</td>
-                                     <td><div _efn="desc" >${e.desc}</div></td>
+                                     <td><div _efn="name">${e.name}</div></td>
+                                     <td><div _efn="desc">${e.desc}</div></td>
                                      <td><div style="background-color: ${e.meta.color}">&nbsp;</div></td>
                                      <td>${e.geojson.length}</td>
                                      <td _cn = "polyLen" >${polyLen}</td>
                                      <td>
-                                         <button _bt="save">&#9989;</button>
                                          <button _bt="cancel">&#10060;</button>
                                          <button _bt="find">&#128269;</button>
+                                         <button _bt="save">&#9989;</button>
+                                         <button _bt="edit">&#9998;</button>
                                      </td>
                                  </tr>
                                 `;
@@ -164,23 +134,24 @@ function setActive(_eid,e = null){
 
     Object.keys(_geos).map((k, i) => {
         if (k == _eid) {
-            _geos[k].active = true;
+            _geos[k].active = !_geos[k].active;
             _geos[k].showOnMap = true;
         } else
             _geos[k].active = false;
     });
 
     $('[_eid]').removeClass('selected');
-    $(`[_eid=${_eid}]`).addClass('selected');
 
-    $(`[_eid=${_eid}] td [_cn="show_on_map"]`).prop('checked',true);
+    if(_geos[_eid].active) {
+        $(`[_eid=${_eid}]`).addClass('selected');
+        $(`[_eid=${_eid}] td [_cn="show_on_map"]`).prop('checked', true);
+        showPolyLineOnMap();
+        showMileageMarkers();
+    }
 
     if (e) e.stopPropagation();
 
-    console.log("@@ ",_geos);
-
-    showPolyLineOnMap();
-    showMileageMarkers();
+    console.log("@@ Set Active",_geos[_eid]);
 }
 
 
@@ -189,18 +160,23 @@ function addMapListener()
     // 05. 2023-10-07 add point on polyline
 
     google.maps.event.addListener(_map, "click", (e) => {
-        console.log("@@ 07. click",e.latLng);
-        const id = Object.entries(_geos).find(item => item[1].active == true)[0];
-        _geos[id].geojson.push([e.latLng.lat(), e.latLng.lng()]);
-        showPolyLineOnMap();
-        drawPolyLineTable();
-        showMileageMarkers();
+        const findActive = Object.entries(_geos).find(item => item[1].active == true)
+
+        console.log("@@ 07. click Map",e.latLng, findActive);
+
+        if (findActive !== undefined)
+        {
+            const id = findActive[0];
+            _geos[id].geojson.push([e.latLng.lat(), e.latLng.lng()]);
+            showPolyLineOnMap();
+            drawPolyLineTable();
+            showMileageMarkers();
+        }
     });
 
 }
 
-function addAction() {
-
+export function addAction() {
 
     // 04. 2023-10-05 select row and set mapGeo active
 
@@ -285,13 +261,15 @@ let action = {
         console.log("@@ _action find",_eid);
         zoom_polyline(_eid);
     },
+
+    edit: function (_eid) {
+        console.log("@@ _action ",_eid);
+        editGeoForm(_eid);
+    },
+
+
 }
 
-// function rowSelect() {
-//     $(this).toggleClass("selected");
-//     _geos[this.id].showOnMap = !_geos[this.id].showOnMap;
-//     showPolyLineOnMap();
-// }
 
 function showPolyLineOnMap() {
 
@@ -356,8 +334,8 @@ function createPolyLine() {
 
     _geos[id] = {
         id: id,
-        name: 'new',
-        desc: 'new 2',
+        name: `new ${id}`,
+        desc: `Описание ${id}`,
         meta: {color: '#ff22bbaa'},
         geojson: [],
         showOnMap: true,
@@ -400,7 +378,7 @@ function showMileageMarkers()
 
     _geos[id].geojson.map((p,i) => {
 
-        if (i > 0) total_dist += distance(po[0],po[1],p[0],p[1]);
+        if (i > 0) total_dist += geo_distance(po[0],po[1],p[0],p[1]);
         po = p;
 
         // console.log("@@ >>> mileage_markers()",id, _geos[id], mapObjects.markers[id]);
@@ -455,21 +433,36 @@ function showMileageMarkers()
 
 }
 
-function getGeos(geo_type = 'polyline') {
-    let req = {
-        method: 'POST',
-        body: {
-            whe: "",
-            geo_type: geo_type
-        }
+function getGeos() {
+    let xhr = new XMLHttpRequest();
+
+    let body = {
+        action: 'getgeos',
+        verbose: true,
+        whe: ""
+    };
+
+    xhr.open("POST", '/api/geos.php', true);
+    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+    const res = xhr.send(JSON.stringify(body));
+
+    xhr.onreadystatechange = function () {
+        if (this.readyState != 4) return;
+
+        const resp =  JSON.parse(this.responseText);
+
+        // let _geosОbj = {...resp.result.data}.map((v,k) => v.id:v )
+
+        let _geosОbj =  [...resp.result.data].map((o, v) => _geos[o.id] = o );
+
+        console.log("@@ 33 ***  get Geos", _geosОbj, resp.result.data); //resp.result.data );
+
+        // _geos[10] = _geosОbj;
+
+        // return _geos;
     }
-
-    console.log("@@ 04  getPath = ", req);
-    // return  apiRequest(req);
-    return _geos;
-
 }
-
 
 
 
@@ -489,16 +482,22 @@ function apiRequest(req) {
 }
 
 
+
+
 function updateGeos(geodata) {
     let xhr = new XMLHttpRequest();
 
     console.log("@@ update Geos");
 
     let body = {
-        id: 1,
-        desc: 'текст описания',
-        geotype: 'polyline',
-        geodata: geodata
+        action: 'geos_create_update',
+        verbose: true,
+        data: {
+            id: 1,
+            desc: 'текст описания',
+            geotype: 'polyline',
+            geodata: geodata
+        }
     };
 
     xhr.open("POST", '/api/geos.php', true);
@@ -508,28 +507,9 @@ function updateGeos(geodata) {
 
     xhr.onreadystatechange = function () {
         if (this.readyState != 4) return;
-        // console.log("@@ POST Geos res", this.responseText );
+        console.log("@@ POST Update Geos", this.responseText );
     }
 
 }
 
 
-// function polyDistance(gsArray)
-// {
-//     console.log("@@ polySementDistance poly= ",gsArray);
-//
-//     const segments = [];
-//
-//     for (let i = 0; i < gsArray.length-1; i++ )
-//     {
-//         const s = gsArray[i];
-//         const e = gsArray[i+1];
-//
-//         let _first = { lat:s[0], lng:s[1] };
-//         let _last =  { lat:e[0], lng:e[1] };
-//         let segLenMeter = Math.floor(google.maps.geometry.spherical.computeDistanceBetween(_first,_last));
-//         segments.push(segLenMeter);
-//     }
-//
-//     return segments;
-// }

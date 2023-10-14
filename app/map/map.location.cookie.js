@@ -53,7 +53,7 @@ function getString(o) {
 
 export function clearCookie() {
 
-    console.log ("@@ clearCookie()!!!");
+    // console.log ("@@ clearCookie()!!!");
     let href;
     href = window.location.origin + window.location.pathname;
     window.location.href = href;

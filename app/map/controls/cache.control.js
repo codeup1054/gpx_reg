@@ -1,41 +1,57 @@
-import {ifMapChanged} from '/app/map/map.location.cookie.js'
-import {mapObjects}  from "/app/geodata/geo_model.js";
+import {MERCATOR} from '/app/map/map.overlay.js?1'
 
-export function initMap(param) {
+export function cacheTool() {
+
+    let mapCtrl = document.createElement("div");
+
+    const hmAreaButton = document.createElement("button");
+    hmAreaButton.textContent = "Get"; // get hm_tile for cache
+    hmAreaButton.classList.add("custom-map-control-button");
+    hmAreaButton.addEventListener("click", () => {
+        let map_bounds = _map.getBounds()
+        let z = _map.getZoom() * 1 + $("#zoom_depth").val() * 1 + 1; // addzoom
+        // console.log("@@ zoom depth=", map.getZoom(), z, $("#zoom_depth").val())
+        hm_area(map_bounds, z)
+    });
+
+    mapCtrl.appendChild(hmAreaButton);
+
+    const clearHMButton = document.createElement("button"); // add to map clear HM button
+    clearHMButton.textContent = "Clear"
+    clearHMButton.classList.add("custom-map-control-button")
+    clearHMButton.addEventListener("click", () => {
+        clear_hm_tiles()
+    });
+
+    mapCtrl.appendChild(clearHMButton);
+
+    // console.log ("@@ add_cache_controls",p)
+
+    let mapContrlsDiv = document.createElement("div");
+    mapContrlsDiv.classList.add("custom-map-control-div");
+
+    $("#debug").append(mapContrlsDiv);
+
+    const zoomDepthOptsSelect = ['1', '2', '3', '4','5','6'].map((v, k) => {
+        return "<option value='" + k + "' " +
+            ((_param.controls.zoom_depth == v) ? 'selected >' : '>') + v + "</option>"
+    }).join("")
 
 
-    const mapOptions = {
-        zoom: param.zoom || 11,
-        center: new google.maps.LatLng(param.homeGeo.lat, param.homeGeo.lng),
-        scaleControl: true,
+    const innerHTML = `
+        <select id='zoom_depth' class="gpx-controls" title='Zoom depth'>` + zoomDepthOptsSelect + `</select>`;
 
-        streetViewControl: true,
-        streetViewControlOptions: {
-            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-            position: google.maps.ControlPosition.RIGHT_BOTTOM,
-        },
+    mapContrlsDiv.innerHTML = "<div class='custom-map-control-div map-controls'>" + innerHTML + "</div>"
 
-        mapTypeControlOptions: {
-            // style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-            position: google.maps.ControlPosition.RIGHT_TOP,
-            mapTypeIds: ["roadmap", "terrain", "satellite", "hybrid"],
-        },
+    mapCtrl.appendChild(mapContrlsDiv);
 
-        zoomControl: true,
-        zoomControlOptions: {
-            position: google.maps.ControlPosition.RIGHT_BOTTOM,
-        },
+    return mapCtrl;
 
-        fullscreenControl: false,
-        fullscreenControlOptions: {
-            position: google.maps.ControlPosition.RIGHT_BOTTOM,
-        },
-
-    };
+}
 
 
-    _map = new google.maps.Map(document.getElementById('map'), mapOptions);
+function hm_area(map_bounds, z) {
+
     class USGSOverlay extends google.maps.OverlayView {
         bounds;
         image;
@@ -70,6 +86,7 @@ export function initMap(param) {
         }
 
         draw() {
+            // console.log("@@ USGSOverlay draw", this.bounds, this.image)
 
             // We use the south-west and north-east
             // coordinates of the overlay to peg it to the correct position and size.
@@ -139,68 +156,66 @@ export function initMap(param) {
         }
     }
 
-    addMapListener();
-    // return _map;
-}
 
 
-export function setMapStyler(param) {
-
-    const lightness = param.mapLightess
-    const mapStyles = [{
-        "stylers": [{
-            "lightness": 2 * lightness - 90
-        }]
-    }];
-    _map.setOptions({styles: mapStyles});
-}
+    // console.log("@@ bounds=", map_bounds);
+    let ne = map_bounds.getNorthEast();
+    let sw = map_bounds.getSouthWest();
 
 
-function addMapListener() {
+    let coord_NE = MERCATOR.getTileAtLatLng({lat: ne.lat(), lng: ne.lng()}, z);
+    let coord_SW = MERCATOR.getTileAtLatLng({lat: sw.lat(), lng: sw.lng()}, z);
 
-    google.maps.event.addListener(_map, 'zoom_changed', function () {
-        const z = _map.getZoom()
-        $('zoom').html(z);
-        _param.zoom = z
-        ifMapChanged();
-    });
+    let x = coord_SW.x
+    let start_y = coord_SW.y
 
+    let cnt = 0
+    let max_cnt = 40000
 
-    google.maps.event.addListener(_map, 'center_changed', function () {
-        ifMapChanged();
-        const lat = this.getCenter().lat().toFixed(5);
-        const lng = this.getCenter().lng().toFixed(5);
+    let overlay;
 
-        _param.homeGeo.lat= lat
-        _param.homeGeo.lng= lng
+    while (x++ < coord_NE.x) {
 
-        $('lat').html(lat);
-        $('lng').html(lng);
-    });
+        let y = start_y
 
+        while (y-- > coord_NE.y && cnt++ < max_cnt) {
 
-    // define getBounds
+            let srcImage1 = 'http://gpxlab.ru/app/php/app.strava.php?z=' + z +
+                '&x=' + x +
+                '&y=' + y +
+                '&thumb1=1'
+            ;
 
-    if (!google.maps.Polyline.prototype.getBounds)
-        google.maps.Polyline.prototype.getBounds = function() {
+            let tile_bounds = MERCATOR.getTileBounds({x: x, y: y, z: z})
 
-            var bounds = new google.maps.LatLngBounds();
+            const img_bounds = new google.maps.LatLngBounds(tile_bounds.sw, tile_bounds.ne);
 
-            this.getPath().forEach( function(latlng) { bounds.extend(latlng); } );
+            if (!hm_tiles[x + '_' + y + '_' + z]) {
 
-            return bounds;
+                // console.log ("@@ hm_tiles",hm_tiles)
+
+                overlay = new USGSOverlay(img_bounds, srcImage1);
+                hm_tiles[x + '_' + y + '_' + z] = overlay
+                overlay.setMap(_map);
+            }
+
+            // drawCacheArea(z, x, y, 0.1,srcImage)
         }
-
-    google.maps.Polyline.prototype.inKm = function(n) {
-        var a = this.getPath(n),
-            len = a.getLength(),
-            dist = 0;
-        for (var i = 0; i < len - 1; i++) {
-            dist += google.maps.geometry.spherical.computeDistanceBetween(a.getAt(i), a.getAt(i + 1));
-        }
-        return dist / 1000;
     }
-
 }
 
+const hm_tiles ={}
 
+function clear_hm_tiles() {
+
+    const break_cnt = 0;
+    console.log ("@@ hm_tiles 2", [hm_tiles.length ,hm_tiles])
+
+    if (hm_tiles.length === 0) alert("Nothing to clear")
+
+    $.each(hm_tiles, function (k, v) {
+
+        v.setMap(null);
+        delete hm_tiles[k];
+    });
+}

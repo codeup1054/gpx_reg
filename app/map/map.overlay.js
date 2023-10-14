@@ -4,7 +4,7 @@ import {mapObjects} from "../geodata/geo_model.js";
 
 export function mapOverlay(param) {
 
-    console.log ("@@ param.mapOverlays",Object.keys(param.mapOverlays).join("_"), _map)
+    // console.log ("@@ param.mapOverlays",Object.keys(param.mapOverlays).join("_"), _map)
 
     // const layerKeys = Object.keys(param.mapOverlays)
     const layerKeys = ['2021-08'] // '2021-08'
@@ -111,7 +111,6 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
 
         let srcImage
         var now = new Date().getTime()
-        // console.log ("@@ stravaCred",queryString, this.overlayName)
         if (queryString != '')
         {
 
@@ -122,7 +121,6 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
                 // + '&heat_activities_type=' + model.param.heat_map.heat_activities_type
                 // + '&heat_color=' + model.param.heat_map.heat_color
                 + '&' + queryString;
-                // console.log ("@@ img_src",srcImage)
 
             $.getJSON(imgCache, function(json) {})
 
@@ -154,7 +152,6 @@ CoordMapType.prototype.getTile = function (coord, zoom, ownerDocument) {
         else
         {
             const [ms,me] = this.overlayName.split("_")
-            console.log ("@@ model.get()",this.overlayName)
 
             srcImage = 'http://gpxlab.ru/php_modules/imgcmpr.php?z=' + zoom +
                 '&x=' + tile.x +
