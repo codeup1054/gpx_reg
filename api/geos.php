@@ -44,7 +44,7 @@ function geosCreateUpdate($data, $verbose)
     global $conn;
 
     $res = (object)array();
-    $res->msg =  "geosCreateUpdate";
+    $res->msg =  "geosCreateUpdate 07";
 
     $geodata = $data->geodata;
 
@@ -55,11 +55,8 @@ function geosCreateUpdate($data, $verbose)
     $meta = json_encode($geodata->meta, JSON_UNESCAPED_UNICODE);
     $geojson = json_encode($geodata->geojson);
 
-
-    print($res->msg);
-
-
-    print ("$meta, $geojson");
+//    print($res->msg);
+//    print ("$meta, $geojson");
 
 //    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{serialize($v->name)}','{\"msg\":\"{$v->meta}\"}', '{$v->geojson}')";
 //    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{$geodata->name}','{$meta}', '{$geojson}')
@@ -69,11 +66,10 @@ function geosCreateUpdate($data, $verbose)
 
     $res->msg .= "\n *** $sql";
 
-    if ($conn->query($sql) === TRUE)  $res =  "Успешно создана новая запись";
+    if ($conn->query($sql) === TRUE)  $res =  "Успешно создана новая запись\n".$sql;
     else $res =  "Ошибка: " . $sql . "<br>" . $conn->error;
 
     return $res;
-
 }
 
 function insertGeos($v)

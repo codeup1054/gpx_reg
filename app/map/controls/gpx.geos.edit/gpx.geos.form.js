@@ -54,14 +54,14 @@ export function editGeoForm(_geoId)
 
             const pipe =  (fld_pipe in pipes)  ? pipes[fld_pipe] : "";
 
-            console.log("@@@@@ reg:",[fld_name, fld_pipe, v, pipe, (fld_pipe in pipes)] );
+            // console.log("@@@@@ reg:",[fld_name, fld_pipe, v, pipe, (fld_pipe in pipes)] );
 
             fieldInputsRe = fieldInputsRe.replaceAll(`>{{${fld_pipe_re}}}`,` ${pipe}`)
         }
     } while (m);
 
 
-    console.log("@@ 75 geoForm", _geos[_geoId]);
+    // console.log("@@ 75 geoForm", _geos[_geoId]);
 
     let fieldInputs = Object.entries(o).map(([v,k],i) =>
         `<div>${v}</div><div>${k}</div>`).join("</br>")
@@ -76,7 +76,7 @@ export function editGeoForm(_geoId)
     popupIssuePoint.appendChild(editForm);
 
     const pickColorEls = document.querySelectorAll(`[pickcolor]`);
-    [...pickColorEls].map((el)=> {el.addEventListener('click',(e) => pickColor(e));  });
+    // [...pickColorEls].map((el)=> { el.addEventListener('click',(e) => pickColor(e));  });
 
     function polylineInfo(v){
 

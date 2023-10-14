@@ -33,6 +33,8 @@ export function polylineTools() {
 
     mapCtrl.appendChild(polyLineTable);
 
+    getGeos();
+
     waitElement("#polylineTools", 1, initGeoEdit, 0)
     return mapCtrl;
 
@@ -62,7 +64,7 @@ function zoom_polyline(_eid) {
 
 function initGeoEdit()
 {
-    getGeos();
+
     drawPolyLineTable();
     addMapListener();
     showPolyLineOnMap();
@@ -105,15 +107,16 @@ function drawPolyLineTable(callback = addAction) {
                                                ${_geos[k].showOnMap ? 'checked' : ''} >
                                      </td>
                                      <td><div _efn="name">${e.name}</div></td>
-                                     <td><div _efn="desc">${e.desc}</div></td>
+                                     <td><div _efn="meta.desc">${e.meta.desc}</div></td>
                                      <td><div style="background-color: ${e.meta.color}">&nbsp;</div></td>
                                      <td>${e.geojson.length}</td>
                                      <td _cn = "polyLen" >${polyLen}</td>
                                      <td>
-                                         <button _bt="cancel">&#10060;</button>
-                                         <button _bt="find">&#128269;</button>
-                                         <button _bt="save">&#9989;</button>
-                                         <button _bt="edit">&#9998;</button>
+                                        <button _bt="cancel">&#10060;</button>
+                                        <button _bt="find">&#128269;</button>
+                                        <button _bt="edit">&#9998;</button>
+                                        <button _bt="save">&#9989;</button>
+
                                      </td>
                                  </tr>
                                 `;
@@ -128,6 +131,8 @@ function drawPolyLineTable(callback = addAction) {
 
     // console.log("@@ polylineList _geos e =", _geos);
 }
+
+
 
 
 function setActive(_eid,e = null){
@@ -173,60 +178,89 @@ function addMapListener()
             showMileageMarkers();
         }
     });
-
 }
 
+
+let action = {
+    save:   function (_eid) {        updateGeos(_geos[_eid]);    },
+    cancel: function (_eid) {        console.log("@@ _action cancel", _eid)    },
+    find:   function (_eid) {        zoom_polyline(_eid);    },
+    edit:   function (_eid) {        editGeoForm(_eid);    },
+}
 export function addAction() {
 
     // 04. 2023-10-05 select row and set mapGeo active
-
-    $('[_eid]').on('click', function (e) {
-        const _eid = $(this).closest('[_eid]').attr('_eid');
-        setActive(_eid,e);
-    });
-
-    // 03. 2023-10-05 show on map check box
-
-    $('[_cn="show_on_map"]').on('click', function (e) {
-        const _eid = $(this).closest('[_eid]').attr('_eid');
-
-        Object.keys(_geos).map((k, i) => {
-            if(k == _eid) _geos[k].showOnMap = $(this).prop('checked');
+        $('[_eid]').on('click', function (e) {
+            const _eid = $(this).closest('[_eid]').attr('_eid');
+            setActive(_eid, e);
         });
 
-        e.stopPropagation();
-        showPolyLineOnMap();
-        // mapObjects.polyLines[_eid].setMap(_geos[_eid].showOnMap? map : null);
-    });
+    // 03. 2023-10-05 show on map check box
+        $('[_cn="show_on_map"]').on('click', function (e) {
+            const _eid = $(this).closest('[_eid]').attr('_eid');
+
+            Object.keys(_geos).map((k, i) => {
+                if (k == _eid) _geos[k].showOnMap = $(this).prop('checked');
+            });
+
+            e.stopPropagation();
+            showPolyLineOnMap();
+            // mapObjects.polyLines[_eid].setMap(_geos[_eid].showOnMap? map : null);
+        });
 
 
     // 02. editable fields
 
     let _efield = document.querySelectorAll('[_efn]');
 
+    console.log("@@ 88 _efield", _efield);
+
+
     [..._efield].map((e, i) => {
 
         const _eid = e.closest('[_eid]').getAttribute('_eid');
 
-        e.addEventListener('click', function (e) {
-            this.contentEditable = true;
-            this.focus();
-            e.stopPropagation();
-        });
+        if (e.getAttribute('listener') !== 'true') {
 
-        e.addEventListener('blur', function () {
-            _geos[_eid].desc = e.innerText;
-            console.log("@@ blur", _eid, e.closest('[_eid]'), _geos);
+            e.addEventListener('click', function (e) {
+                this.contentEditable = true;
+                this.focus();
+                e.stopPropagation();
+            });
 
-        });
+            e.addEventListener('blur', function () {
 
-        e.addEventListener('keyup', function () {
-            console.log("@@ keyup");
-        });
+                // let _eFields = document.querySelectorAll(`[_eid="${_eid}"] [_efn]`);
+
+                const attr = e.getAttribute('_efn');
+                const dataToGeos = {};
+                // [..._eFields].map((e) => {
+                //     const cols = `["${e.getAttribute('_efn').split('.').join('"]["')}"]`;
+                //
+                //
+                //     const eval_str = `_geos${cols}="${e.innerText}"`
+                //     console.log("@@ eval_str",eval_str);
+                //
+                //
+                //     dataToGeos[e.getAttribute('_efn')] = e.innerText + cols;
+                // })
+
+                const cols = `["${e.getAttribute('_efn').split('.').join('"]["')}"]`;
+                const eval_str = `_geos[${_eid}]${cols}="${e.innerText}"`
+                eval (eval_str);
+
+                // _geos[_eid].desc = e.innerText;
+                console.log("@@ blur", _eid, eval_str,  attr, dataToGeos, _geos);
+            });
+
+            e.addEventListener('keyup', function () {
+                console.log("@@ keyup");
+            });
+        }
         // e.addEventListener('paste',function() {console.log("@@ paste"); });
         // e.addEventListener('input',function() {console.log("@@ input"); });
 
-        // console.log("@@ _efn", e, _eid, e.innerText);
+        // console.log("@@ _efn", e, _eid, e.innerText, e.getAttribute('listener') !== 'true');
     })
 
 
@@ -234,41 +268,28 @@ export function addAction() {
 
 
     let _btn = document.querySelectorAll('[_bt]');
+
+    console.log("@@ _btn",_btn, _efield);
+
     [..._btn].map((e, i) => {
 
         const _eid = e.closest('[_eid]').getAttribute('_eid');
         const _bt = e.getAttribute('_bt');
 
-        e.addEventListener('click', function (event) {
-            console.log("@@ action_click", _eid);
-            action[_bt](_eid);
-            event.stopPropagation();
-        });
+        const evList = e.getAttribute('listener');
 
+        if (evList !== 'true') {
+            e.addEventListener('click', function (event) {
+                console.log("@@ 77 click to _eid", _eid,  evList);
+                action[_bt](_eid);
+                event.stopPropagation();
+            });
+        }
     })
 
 }
 
-let action = {
-    save: function (_eid) {
-        console.log("@@ _action save", _eid)
-        updateGeos(_geos[_eid]);
-    },
-    cancel: function (_eid) {
-        console.log("@@ _action cancel", _eid)
-    },
-    find: function (_eid) {
-        console.log("@@ _action find",_eid);
-        zoom_polyline(_eid);
-    },
 
-    edit: function (_eid) {
-        console.log("@@ _action ",_eid);
-        editGeoForm(_eid);
-    },
-
-
-}
 
 
 function showPolyLineOnMap() {
@@ -342,6 +363,7 @@ function createPolyLine() {
     }
 
     drawPolyLineTable();
+
     setActive(id);
 
     let polyOption = {
@@ -371,7 +393,9 @@ function showMileageMarkers()
         mapObjects.markers[id] = [];
     });
 
-    let id = Object.entries(_geos).find(item => item[1].active == true)[0];
+    let id = Object.entries(_geos).find(item => item[1].active == true);
+
+    id = id !== undefined? id[0]:1;
 
 
     mapObjects.markers[id] = [];
@@ -507,7 +531,8 @@ function updateGeos(geodata) {
 
     xhr.onreadystatechange = function () {
         if (this.readyState != 4) return;
-        console.log("@@ POST Update Geos", this.responseText );
+        console.log("@@ 01 POST Update Geos\n", this.responseText );
+        console.log("@@ 02 POST Update Geos\n", JSON.parse(this.responseText) );
     }
 
 }
