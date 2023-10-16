@@ -88,7 +88,7 @@ export let mapControls = {
 
     add_polyline_control: function(mapCtrl)
     {
-        polylineTools();
+        // polylineTools();
     }
 
 }
@@ -100,7 +100,7 @@ export function addSliderCallback(sliderEl) {
     const sliderId = $(sliderEl).attr(`target`);
     const target = sliderId;
 
-    console.log(`@@ 21. addSliderCallback [${target}] `,  sliderEl, sliderId);
+    // console.log(`@@ 21. addSliderCallback [${target}] `,  sliderEl, sliderId);
 
     let el_opacity = (_param.mapOverlays[sliderId] !== undefined ) ? _param.mapOverlays[sliderId].opacity : 0.5
 
@@ -114,7 +114,7 @@ export function addSliderCallback(sliderEl) {
 
             let sliderHandle = sliderEl.querySelector('span.ui-slider-handle');
             sliderHandle.innerHTML="<div>" + Math.floor(el_opacity * 100) + "</div>";
-            console.log("@@ 22. span.ui-slider-handle')", sliderHandle,"\n children=" , $(this).children());
+            // console.log("@@ 22. span.ui-slider-handle')", sliderHandle,"\n children=" , $(this).children());
 
             if (target === 'map')
                 setMapStyler(el_opacity * 100);

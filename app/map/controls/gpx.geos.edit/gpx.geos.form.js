@@ -4,13 +4,17 @@ import {addAction}  from "/app/map/controls/gpx.geos.edit/gpx.geos.list.edit.js"
 import {geo_distance} from '/app/lib/geo.js';
 
 
-const tpl = `<b>Форма редактирования</b>
-    <div style="width: calc(100% - 190px); cursor: pointer ; border: 0px; display: inline-block; text-align: right;" onclick='this.parentNode.remove()'>&#10006;</div>
+const tpl = `<div class="flex">
+        <div><b>Маршрут</b></div>
+        <div class="_sm _g _i">{{tm_modified}}</div>
+        <!--    <div style="width: calc(100% - 190px); cursor: pointer ; border: 0px; display: inline-block; text-align: right;" onclick='this.parentNode.remove()'>&#10006;</div>-->
+        <div style="cursor: pointer ; border: 0px; text-align: right;" onclick='this.closest(".popup-form").remove()'>&#10006;</div>
+    </div>
 <table width="100%" style="border:0px white; ">
-    <tr><td>*Название</td><td>{{name|editable}}</td></tr>
-    <tr><td>*Описание </td><td>{{desc|editable}}</td></tr>
-    <tr><td>*Цвет</td><td>{{meta.color|color_picker}}</td></tr>
-    <tr><td>*Путь</td><td>{{geojson|polyline}}</td></tr>
+    <tr><td>Название</td><td>{{name|editable}}</td></tr>
+    <tr><td>Описание </td><td>{{meta.desc|editable}}</td></tr>
+    <tr><td>Цвет</td><td><div>{{meta.color|color_picker}}</div></td></tr>
+    <tr><td>Путь</td><td><textarea cols="50" rows="7">{{geojson|polyline}}</textarea></td></tr>
     </tr>
     <tr><td colspan="2" align="right">
         <span>{{geojson|polyline_info}}</span>
@@ -52,9 +56,9 @@ export function editGeoForm(_geoId)
                 "polyline_info": `polylineinfo1 style = 'background-color:#FFE;'>${ polylineInfo(v)}`,
             }
 
-            const pipe =  (fld_pipe in pipes)  ? pipes[fld_pipe] : "";
+            const pipe =  (fld_pipe in pipes)  ? pipes[fld_pipe] : `>${v}`;
 
-            // console.log("@@@@@ reg:",[fld_name, fld_pipe, v, pipe, (fld_pipe in pipes)] );
+            // console.log("@@@@@ reg:",[fld_name, fld_pipe, fld_pipe_re,  pipe, (fld_pipe in pipes)] );
 
             fieldInputsRe = fieldInputsRe.replaceAll(`>{{${fld_pipe_re}}}`,` ${pipe}`)
         }
@@ -75,8 +79,33 @@ export function editGeoForm(_geoId)
     const popupIssuePoint = document.querySelector(`[_eid="${_geoId}"]`);
     popupIssuePoint.appendChild(editForm);
 
-    const pickColorEls = document.querySelectorAll(`[pickcolor]`);
-    // [...pickColorEls].map((el)=> { el.addEventListener('click',(e) => pickColor(e));  });
+    let pickColorEls = document.querySelectorAll(`[pickcolor]`);
+
+    console.log("@@ 40 pickColorEls",pickColorEls[0]);
+
+    [...pickColorEls].map((el,i) => {
+
+        const newColor = document.createElement('div');
+        newColor.innerHTML =el.innerHTML;
+        newColor.style.backgroundColor = el.innerHTML;
+
+        console.log("@@ 41 pickcolor set click",el, el.innerHTML);
+
+        el.parentElement.appendChild(newColor);
+
+        // el.parentElement.outerHTML = el.parentElement.outerHTML; /** remove all listner */
+
+        el.addEventListener('click', (e) => {
+            console.log("@@ 19 addEventListener",e);
+            pickColor(e);
+            e.stopPropagation();
+        });
+
+        // const evList = el.getAttribute('listener');
+        // if (evList !== 'true') {
+        // }
+
+    });
 
     function polylineInfo(v){
 
@@ -99,12 +128,16 @@ export function editGeoForm(_geoId)
 }
 
 // https://habr.com/ru/articles/147032/  colorPicker
-function pickColor(e)
+function pickColor(ev)
 {
-    console.log("@@ 45 pickColor",e.target.innerHTML);  // e.target.parentNode.innerHTML
-    if (e) {
-        console.log("@@ 45 stopPropagation",e);
-        e.stopPropagation();
+    const el = ev.target;
+    console.log("@@ 43 pickColor",el.innerHTML);  // e.target.parentNode.innerHTML
+
+    if (el) {
+        const _eid = el.closest('[_eid]').getAttribute('_eid');
+        _geos[_eid].meta.color = el.innerText;
+        el.style.backgroundColor =  el.innerText;
+        ev.stopPropagation();
     }
 }
 

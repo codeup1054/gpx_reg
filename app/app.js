@@ -63,7 +63,6 @@ function sync_import()
             // mapControls.add_cache_control()
             mapInformer.add()
             mapControls.add_geozone_control()
-            mapControls.add_polyline_control()
         }
     })
 }

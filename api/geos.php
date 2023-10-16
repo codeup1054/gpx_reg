@@ -25,7 +25,7 @@ function proccess_request($rqst)
             $res = insertGeos($rqst->data);
             break;
         case 'getgeos':
-            $res = getGeos($rqst->whe, $rqst->verbose );
+            $res = getGeos($rqst->whe, $rqst->sort , $rqst->verbose );
             break;
         case 'geos_create_update':
             $res->funcres  = geosCreateUpdate($rqst->data, $rqst->verbose );
@@ -75,8 +75,6 @@ function geosCreateUpdate($data, $verbose)
 function insertGeos($v)
 {
     global $conn;
-//    print_r ($v->meta->msg);
-//    print_r ($v->name);
 
     $meta = json_encode($v->meta, JSON_UNESCAPED_UNICODE);
     $geojson = json_encode($v->geojson);
@@ -86,9 +84,6 @@ function insertGeos($v)
 //    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{serialize($v->name)}','{\"msg\":\"{$v->meta}\"}', '{$v->geojson}')";
     $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{$v->name}','{$meta}', '{$geojson}')";
 
-//    INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE
-//name="A", age=19
-
     print ($sql);
 
     if ($conn->query($sql) === TRUE)  $res =  "Успешно создана новая запись";
@@ -97,7 +92,7 @@ function insertGeos($v)
 }
 
 
-function getGeos($whe, $verb= false)
+function getGeos($whe="", $sort = " order by tm_modified desc",  $verb= false)
 {
     global $conn;
     $ret = (object)  array();
@@ -105,7 +100,8 @@ function getGeos($whe, $verb= false)
 
 // 2023-09-29 поиск по JSON  SELECT * FROM gpx_geos WHERE JSON_UNQUOTE(meta->'$.msg') LIKE "Postman 4%т";
 
-    $sql = "SELECT * from  gpx_geos {$whe}";
+    $sql = "SELECT * from  gpx_geos ${whe} ${sort}";
+
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
@@ -116,11 +112,12 @@ function getGeos($whe, $verb= false)
             $rows[] =  $r;
         }
 
-        $ret->msg = "Найдено:".$result->num_rows;
+        $ret->msg = "Found Найдено:".$result->num_rows;
+        $ret->sql_ = $sql;
         $ret->data = $rows;
 
     } else
-        $ret->msg = "Нет данных".$sql;
+        $ret->msg = "No data Нет данных".$sql;
 
     return $ret;
 }

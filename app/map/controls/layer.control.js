@@ -17,9 +17,6 @@ export function layerTool () {
 
     let mapLayerSelectorHTML = ""
 
-    // let defaultMonth = Object.keys(param.mapOverlays)
-
-    console.log ("@@ Object.keys(param.mapOverlays)",Object.keys(_param.mapOverlays))
 
     let defaultMonth = ['2021-08'] //['2021-08','2021-11']
 
@@ -54,7 +51,7 @@ export function layerTool () {
         mapLayerSlider.setAttribute("target", v);
         mapLayerSlider.setAttribute("slider", null);
         addSliderCallback(mapLayerSlider);
-        console.log("@@ mapLayerSlider",mapLayerSlider);
+        // console.log("@@ mapLayerSlider",mapLayerSlider);
         mapCtrl.insertBefore(mapLayerSlider,mapCtrl.firstChild);
 
     })

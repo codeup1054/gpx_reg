@@ -2,7 +2,7 @@
 // 2023-09-28 https://github.com/zhenyanghua/MeasureTool-GoogleMaps-V3
 // 2023-09-27  https://www.youtube.com/watch?v=nUdt9aMcg0M
 
-import {mapObjects, _geos}  from "/app/geodata/geo_model.js";
+import {mapObjects, _geos, appState}  from "/app/geodata/geo_model.js";
 import {editGeoForm} from '/app/map/controls/gpx.geos.edit/gpx.geos.form.js';
 import {geo_distance} from '/app/lib/geo.js';
 
@@ -64,12 +64,10 @@ function zoom_polyline(_eid) {
 
 function initGeoEdit()
 {
-
     drawPolyLineTable();
     addMapListener();
     showPolyLineOnMap();
-    showMileageMarkers();
-
+    showDistance();
     // waitElement("#polyLineTable", 1, addAction, 0)
 }
 
@@ -77,7 +75,8 @@ function drawPolyLineTable(callback = addAction) {
 
     let rows = `<tr>
         <td>ID</td>
-        <td>M</td>
+        <td>P</td>
+        <td>D</td>
         <td>Name</td>
         <td>Описание</td>
         <td>Настр</td>
@@ -86,27 +85,45 @@ function drawPolyLineTable(callback = addAction) {
         <td>Действие</td>
         </tr>`;
 
-    Object.keys(_geos).map((k, i) => {
-        const e = _geos[k];
-        let segs = [];
-        for (let i = 0; i < e.geojson.length - 1; i++) {
-            segs.push(geo_distance(e.geojson[i][0], e.geojson[i][1],
-                e.geojson[i + 1][0], e.geojson[i + 1][1]));
-        }
 
-        const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(3);
+    let no_sorted_by_key = [];
+    for (let el in _geos) {
+        no_sorted_by_key.push([_geos[el][appState.key_sort], el]);
+    }
 
-        rows += `<tr _eid="${e.id}" 
+    const sorted_by_key = no_sorted_by_key.sort((a, b) =>
+        a<b ? appState.sort_direction : -appState.sort_direction );
+
+    console.log("@@ 22 sortable  ",no_sorted_by_key, sorted_by_key);
+
+    // Object.keys(_geos).map((k, i) => {
+    sorted_by_key.map((sorted, i) => {
+            const k = sorted[1];
+            const e = _geos[k];
+            // console.log("@@ _geos[k]",k,e);
+            let segs = [];
+            for (let i = 0; i < e.geojson.length - 1; i++) {
+                segs.push(geo_distance(e.geojson[i][0], e.geojson[i][1],
+                    e.geojson[i + 1][0], e.geojson[i + 1][1]));
+            }
+
+            const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(3);
+
+            rows += `<tr _eid="${e.id}" 
                                      _et="polyline"
                                      class = ${_geos[k].active ? 'selected' : ''} 
                                      >
                                      <td>${e.id}</td>
                                      <td>
-                                        <input _cn = "show_on_map"  
+                                        <input _cn = "show_polyline"  
                                                type="checkbox" 
-                                               ${_geos[k].showOnMap ? 'checked' : ''} >
+                                               ${_geos[k].showPolyline ? 'checked' : ''} >
                                      </td>
-                                     <td><div _efn="name">${e.name}</div></td>
+                                     <td>
+                                        <input _cn = "show_distance"  
+                                               type="checkbox" 
+                                               ${_geos[k].showDistance ? 'checked' : ''} >
+                                     </td>                                     <td><div _efn="name">${e.name}</div></td>
                                      <td><div _efn="meta.desc">${e.meta.desc}</div></td>
                                      <td><div style="background-color: ${e.meta.color}">&nbsp;</div></td>
                                      <td>${e.geojson.length}</td>
@@ -123,7 +140,7 @@ function drawPolyLineTable(callback = addAction) {
 
 //https://htmlweb.ru/html/symbols.php  special symbols
 
-    });
+        });
 
     $("#polyLineTable").html(rows);
 
@@ -140,7 +157,7 @@ function setActive(_eid,e = null){
     Object.keys(_geos).map((k, i) => {
         if (k == _eid) {
             _geos[k].active = !_geos[k].active;
-            _geos[k].showOnMap = true;
+            _geos[k].showPolyLine = true;
         } else
             _geos[k].active = false;
     });
@@ -149,14 +166,13 @@ function setActive(_eid,e = null){
 
     if(_geos[_eid].active) {
         $(`[_eid=${_eid}]`).addClass('selected');
-        $(`[_eid=${_eid}] td [_cn="show_on_map"]`).prop('checked', true);
+        $(`[_eid=${_eid}] td [_cn="show_polyline"]`).prop('checked', true);
         showPolyLineOnMap();
-        showMileageMarkers();
     }
 
     if (e) e.stopPropagation();
 
-    console.log("@@ Set Active",_geos[_eid]);
+    // console.log("@@ Set Active",_geos[_eid]);
 }
 
 
@@ -173,9 +189,9 @@ function addMapListener()
         {
             const id = findActive[0];
             _geos[id].geojson.push([e.latLng.lat(), e.latLng.lng()]);
-            showPolyLineOnMap();
-            drawPolyLineTable();
-            showMileageMarkers();
+            // showPolyLineOnMap();
+            // drawPolyLineTable();
+            // showDistance();
         }
     });
 }
@@ -196,11 +212,11 @@ export function addAction() {
         });
 
     // 03. 2023-10-05 show on map check box
-        $('[_cn="show_on_map"]').on('click', function (e) {
+        $('[_cn="show_polyline"]').on('click', function (e) {
             const _eid = $(this).closest('[_eid]').attr('_eid');
 
             Object.keys(_geos).map((k, i) => {
-                if (k == _eid) _geos[k].showOnMap = $(this).prop('checked');
+                if (k == _eid) _geos[k].showPolyLine = $(this).prop('checked');
             });
 
             e.stopPropagation();
@@ -208,12 +224,23 @@ export function addAction() {
             // mapObjects.polyLines[_eid].setMap(_geos[_eid].showOnMap? map : null);
         });
 
+    $('[_cn="show_distance"]').on('click', function (e) {
+        const _eid = $(this).closest('[_eid]').attr('_eid');
+
+        Object.keys(_geos).map((k, i) => {
+            if (k == _eid) _geos[k].showDistance = $(this).prop('checked');
+        });
+
+        e.stopPropagation();
+        showDistance();
+        // mapObjects.polyLines[_eid].setMap(_geos[_eid].showOnMap? map : null);
+    });
 
     // 02. editable fields
 
     let _efield = document.querySelectorAll('[_efn]');
 
-    console.log("@@ 88 _efield", _efield);
+    // console.log("@@ 88 _efield", _efield);
 
 
     [..._efield].map((e, i) => {
@@ -269,7 +296,7 @@ export function addAction() {
 
     let _btn = document.querySelectorAll('[_bt]');
 
-    console.log("@@ _btn",_btn, _efield);
+    // console.log("@@ _btn",_btn, _efield);
 
     [..._btn].map((e, i) => {
 
@@ -297,7 +324,7 @@ function showPolyLineOnMap() {
     Object.keys(_geos).map((id) => {
         // console.log("@@ 01. showPolyLineOnMap", id, _geos, mapObjects.polyLines[id]);
 
-        if (_geos[id].showOnMap) {
+        if (_geos[id].showPolyLine) {
             if (mapObjects.polyLines[id] !== undefined)
                 mapObjects.polyLines[id].setMap(null);
 
@@ -326,7 +353,7 @@ function showPolyLineOnMap() {
                             _geos[id].geojson = mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
                             console.log("@@ event",event);
                             drawPolyLineTable();
-                            showMileageMarkers();
+                            showDistance();
                         })
                     }
                 );
@@ -362,9 +389,8 @@ function createPolyLine() {
         showOnMap: true,
     }
 
-    drawPolyLineTable();
-
-    setActive(id);
+    // drawPolyLineTable();
+    // setActive(id);
 
     let polyOption = {
         geodesic: true,
@@ -382,34 +408,35 @@ function createPolyLine() {
 
 }
 
-function showMileageMarkers()
+function showDistance()
 {
     let po;
     let dist = 0;
     let total_dist = 0;
 
+    // console.log("@@ 75 showDistance");
+
     Object.keys(mapObjects.markers).map(id => {
-        mapObjects.markers[id].map(m=>m.setMap(null));
-        mapObjects.markers[id] = [];
-    });
+            if(mapObjects.markers[id] !== undefined) {
+                mapObjects.markers[id].map(i => i.setMap(null));  // remove all marker
+                mapObjects.markers[id] = [];
+            }
+        });
 
-    let id = Object.entries(_geos).find(item => item[1].active == true);
+    Object.keys(_geos).map(id => {
+        if (_geos[id].showDistance) {
 
-    id = id !== undefined? id[0]:1;
+            mapObjects.markers[id] = [];
+            _geos[id].geojson.map((p,i) => {
 
+                if (i > 0) total_dist += geo_distance(po[0],po[1],p[0],p[1]);
+                po = p;
 
-    mapObjects.markers[id] = [];
+                // console.log("@@ >>> mileage_markers()",id, _geos[id], mapObjects.markers[id]);
 
-    _geos[id].geojson.map((p,i) => {
+                const svg_width = total_dist.toFixed(2).length*8;
 
-        if (i > 0) total_dist += geo_distance(po[0],po[1],p[0],p[1]);
-        po = p;
-
-        // console.log("@@ >>> mileage_markers()",id, _geos[id], mapObjects.markers[id]);
-
-        const svg_width = total_dist.toFixed(2).length*8;
-
-        const svg = `<?xml version="1.0"?>
+                const svg = `<?xml version="1.0"?>
                 <svg width="${svg_width}px" height="15px" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
                 <text x="5" y="14" 
@@ -424,35 +451,43 @@ function showMileageMarkers()
                 stroke-width:3;">${total_dist.toFixed(2)}</text>
                 </svg>`;
 
-        const svg_icon = {
-            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-            anchor: new google.maps.Point(7, 22),
+                const svg_icon = {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+                    anchor: new google.maps.Point(7, 22),
+                }
+
+
+                let markerOption = {
+                    position: {lat: p[0], lng: p[1]},
+                    map: _map,
+                    title: `${p[0].toFixed(3)}, ${p[1].toFixed(3)}`, // {total_dist.toFixed(2)},
+                    icon: svg_icon
+                }
+
+                const marker = new google.maps.Marker(markerOption);
+
+                mapObjects.markers[id].push( marker);
+
+                google.maps.event.addListener(marker, 'click', function (event) {
+                    console.log("@@ delete marker",id,i);
+                    mapObjects.markers[id][i].setMap(null);
+                    mapObjects.markers[id].splice(i, 1);
+                    _geos[id].geojson.splice(i, 1);
+                    mapObjects.polyLines[id].getPath().removeAt(i);
+                });
+
+
+            })
         }
 
+    });
 
-        let markerOption = {
-            position: {lat: p[0], lng: p[1]},
-            map: _map,
-            title: `${p[0].toFixed(3)}, ${p[1].toFixed(3)}`, // {total_dist.toFixed(2)},
-            icon: svg_icon
-        }
-
-        const marker = new google.maps.Marker(markerOption);
-
-        mapObjects.markers[id].push( marker);
-
-        google.maps.event.addListener(marker, 'click', function (event) {
-            console.log("@@ delete marker",id,i);
-            mapObjects.markers[id][i].setMap(null);
-            mapObjects.markers[id].splice(i, 1);
-            _geos[id].geojson.splice(i, 1);
-            mapObjects.polyLines[id].getPath().removeAt(i);
-        });
+    // let id = Object.entries(_geos).find(item => item[1].showDistance == true);
+    //
+    // id = id !== undefined? id[0]:1;
 
 
-        // console.log("@@ mileage_markers() markerOption=",id, markerOption, new_marker);
 
-    })
 
 
 }
@@ -463,7 +498,8 @@ function getGeos() {
     let body = {
         action: 'getgeos',
         verbose: true,
-        whe: ""
+        whe: "",
+        sort: " order by tm_modified desc"
     };
 
     xhr.open("POST", '/api/geos.php', true);
@@ -480,7 +516,7 @@ function getGeos() {
 
         let _geosОbj =  [...resp.result.data].map((o, v) => _geos[o.id] = o );
 
-        console.log("@@ 33 ***  get Geos", _geosОbj, resp.result.data); //resp.result.data );
+        // console.log("@@ 33 ***  get Geos", _geosОbj, resp.result.data); //resp.result.data );
 
         // _geos[10] = _geosОbj;
 

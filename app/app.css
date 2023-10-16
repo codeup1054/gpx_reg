@@ -27,3 +27,9 @@
 .stab tr.selected{
     background: #d7e7ff;
 }
+
+._sm {font-size: 9px;}
+._g {font-color: "#999999";}
+._i {font-style: italic;}
+
+

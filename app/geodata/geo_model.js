@@ -8,6 +8,12 @@ export let mapObjects = {
     _map: "_mapObjects_map_",
 };
 
+
+export let appState = {
+    key_sort : 'tm_modified',
+    sort_direction : 1  // 1 - asc
+}
+
 export let geoZonesFiles = [
     'z12_Mosobl.kml',
     'z14_Tver_Dubna_Zavidovo.kml',
@@ -28,7 +34,7 @@ export let _geos = {
         geojson: [[55.723, 37.45], [55.73, 37.501], [55.72, 37.51]],
         active: true,
         showDistance: true,
-        showOnMap: true
+        showPolyLine: true
     },
     2: {
         id: 2,
