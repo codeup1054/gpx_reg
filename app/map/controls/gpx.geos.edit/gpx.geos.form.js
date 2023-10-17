@@ -114,8 +114,7 @@ export function editGeoForm(_geoId)
             const pointCount =  v.length;
             let segs = [];
             for (let i = 0; i < v.length - 1; i++) {
-                segs.push(geo_distance(v[i][0], v[i][1],
-                    v[i + 1][0], v[i + 1][1]));
+                segs.push(geo_distance(v[i],v[i + 1]));
             }
             const totalDistance =  segs.reduce((a, b) => a + b, 0).toFixed(3);
             return `Точек: ${pointCount} | ${totalDistance}км`;

@@ -79,9 +79,7 @@ function drawPolyLineTable(callback = addAction) {
         <td>D</td>
         <td>Name</td>
         <td>Описание</td>
-        <td>Настр</td>
-        <td>Точек</td>
-        <td>Длина</td>
+        <td>Инфо</td>
         <td>Действие</td>
         </tr>`;
 
@@ -112,33 +110,24 @@ function drawPolyLineTable(callback = addAction) {
                                      _et="polyline"
                                      class = ${_geos[k].active ? 'selected' : ''} 
                                      >
-                                     <td>${e.id}</td>
+                                     <td align="right" >
+                                        ${e.id}&nbsp
+                                        <div style="background-color: ${e.meta.color}; display: inline-block; width: 7px; height: 10px;">&nbsp</div></td>
                                      <td>
                                         <input _cn = "show_polyline"  
                                                type="checkbox" 
                                                ${_geos[k].meta.showPolyLine ? 'checked' : ''} >
                                      </td>
                                      <td style="vertical-align: middle; ">
-                                        <div _bt="distance_direction"  
-                                                   style="border: solid #888 1.5px; 
-                                                   display: inline-block;
-                                                   text-align: center; 
-                                                   border-radius: 2px;
-                                                   padding: 0px; 
-                                                   margin: 0px;
-                                                   width:10px; 
-                                                   height: 10px;
-                                                   cursor: pointer;
-                                                   -webkit-user-select:none;
-                                                   font-size: 8px;"></div>
+                                        <div _bt="distance_direction"></div>
                                      </td>
                                      <td><div _efn="name">${e.name}</div></td>
                                      <td><div _efn="meta.desc">${e.meta.desc}</div></td>
-                                     <td><div style="background-color: ${e.meta.color}">&nbsp;</div></td>
-                                     <td>${e.geojson.length}</td>
-                                     <td _cn = "polyLen" >${polyLen}</td>
                                      <td>
-                                        <button _bt="geo_cancel">&#10060;</button>
+                                        ${e.geojson.length} | <span _cn = "polyLen" >${polyLen} км</span>
+                                     </td>
+                                     <td>
+                                        <!-- <button _bt="geo_cancel">&#10060;</button> -->
                                         <button _bt="geo_find">&#128269;</button>
                                         <button _bt="geo_edit">&#9998;</button>
                                         <button _bt="geo_save">&#9989;</button>

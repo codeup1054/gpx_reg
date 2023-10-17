@@ -32,4 +32,17 @@
 ._g {font-color: "#999999";}
 ._i {font-style: italic;}
 
+[_bt="distance_direction"] {
+    border: solid #888 1.5px;
+    display: inline-block;
+    text-align: center;
+    border-radius: 2px;
+    padding: 0px;
+    margin: 0px;
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    font-size: 8px;
+}
 
