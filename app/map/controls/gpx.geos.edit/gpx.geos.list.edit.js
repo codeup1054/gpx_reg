@@ -67,7 +67,7 @@ function initGeoEdit()
     drawPolyLineTable();
     addMapListener();
     showPolyLineOnMap();
-    showDistance();
+    distanceMarker();
     // waitElement("#polyLineTable", 1, addAction, 0)
 }
 
@@ -119,20 +119,30 @@ function drawPolyLineTable(callback = addAction) {
                                                type="checkbox" 
                                                ${_geos[k].showPolyline ? 'checked' : ''} >
                                      </td>
-                                     <td>
-                                        <input _cn = "show_distance"  
-                                               type="checkbox" 
-                                               ${_geos[k].showDistance ? 'checked' : ''} >
-                                     </td>                                     <td><div _efn="name">${e.name}</div></td>
+                                     <td style="vertical-align: middle; ">
+                                        <div _bt="distance_direction"  
+                                                   style="border: solid #888 1.5px; 
+                                                   display: inline-block;
+                                                   text-align: center; 
+                                                   border-radius: 2px;
+                                                   padding: 0px; 
+                                                   margin: 0px;
+                                                   width:10px; 
+                                                   height: 10px;
+                                                   cursor: pointer;
+                                                   -webkit-user-select:none;
+                                                   font-size: 8px;"></div>
+                                     </td>
+                                     <td><div _efn="name">${e.name}</div></td>
                                      <td><div _efn="meta.desc">${e.meta.desc}</div></td>
                                      <td><div style="background-color: ${e.meta.color}">&nbsp;</div></td>
                                      <td>${e.geojson.length}</td>
                                      <td _cn = "polyLen" >${polyLen}</td>
                                      <td>
-                                        <button _bt="cancel">&#10060;</button>
-                                        <button _bt="find">&#128269;</button>
-                                        <button _bt="edit">&#9998;</button>
-                                        <button _bt="save">&#9989;</button>
+                                        <button _bt="geo_cancel">&#10060;</button>
+                                        <button _bt="geo_find">&#128269;</button>
+                                        <button _bt="geo_edit">&#9998;</button>
+                                        <button _bt="geo_save">&#9989;</button>
 
                                      </td>
                                  </tr>
@@ -198,10 +208,37 @@ function addMapListener()
 
 
 let action = {
-    save:   function (_eid) {        updateGeos(_geos[_eid]);    },
-    cancel: function (_eid) {        console.log("@@ _action cancel", _eid)    },
-    find:   function (_eid) {        zoom_polyline(_eid);    },
-    edit:   function (_eid) {        editGeoForm(_eid);    },
+    geo_save:   function (_eid) {        updateGeos(_geos[_eid]);    },
+    geo_cancel: function (_eid) {        console.log("@@ _action cancel", _eid)    },
+    geo_find:   function (_eid) {        zoom_polyline(_eid);    },
+    geo_edit:   function (_eid) {        editGeoForm(_eid);    },
+    distance_direction: function (_eid) {
+
+        const _stateIcon = {
+            0:"",
+            1: "&#9658",
+            2: "&#9668"
+        };
+
+        _geos[_eid]['meta']['distanceDirection'] ??= 0 ;
+
+        const _state = (_geos[_eid]['meta']['distanceDirection'] + 1) % 3;
+
+        _geos[_eid]['meta']['distanceDirection'] = _state;
+
+        let _efield = document.querySelectorAll(`[_eid = "${_eid}"] [_bt = "distance_direction"]`);
+
+        [..._efield].map((el) => {
+            el.innerHTML = _stateIcon[_state];
+            el.style.backgroundColor = _state == 0 ? '#fff':'#0075FF';
+            el.style.borderColor = _state == 0 ? '#888':'#0075FF';
+            el.style.color = '#fff';
+        });
+
+        console.log("@@ 99 _state ",_state);
+
+        distanceMarker();
+    }
 }
 export function addAction() {
 
@@ -232,9 +269,24 @@ export function addAction() {
         });
 
         e.stopPropagation();
-        showDistance();
+        distanceMarker();
         // mapObjects.polyLines[_eid].setMap(_geos[_eid].showOnMap? map : null);
     });
+
+
+    // $('[_cn="distance_direction"]').on('click', function (e) {
+    //     const _eid = $(this).closest('[_eid]').attr('_eid');
+    //
+    //     Object.keys(_geos).map((k, i) => {
+    //         if (k == _eid) _geos[k].distanceDirection = $(this).prop('checked');
+    //     });
+    //
+    //     e.stopPropagation();
+    //     distanceMarker();
+    //     // mapObjects.polyLines[_eid].setMap(_geos[_eid].showOnMap? map : null);
+    // });
+
+
 
     // 02. editable fields
 
@@ -307,7 +359,7 @@ export function addAction() {
 
         if (evList !== 'true') {
             e.addEventListener('click', function (event) {
-                console.log("@@ 77 click to _eid", _eid,  evList);
+                console.log("@@ 77 click to _eid", _eid,  _bt);
                 action[_bt](_eid);
                 event.stopPropagation();
             });
@@ -353,7 +405,7 @@ function showPolyLineOnMap() {
                             _geos[id].geojson = mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
                             console.log("@@ event",event);
                             drawPolyLineTable();
-                            showDistance();
+                            distanceMarker();
                         })
                     }
                 );
@@ -408,13 +460,13 @@ function createPolyLine() {
 
 }
 
-function showDistance()
+function distanceMarker()
 {
     let po;
     let dist = 0;
     let total_dist = 0;
 
-    // console.log("@@ 75 showDistance");
+    console.log("@@ 75 distanceMarker");
 
     Object.keys(mapObjects.markers).map(id => {
             if(mapObjects.markers[id] !== undefined) {
@@ -475,7 +527,6 @@ function showDistance()
                     _geos[id].geojson.splice(i, 1);
                     mapObjects.polyLines[id].getPath().removeAt(i);
                 });
-
 
             })
         }
