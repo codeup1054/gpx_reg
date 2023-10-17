@@ -1,6 +1,15 @@
 // let _map = null;
 // export let _map;
 
+/** 2023-10-17 n-state checkbox*/
+
+export const _stateControl = {
+    0: {icon:"", backgroundColor:"", borderColor:"#888"  },
+    1: {icon:"&#9658", backgroundColor:'#0075FF', borderColor:'#0075FF', color:'#FFF' },
+    2: {icon:"&#9668", backgroundColor:'#0075FF', borderColor:'#0075FF', color:'#FFF' },
+};
+
+
 export let mapObjects = {
     polyLines: {},
     markers: {},

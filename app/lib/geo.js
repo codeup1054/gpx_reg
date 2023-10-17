@@ -1,4 +1,10 @@
-export function geo_distance(lat1, lon1, lat2, lon2, precision = 3, unit = "K") {
+export function geo_distance(a, b, precision = 3, unit = "K") {
+    const lat1 = a[0];
+    const lon1 = a[1];
+    const lat2 = b[0];
+    const lon2 = b[1];
+
+
     var radlat1 = Math.PI * lat1 / 180
     var radlat2 = Math.PI * lat2 / 180
     var theta = lon1 - lon2

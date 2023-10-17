@@ -2,7 +2,7 @@
 // 2023-09-28 https://github.com/zhenyanghua/MeasureTool-GoogleMaps-V3
 // 2023-09-27  https://www.youtube.com/watch?v=nUdt9aMcg0M
 
-import {mapObjects, _geos, appState}  from "/app/geodata/geo_model.js";
+import {mapObjects, _geos, appState, _stateControl} from "/app/geodata/geo_model.js";
 import {editGeoForm} from '/app/map/controls/gpx.geos.edit/gpx.geos.form.js';
 import {geo_distance} from '/app/lib/geo.js';
 
@@ -22,7 +22,7 @@ export function polylineTools() {
     addPolyLineButton = document.createElement("button");
     addPolyLineButton.innerHTML = '_geos';
     addPolyLineButton.addEventListener("click", function () {
-        console.log("@@ 65 button", _geos)
+        console.log("@@ 100 *** GEOS", _geos)
     });
     mapCtrl.appendChild(addPolyLineButton);
 
@@ -103,8 +103,7 @@ function drawPolyLineTable(callback = addAction) {
             // console.log("@@ _geos[k]",k,e);
             let segs = [];
             for (let i = 0; i < e.geojson.length - 1; i++) {
-                segs.push(geo_distance(e.geojson[i][0], e.geojson[i][1],
-                    e.geojson[i + 1][0], e.geojson[i + 1][1]));
+                segs.push(geo_distance(e.geojson[i], e.geojson[i + 1]));
             }
 
             const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(3);
@@ -117,7 +116,7 @@ function drawPolyLineTable(callback = addAction) {
                                      <td>
                                         <input _cn = "show_polyline"  
                                                type="checkbox" 
-                                               ${_geos[k].showPolyline ? 'checked' : ''} >
+                                               ${_geos[k].meta.showPolyLine ? 'checked' : ''} >
                                      </td>
                                      <td style="vertical-align: middle; ">
                                         <div _bt="distance_direction"  
@@ -167,7 +166,7 @@ function setActive(_eid,e = null){
     Object.keys(_geos).map((k, i) => {
         if (k == _eid) {
             _geos[k].active = !_geos[k].active;
-            _geos[k].showPolyLine = true;
+            _geos[k].meta.showPolyLine = true;
         } else
             _geos[k].active = false;
     });
@@ -214,32 +213,32 @@ let action = {
     geo_edit:   function (_eid) {        editGeoForm(_eid);    },
     distance_direction: function (_eid) {
 
-        const _stateIcon = {
-            0:"",
-            1: "&#9658",
-            2: "&#9668"
-        };
+        // _geos[_eid]['meta']['distanceDirection'] ??= 0 ;
 
-        _geos[_eid]['meta']['distanceDirection'] ??= 0 ;
 
-        const _state = (_geos[_eid]['meta']['distanceDirection'] + 1) % 3;
+        let _state = _geos[_eid]['meta']['distanceDirection'] == undefined ? 0 : (_geos[_eid]['meta']['distanceDirection'] +=1 ) %3;
 
-        _geos[_eid]['meta']['distanceDirection'] = _state;
+        _geos[_eid]['meta']['distanceDirection'] = _state ;
+
 
         let _efield = document.querySelectorAll(`[_eid = "${_eid}"] [_bt = "distance_direction"]`);
 
-        [..._efield].map((el) => {
-            el.innerHTML = _stateIcon[_state];
-            el.style.backgroundColor = _state == 0 ? '#fff':'#0075FF';
-            el.style.borderColor = _state == 0 ? '#888':'#0075FF';
-            el.style.color = '#fff';
-        });
+        [..._efield].map(el => setStateControl(el, _state ));
 
         console.log("@@ 99 _state ",_state);
 
         distanceMarker();
     }
 }
+
+function setStateControl(el, _state=0)
+{
+    el.innerHTML                = _stateControl[_state].icon;
+    el.style.backgroundColor    = _stateControl[_state].backgroundColor;
+    el.style.borderColor        = _stateControl[_state].borderColor;
+    el.style.color              = _stateControl[_state].color;
+}
+
 export function addAction() {
 
     // 04. 2023-10-05 select row and set mapGeo active
@@ -253,7 +252,7 @@ export function addAction() {
             const _eid = $(this).closest('[_eid]').attr('_eid');
 
             Object.keys(_geos).map((k, i) => {
-                if (k == _eid) _geos[k].showPolyLine = $(this).prop('checked');
+                if (k == _eid) _geos[k].meta.showPolyLine = $(this).prop('checked');
             });
 
             e.stopPropagation();
@@ -354,9 +353,17 @@ export function addAction() {
 
         const _eid = e.closest('[_eid]').getAttribute('_eid');
         const _bt = e.getAttribute('_bt');
-
         const evList = e.getAttribute('listener');
 
+        /** prepare button */
+
+        if (_bt == "distance_direction") {
+            console.log("@@ 33 ",_bt, _geos[_eid].meta.distanceDirection );
+            setStateControl(e, _geos[_eid].meta.distanceDirection);
+        }
+
+        /** add action to button */
+        
         if (evList !== 'true') {
             e.addEventListener('click', function (event) {
                 console.log("@@ 77 click to _eid", _eid,  _bt);
@@ -376,7 +383,7 @@ function showPolyLineOnMap() {
     Object.keys(_geos).map((id) => {
         // console.log("@@ 01. showPolyLineOnMap", id, _geos, mapObjects.polyLines[id]);
 
-        if (_geos[id].showPolyLine) {
+        if (_geos[id].meta.showPolyLine) {
             if (mapObjects.polyLines[id] !== undefined)
                 mapObjects.polyLines[id].setMap(null);
 
@@ -386,6 +393,7 @@ function showPolyLineOnMap() {
                     strokeColor: _geos[id].meta.color,
                     strokeWeight: 3,
                     map:_map,
+                    title: _geos[id].name,
                     path: _geos[id].geojson.map(p => {
                         return {lat: p[0], lng: p[1]}
                     })
@@ -393,6 +401,35 @@ function showPolyLineOnMap() {
 
                 mapObjects.polyLines[id] = new google.maps.Polyline(polyOption);
                 mapObjects.polyLines[id].setEditable(_geos[id].active);
+
+                let total_distance = 0;
+                let _pts = _geos[id].geojson;
+                console.log("@@ ",id);
+
+                _pts.map((p,i)=> {
+                    console.log("@@ \n",_pts[i-1], _pts[i-1]," | ", _pts[i], _pts[i]);
+
+                    if (i>0)  total_distance  +=  geo_distance(_pts[i-1], _pts[i]);
+                });
+
+
+                const infoText = `${_geos[id].name}</br>
+                                [${_geos[id].geojson.length}] - ${total_distance.toFixed(3)} km`;
+
+                let infoWindow = new google.maps.InfoWindow({
+                    pixelOffset: new google.maps.Size(0, -7),
+                    content: infoText
+                });
+
+                google.maps.event.addListener(mapObjects.polyLines[id], 'mouseover', function(e) {
+                    infoWindow.setPosition(e.latLng);
+                    infoWindow.open(_map);
+                });
+// Close the InfoWindow on mouseout:
+                google.maps.event.addListener(mapObjects.polyLines[id], 'mouseout', function() {
+                    infoWindow.close();
+                });
+
 
                 mapObjects.polyLines[id].addListener("click", (e) => {
                     console.log("@@ polyLines click");
@@ -464,7 +501,7 @@ function distanceMarker()
 {
     let po;
     let dist = 0;
-    let total_dist = 0;
+    // let total_dist = 0;
 
     console.log("@@ 75 distanceMarker");
 
@@ -476,70 +513,75 @@ function distanceMarker()
         });
 
     Object.keys(_geos).map(id => {
-        if (_geos[id].showDistance) {
 
-            mapObjects.markers[id] = [];
-            _geos[id].geojson.map((p,i) => {
+        const distanceDirection = _geos[id].meta.distanceDirection;
 
-                if (i > 0) total_dist += geo_distance(po[0],po[1],p[0],p[1]);
-                po = p;
+        if ( distanceDirection > 0) {
 
-                // console.log("@@ >>> mileage_markers()",id, _geos[id], mapObjects.markers[id]);
+            mapObjects.markers[id] ??= [];
 
-                const svg_width = total_dist.toFixed(2).length*8;
+            console.log("@@ 75.1 distanceMarker", distanceDirection);
 
-                const svg = `<?xml version="1.0"?>
-                <svg width="${svg_width}px" height="15px" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            const distPnts = distanceDirection == 2 ? _geos[id].geojson.reverse(): _geos[id].geojson;
 
-                <text x="5" y="14" 
-                font-size="13" 
-                font-family="Helvetica, sans-serif"
-                
-                style="
-                font-weight:bold;
-                paint-order: stroke;
-                fill:${_geos[id].meta.color};
-                stroke:rgb(255,255,255);
-                stroke-width:3;">${total_dist.toFixed(2)}</text>
-                </svg>`;
+            let total_dist = 0;
 
-                const svg_icon = {
-                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-                    anchor: new google.maps.Point(7, 22),
-                }
+            distPnts.map((p,i) => {
+
+                    if (i > 0) total_dist += geo_distance(po,p);
+                    po = p;
+
+                    // console.log("@@ >>> mileage_markers()",id, _geos[id], mapObjects.markers[id]);
+
+                    const svg_width = total_dist.toFixed(2).length*8;
+
+                    const svg = `<?xml version="1.0"?>
+                    <svg width="${svg_width}px" height="15px" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    
+                    <text x="5" y="14" 
+                    font-size="13" 
+                    font-family="Helvetica, sans-serif"
+                    
+                    style="
+                    font-weight:bold;
+                    paint-order: stroke;
+                    fill:${_geos[id].meta.color};
+                    stroke:rgb(255,255,255);
+                    stroke-width:3;">${total_dist.toFixed(2)}</text>
+                    </svg>`;
+
+                    const svg_icon = {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+                        anchor: new google.maps.Point(7, 22),
+                    }
 
 
-                let markerOption = {
-                    position: {lat: p[0], lng: p[1]},
-                    map: _map,
-                    title: `${p[0].toFixed(3)}, ${p[1].toFixed(3)}`, // {total_dist.toFixed(2)},
-                    icon: svg_icon
-                }
+                    let markerOption = {
+                        position: {lat: p[0], lng: p[1]},
+                        map: _map,
+                        title: `${p[0].toFixed(3)}, ${p[1].toFixed(3)}`, // {total_dist.toFixed(2)},
+                        icon: svg_icon
+                    }
 
-                const marker = new google.maps.Marker(markerOption);
+                    const marker = new google.maps.Marker(markerOption);
 
-                mapObjects.markers[id].push( marker);
+                    mapObjects.markers[id].push( marker);
 
-                google.maps.event.addListener(marker, 'click', function (event) {
-                    console.log("@@ delete marker",id,i);
-                    mapObjects.markers[id][i].setMap(null);
-                    mapObjects.markers[id].splice(i, 1);
-                    _geos[id].geojson.splice(i, 1);
-                    mapObjects.polyLines[id].getPath().removeAt(i);
-                });
+                    google.maps.event.addListener(marker, 'click', function (event) {
+                        console.log("@@ delete marker",id,i);
+                        mapObjects.markers[id][i].setMap(null);
+                        mapObjects.markers[id].splice(i, 1);
+                        _geos[id].geojson.splice(i, 1);
+                        mapObjects.polyLines[id].getPath().removeAt(i);
+                    });
 
             })
-        }
-
+        } // if (_geos[id].distanceDirection > 0)
     });
 
     // let id = Object.entries(_geos).find(item => item[1].showDistance == true);
     //
     // id = id !== undefined? id[0]:1;
-
-
-
-
 
 }
 
