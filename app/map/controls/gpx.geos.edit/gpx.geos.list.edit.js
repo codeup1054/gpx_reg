@@ -2,7 +2,7 @@
 // 2023-09-28 https://github.com/zhenyanghua/MeasureTool-GoogleMaps-V3
 // 2023-09-27  https://www.youtube.com/watch?v=nUdt9aMcg0M
 
-import {mapObjects, _geos, appState, _stateControl} from "/app/geodata/geo_model.js";
+import {_mapObjects, _geos, _appState, _stateControl} from "/app/geodata/geo_model.js";
 import {editGeoForm} from '/app/map/controls/gpx.geos.edit/gpx.geos.form.js';
 import {geo_distance} from '/app/lib/geo.js';
 
@@ -22,7 +22,7 @@ export function polylineTools() {
     addPolyLineButton = document.createElement("button");
     addPolyLineButton.innerHTML = '_geos';
     addPolyLineButton.addEventListener("click", function () {
-        console.log("@@ 100 *** GEOS", _geos)
+        console.log("@@ 100 *** GEOS", _geos, _appState)
     });
     mapCtrl.appendChild(addPolyLineButton);
 
@@ -53,10 +53,8 @@ function waitElement(selector, time, callback = initGeoEdit, lap = 0) {
 
 
 function zoom_polyline(_eid) {
-    console.log("@@ polyBound 1 =", _map, _param);
-    mapObjects.polyLines[_eid].setMap(_map);
-    const polyBound = mapObjects.polyLines[_eid].getBounds();
-    console.log("@@ polyBound 2 =", polyBound, this);
+    _mapObjects.polyLines[_eid].setMap(_map);
+    const polyBound = _mapObjects.polyLines[_eid].getBounds();
     // center = bounds.getCenter();
     _map.fitBounds(polyBound);
 }
@@ -86,13 +84,13 @@ function drawPolyLineTable(callback = addAction) {
 
     let no_sorted_by_key = [];
     for (let el in _geos) {
-        no_sorted_by_key.push([_geos[el][appState.key_sort], el]);
+        no_sorted_by_key.push([_geos[el][_appState.key_sort], el]);
     }
 
     const sorted_by_key = no_sorted_by_key.sort((a, b) =>
-        a<b ? appState.sort_direction : -appState.sort_direction );
+        a<b ? _appState.sort_direction : -_appState.sort_direction );
 
-    console.log("@@ 22 sortable  ",no_sorted_by_key, sorted_by_key);
+    // console.log("@@ 22 sortable  ",no_sorted_by_key, sorted_by_key);
 
     // Object.keys(_geos).map((k, i) => {
     sorted_by_key.map((sorted, i) => {
@@ -347,7 +345,7 @@ export function addAction() {
         /** prepare button */
 
         if (_bt == "distance_direction") {
-            console.log("@@ 33 ",_bt, _geos[_eid].meta.distanceDirection );
+            // console.log("@@ 33 ",_bt, _geos[_eid].meta.distanceDirection );
             setStateControl(e, _geos[_eid].meta.distanceDirection);
         }
 
@@ -373,10 +371,10 @@ function showPolyLineOnMap() {
         // console.log("@@ 01. showPolyLineOnMap", id, _geos, mapObjects.polyLines[id]);
 
         if (_geos[id].meta.showPolyLine) {
-            if (mapObjects.polyLines[id] !== undefined)
-                mapObjects.polyLines[id].setMap(null);
+            if (_mapObjects.polyLines[id] !== undefined)
+                _mapObjects.polyLines[id].setMap(null);
 
-            if (mapObjects.polyLines[id] === undefined || 1) {
+            if (_mapObjects.polyLines[id] === undefined || 1) {
                 let polyOption = {
                     geodesic: true,
                     strokeColor: _geos[id].meta.color,
@@ -388,16 +386,13 @@ function showPolyLineOnMap() {
                     })
                 };
 
-                mapObjects.polyLines[id] = new google.maps.Polyline(polyOption);
-                mapObjects.polyLines[id].setEditable(_geos[id].active);
+                _mapObjects.polyLines[id] = new google.maps.Polyline(polyOption);
+                _mapObjects.polyLines[id].setEditable(_geos[id].active);
 
                 let total_distance = 0;
                 let _pts = _geos[id].geojson;
-                console.log("@@ ",id);
 
                 _pts.map((p,i)=> {
-                    console.log("@@ \n",_pts[i-1], _pts[i-1]," | ", _pts[i], _pts[i]);
-
                     if (i>0)  total_distance  +=  geo_distance(_pts[i-1], _pts[i]);
                 });
 
@@ -410,25 +405,25 @@ function showPolyLineOnMap() {
                     content: infoText
                 });
 
-                google.maps.event.addListener(mapObjects.polyLines[id], 'mouseover', function(e) {
+                google.maps.event.addListener(_mapObjects.polyLines[id], 'mouseover', function(e) {
                     infoWindow.setPosition(e.latLng);
                     infoWindow.open(_map);
                 });
 // Close the InfoWindow on mouseout:
-                google.maps.event.addListener(mapObjects.polyLines[id], 'mouseout', function() {
+                google.maps.event.addListener(_mapObjects.polyLines[id], 'mouseout', function() {
                     infoWindow.close();
                 });
 
 
-                mapObjects.polyLines[id].addListener("click", (e) => {
-                    console.log("@@ polyLines click");
+                _mapObjects.polyLines[id].addListener("click", (e) => {
+                    // console.log("@@ polyLines click");
                     setActive(id,false);
                 });
 
 
                 ['remove_at', 'set_at', 'dragend',"insert_at"].map((event) => {
-                        mapObjects.polyLines[id].getPath().addListener(event, e => {
-                            _geos[id].geojson = mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
+                        _mapObjects.polyLines[id].getPath().addListener(event, e => {
+                            _geos[id].geojson = _mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
                             console.log("@@ event",event);
                             drawPolyLineTable();
                             distanceMarker();
@@ -439,13 +434,13 @@ function showPolyLineOnMap() {
             }
 
             else
-            {console.log("@@ else ",id, mapObjects.polyLines[id].getPath().length);}
+            {console.log("@@ else ",id, _mapObjects.polyLines[id].getPath().length);}
 
             // console.log("@@ 11 geoLayers.mapPolylines[id]", id, newPoly);
 
         } else {
-            if (mapObjects.polyLines[id] !== undefined)
-                mapObjects.polyLines[id].setMap(null);
+            if (_mapObjects.polyLines[id] !== undefined)
+                _mapObjects.polyLines[id].setMap(null);
         }
 
 
@@ -456,15 +451,19 @@ function showPolyLineOnMap() {
 
 function createPolyLine() {
 
-    const id = Math.max(...Object.keys(_geos).map(k => _geos[k].id))+1
+    const new_id = Math.max(...Object.keys(_geos).map(k => _geos[k].id))+1
 
-    _geos[id] = {
-        id: id,
-        name: `new ${id}`,
-        desc: `Описание ${id}`,
-        meta: {color: '#ff22bbaa'},
+    _geos[new_id] = {
+        id: new_id,
+        name: `new ${new_id}`,
+        desc: `Описание ${new_id}`,
+        meta: {
+            color: '#ff22bbaa',
+            distanceDirection: 1,
+            showPolyLine: true,
+        },
         geojson: [],
-        showOnMap: true,
+        active: true
     }
 
     // drawPolyLineTable();
@@ -479,10 +478,22 @@ function createPolyLine() {
         editable: true
     }
 
-    console.log("@@ 02 polyOption, newGeosPoly", _geos, polyOption);
+    console.log("@@ 02 polyOption, newGeosPoly", _geos, new_id, polyOption);
+
+    drawPolyLineTable();
 
 
-    // showPolyLineOnMap();
+    google.maps.event.addListener(_map, "click", (e) => {
+        console.log("@@ 07 click",e.latLng);
+        // const id = Object.entries(_geos).find(item => item[1].active == true)[0];
+
+        _geos[new_id].geojson.push([e.latLng.lat(), e.latLng.lng()]);
+        showPolyLineOnMap();
+        drawPolyLineTable();
+        distanceMarker();
+    });
+
+
 
 }
 
@@ -492,12 +503,12 @@ function distanceMarker()
     let dist = 0;
     // let total_dist = 0;
 
-    console.log("@@ 75 distanceMarker");
+    // console.log("@@ 75 distanceMarker");
 
-    Object.keys(mapObjects.markers).map(id => {
-            if(mapObjects.markers[id] !== undefined) {
-                mapObjects.markers[id].map(i => i.setMap(null));  // remove all marker
-                mapObjects.markers[id] = [];
+    Object.keys(_mapObjects.markers).map(id => {
+            if(_mapObjects.markers[id] !== undefined) {
+                _mapObjects.markers[id].map(i => i.setMap(null));  // remove all marker
+                _mapObjects.markers[id] = [];
             }
         });
 
@@ -507,9 +518,9 @@ function distanceMarker()
 
         if ( distanceDirection > 0) {
 
-            mapObjects.markers[id] ??= [];
+            _mapObjects.markers[id] ??= [];
 
-            console.log("@@ 75.1 distanceMarker", distanceDirection);
+            // console.log("@@ 75.1 distanceMarker", distanceDirection);
 
             const distPnts = distanceDirection == 2 ? _geos[id].geojson.reverse(): _geos[id].geojson;
 
@@ -528,15 +539,14 @@ function distanceMarker()
                     <svg width="${svg_width}px" height="15px" version="1.1" xmlns="http://www.w3.org/2000/svg">
     
                     <text x="5" y="14" 
-                    font-size="13" 
+                    font-size="12" 
                     font-family="Helvetica, sans-serif"
-                    
                     style="
                     font-weight:bold;
                     paint-order: stroke;
                     fill:${_geos[id].meta.color};
                     stroke:rgb(255,255,255);
-                    stroke-width:3;">${total_dist.toFixed(2)}</text>
+                    stroke-width:2;">${total_dist.toFixed(2)}</text>
                     </svg>`;
 
                     const svg_icon = {
@@ -554,14 +564,14 @@ function distanceMarker()
 
                     const marker = new google.maps.Marker(markerOption);
 
-                    mapObjects.markers[id].push( marker);
+                    _mapObjects.markers[id].push( marker);
 
                     google.maps.event.addListener(marker, 'click', function (event) {
                         console.log("@@ delete marker",id,i);
-                        mapObjects.markers[id][i].setMap(null);
-                        mapObjects.markers[id].splice(i, 1);
+                        _mapObjects.markers[id][i].setMap(null);
+                        _mapObjects.markers[id].splice(i, 1);
                         _geos[id].geojson.splice(i, 1);
-                        mapObjects.polyLines[id].getPath().removeAt(i);
+                        _mapObjects.polyLines[id].getPath().removeAt(i);
                     });
 
             })

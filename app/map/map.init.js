@@ -1,5 +1,5 @@
 import {ifMapChanged} from '/app/map/map.location.cookie.js'
-import {mapObjects}  from "/app/geodata/geo_model.js";
+import {_mapObjects}  from "/app/geodata/geo_model.js";
 
 export function initMap(param) {
 
@@ -94,31 +94,10 @@ export function initMap(param) {
             }
         }
 
-        /**
-         * The onRemove() method will be called automatically from the API if
-         * we ever set the overlay's map property to 'null'.
-         */
-        onRemove() {
-            if (this.div) {
-                this.div.parentNode.removeChild(this.div);
-                delete this.div;
-            }
-        }
-
-        /**
-         *  Set the visibility to 'hidden' or 'visible'.
-         */
-        hide() {
-            if (this.div) {
-                this.div.style.visibility = "hidden";
-            }
-        }
-
-        show() {
-            if (this.div) {
-                this.div.style.visibility = "visible";
-            }
-        }
+        /*** The onRemove() method will be called automatically from the API if  we ever set the overlay's map property to 'null'. */
+        onRemove() {   if (this.div) { this.div.parentNode.removeChild(this.div); delete this.div; }}
+        hide() {if (this.div) {this.div.style.visibility = "hidden";}}  /***  Set the visibility to 'hidden' or 'visible'. */
+        show() {if (this.div) {this.div.style.visibility = "visible";}}
 
         toggle() {
             if (this.div) {

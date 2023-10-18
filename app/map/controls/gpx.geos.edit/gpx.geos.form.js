@@ -18,9 +18,9 @@ const tpl = `<div class="flex">
     </tr>
     <tr><td colspan="2" align="right">
         <span>{{geojson|polyline_info}}</span>
-        <button _bt="find">&#128269;</button>
-        <button _bt="cancel">&#10060;</button>
-        <button _bt="save">&#9989;</button>
+        <button _bt="geo_find">&#128269;</button>
+        <button _bt="geo_cancel">&#10060;</button>
+        <button _bt="geo_save">&#9989;</button>
     </td></tr>
 </table>        
 `;

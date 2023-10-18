@@ -7,6 +7,7 @@ export let mapInformer = {
 
         let zoomLatLngMonitor = document.createElement("div");
         zoomLatLngMonitor.classList.add("custom-map-control-div");
+        zoomLatLngMonitor.style.display="inline-block";
 
         $("#debug").append(zoomLatLngMonitor);
 
@@ -23,7 +24,7 @@ export let mapInformer = {
         zoomLatLngMonitor.innerHTML = "<zoom>" + _param.zoom  + "</zoom>" +
             "<div class='inline-block'><lat>" + _param.homeGeo.lat + "</lat><br><lng>" + _param.homeGeo.lng + "</lng></div>";
 
-        _map.controls[google.maps.ControlPosition.TOP_LEFT].push(zoomLatLngMonitor);
+        _map.controls[google.maps.ControlPosition.TOP_RIGHT].push(zoomLatLngMonitor);
 
         $("zoom").on("click",() => { console.log ("@@ 222",222);  clearCookie();});
     }

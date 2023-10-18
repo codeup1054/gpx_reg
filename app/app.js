@@ -25,12 +25,13 @@ const gpx_js = [
  / CONST and GLOBALS
  * */
 
-import {mapObjects}  from "/app/geodata/geo_model.js";
-window._map = mapObjects._map;  /** set global for all modules **/
+import {_mapObjects}  from "/app/geodata/geo_model.js";
+window._map = _mapObjects._map;  /** set global for all modules **/
 window._param = model.get();    /** get param from cookie      **/
 
 import {initMap, setMapStyler} from '/app/map/map.init.js?1'
-import {mapOverlay,MERCATOR} from '/app/map/map.overlay.js?1'
+import {mapOverlay, mapOverlayStravaDirect} from '/app/map/map.overlay.js?1'
+import {MERCATOR} from '/app/lib/geo.js?1'
 import {mapInformer} from '/app/map/map.informer.js?2'
 import {mapControls} from '/app/map/map.controls.js?2'
 
@@ -56,9 +57,10 @@ function sync_import()
         else
         {
             // console.log ("@@ 14._param",_param)
-            initMap(_param)
-            setMapStyler(_param)
-            mapOverlay(_param)
+            initMap(_param);
+            setMapStyler(_param);
+            mapOverlay(_param);
+            mapOverlayStravaDirect();
             mapControls.add_custom_control_panel()
             // mapControls.add_cache_control()
             mapInformer.add()

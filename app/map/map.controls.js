@@ -1,9 +1,9 @@
-import {mapObjects, geoZonesFiles,_geos}  from "/app/geodata/geo_model.js";
+import {_mapObjects, geoZonesFiles,_geos}  from "/app/geodata/geo_model.js";
 import {ifMapChanged} from "/app/map/map.location.cookie.js";
-import {MERCATOR} from '/app/map/map.overlay.js?1'
+// import {MERCATOR} from '/app/lib/geo.js?1'
 import {geoZoneTools} from "./controls/geo_zones.js";
 import {cacheTool} from "./controls/cache.control.js";
-import {layerTool, hmCompareTool} from "./controls/layer.control.js";
+import {layerStravaHistory, mapStyleTool, layerStravaDirect} from "./controls/layer.control.js";
 import {polylineTools} from "./controls/gpx.geos.edit/gpx.geos.list.edit.js";
 
 
@@ -50,8 +50,9 @@ export let mapControls = {
 
 
         customControlPanel = document.createElement("div");
-        customControlPanel.appendChild(layerTool());
-        customControlPanel.appendChild(hmCompareTool()) ;
+        customControlPanel.appendChild(layerStravaHistory());
+        customControlPanel.appendChild(layerStravaDirect());
+        customControlPanel.appendChild(mapStyleTool()) ;
         _map.controls[google.maps.ControlPosition.TOP_CENTER].push(customControlPanel);
 
         // addSlider();
@@ -97,12 +98,12 @@ export let mapControls = {
 
 // export function addSliderCallback(sliderId, target) {
 export function addSliderCallback(sliderEl) {
-    const sliderId = $(sliderEl).attr(`target`);
-    const target = sliderId;
 
-    // console.log(`@@ 21. addSliderCallback [${target}] `,  sliderEl, sliderId);
+    const target = $(sliderEl).attr(`target`);
+    const target2 = $(sliderEl).attr(`target2`) || 'no_target2';
 
-    let el_opacity = (_param.mapOverlays[sliderId] !== undefined ) ? _param.mapOverlays[sliderId].opacity : 0.5
+
+    let el_opacity = (_param.mapOverlays[target] !== undefined ) ? _param.mapOverlays[target].opacity : 0.5
 
     $(sliderEl).slider({
         orientation: "horizontal",
@@ -118,23 +119,32 @@ export function addSliderCallback(sliderEl) {
 
             if (target === 'map')
                 setMapStyler(el_opacity * 100);
-            else
-                $('[' + target +']').css({opacity: el_opacity });
+            else {
+                $('[' + target + ']').css({opacity: el_opacity});
+            }
+
         },
         slide: function (event, ui) {
             let tval = ui.value;
 
-            _param.mapOverlays[sliderId] = {"opacity" :  tval / 100};
+            _param.mapOverlays[target] = {"opacity" :  tval / 100};
 
             if (target === 'map') {
                 setMapStyler(tval)
             } else {
-                $('.' + target).css('opacity', tval/100);
+                const target2opacity = $('.' + target2).css("opacity");
+
+                $('.' +  target).css({opacity : tval/100});
+
+                const selected_val = $(`select[target2 = "${target2}"]`).val();
+                // console.log(`@@ 21. addSliderCallback [${target}] [${target2}] `, selected_val, 100-tval/100);
+
+                $('.' + target2).css({opacity: (selected_val == 'NO MAP')? 0: 1-tval/100});
                 // $('.map-tile').css('opacity', tval/100);
             }
 
             // sliderHandle.innerHTML="<div>" + tval + "</div>";
-            $('[target=' + sliderId + '] span.ui-slider-handle').html("<div>" + tval + "</div>");
+            $('[target=' + target + '] span.ui-slider-handle').html("<div>" + tval + "</div>");
 
             ifMapChanged();
         }
