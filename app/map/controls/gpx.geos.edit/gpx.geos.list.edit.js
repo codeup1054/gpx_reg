@@ -397,22 +397,25 @@ function showPolyLineOnMap() {
                 });
 
 
-                const infoText = `${_geos[id].name}</br>
-                                [${_geos[id].geojson.length}] - ${total_distance.toFixed(3)} km`;
-
-                let infoWindow = new google.maps.InfoWindow({
-                    pixelOffset: new google.maps.Size(0, -7),
-                    content: infoText
-                });
-
-                google.maps.event.addListener(_mapObjects.polyLines[id], 'mouseover', function(e) {
-                    infoWindow.setPosition(e.latLng);
-                    infoWindow.open(_map);
-                });
-// Close the InfoWindow on mouseout:
-                google.maps.event.addListener(_mapObjects.polyLines[id], 'mouseout', function() {
-                    infoWindow.close();
-                });
+                // const infoText = `${_geos[id].name}</br>
+                //                 [${_geos[id].geojson.length}] - ${total_distance.toFixed(3)} km</br>
+                //                 <a onclick="removeMarker(${id},0);">Удалить</a>`;
+                //
+                // let infoWindow = new google.maps.InfoWindow({
+                //     pixelOffset: new google.maps.Size(0, -7),
+                //     content: infoText
+                // });
+                //
+                // //'mouseover'
+                //
+                // google.maps.event.addListener(_mapObjects.polyLines[id], 'click', function(e) {
+                //     infoWindow.setPosition(e.latLng);
+                //     infoWindow.open(_map);
+                // });
+// // Close the InfoWindow on mouseout:
+//                 google.maps.event.addListener(_mapObjects.polyLines[id], 'mouseout', function() {
+//                     infoWindow.close();
+//                 });
 
 
                 _mapObjects.polyLines[id].addListener("click", (e) => {
@@ -424,7 +427,7 @@ function showPolyLineOnMap() {
                 ['remove_at', 'set_at', 'dragend',"insert_at"].map((event) => {
                         _mapObjects.polyLines[id].getPath().addListener(event, e => {
                             _geos[id].geojson = _mapObjects.polyLines[id].getPath().getArray().map(p => [p.lat(), p.lng()]);
-                            console.log("@@ event",event);
+                            console.log("@@ showPolyLineOnMap event",event);
                             drawPolyLineTable();
                             distanceMarker();
                         })
@@ -482,7 +485,6 @@ function createPolyLine() {
 
     drawPolyLineTable();
 
-
     google.maps.event.addListener(_map, "click", (e) => {
         console.log("@@ 07 click",e.latLng);
         // const id = Object.entries(_geos).find(item => item[1].active == true)[0];
@@ -497,12 +499,26 @@ function createPolyLine() {
 
 }
 
+
+function removeMarker(id,i)
+{
+    // id = polyline id
+    // i = marker id
+    console.log("@@ remove marker",id,i);
+
+    _mapObjects.markers[id][i].setMap(null);
+    _mapObjects.markers[id].splice(i, 1);
+    _geos[id].geojson.splice(i, 1);
+    _mapObjects.polyLines[id].getPath().removeAt(i);
+
+}
+
+
 function distanceMarker()
 {
     let po;
     let dist = 0;
     // let total_dist = 0;
-
     // console.log("@@ 75 distanceMarker");
 
     Object.keys(_mapObjects.markers).map(id => {
@@ -517,9 +533,7 @@ function distanceMarker()
         const distanceDirection = _geos[id].meta.distanceDirection;
 
         if ( distanceDirection > 0) {
-
             _mapObjects.markers[id] ??= [];
-
             // console.log("@@ 75.1 distanceMarker", distanceDirection);
 
             const distPnts = distanceDirection == 2 ? _geos[id].geojson.reverse(): _geos[id].geojson;
@@ -557,9 +571,12 @@ function distanceMarker()
 
                     let markerOption = {
                         position: {lat: p[0], lng: p[1]},
+
                         map: _map,
                         title: `${p[0].toFixed(3)}, ${p[1].toFixed(3)}`, // {total_dist.toFixed(2)},
-                        icon: svg_icon
+                        icon: svg_icon,
+                        total_dist: total_dist
+
                     }
 
                     const marker = new google.maps.Marker(markerOption);
@@ -567,13 +584,32 @@ function distanceMarker()
                     _mapObjects.markers[id].push( marker);
 
                     google.maps.event.addListener(marker, 'click', function (event) {
-                        console.log("@@ delete marker",id,i);
-                        _mapObjects.markers[id][i].setMap(null);
-                        _mapObjects.markers[id].splice(i, 1);
-                        _geos[id].geojson.splice(i, 1);
-                        _mapObjects.polyLines[id].getPath().removeAt(i);
-                    });
 
+                        console.log("@@ addListener(marker",marker);
+
+                        const infoText = `${marker.total_dist.toFixed(2)}км</br>
+                                    ${marker.position.lat().toFixed(4)}, ${marker.position.lng().toFixed(4)}</br>
+                                <a id="m${id}_${i}">Удалить</a>`;
+
+                        let infoWindow = new google.maps.InfoWindow({
+                            pixelOffset: new google.maps.Size(0, -7),
+                            content: infoText
+                        });
+                        infoWindow.setPosition({lat: p[0], lng: p[1]});
+                        infoWindow.open(_map);
+
+                        google.maps.event.addListener(infoWindow, 'domready', function() {
+                            document.getElementById(`m${id}_${i}`)
+                                    .addEventListener("click", function(e) {
+                                removeMarker(id, i);
+                                infoWindow.close();
+                            });
+                        });
+
+                        //'mouseover'
+
+                        // removeMarker(id,i);
+                    });
             })
         } // if (_geos[id].distanceDirection > 0)
     });
@@ -583,6 +619,9 @@ function distanceMarker()
     // id = id !== undefined? id[0]:1;
 
 }
+
+
+
 
 function getGeos() {
     let xhr = new XMLHttpRequest();
