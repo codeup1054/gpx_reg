@@ -1,3 +1,64 @@
+export function altitudeColor(alt,
+                              altThresholds = [
+                                  0, 100, 120, 140,
+                                  160, 180, 200, 220,
+                                  240, 260],
+                              colors = [
+                                  '#440077', '#0040CC', '#00aaDD', '#00CCB0',
+                                  '#00C000', '#80FF00', '#FFFF00', '#FFC000',
+                                  '#FF0000', '#882200', '#411100'
+                              ]
+) {
+    // const altThresholds = [800, 900, 1000, 1100, 1200, 1300, 1400, 1500]; // meters
+
+    // const altThresholds = [
+    //       0, 100, 120, 140,
+    //     160, 180, 200, 220,
+    //     240, 260 ]; // meters
+
+    // const colors = [
+    //     '#440099', '#0040FF', '#00aaFF', '#00FFB0',
+    //     '#00E000', '#80FF00', '#FFFF00', '#FFC000',
+    //     '#FF0000', '#880066'
+    // ];
+
+
+    for (let i = 0; i < colors.length; ++i) {
+        if (alt >= altThresholds[i] && alt < altThresholds[i+1]) {
+            const p = (alt - altThresholds[i]) / (altThresholds[i+1] - altThresholds[i]);
+            const col = calSegmentColor(colors[i],colors[i+1], p);
+            // console.log(`@@ geo.js col=${col}`);
+            return col;
+        }
+    }
+    return colors[colors.length-1];
+}
+
+function calSegmentColor(h1 = '0000FF',h2 = 'FF0000', p=0.5)
+    {
+        const r1 = hexToRgb(h1.replace('#',''));
+        const r2 = hexToRgb(h2.replace('#',''));
+        const r3 = {
+            r: Math.floor(r1.r + p * (r2.r - r1.r)).toString(16).padStart(2,'0'),
+            g: Math.floor(r1.g + p * (r2.g - r1.g)).toString(16).padStart(2,'0'),
+            b: Math.floor(r1.b + p * (r2.b - r1.b)).toString(16).padStart(2,'0'),
+        }
+
+        // console.log(`@@ geo.js r3 = `,r3, p);
+
+        return `#`+[r3.r,r3.g,r3.b].join('')
+    }
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+
 export function geo_distance(a, b, precision = 3, unit = "K") {
     const lat1 = a[0];
     const lon1 = a[1];

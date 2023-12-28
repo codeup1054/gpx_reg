@@ -1,14 +1,14 @@
 // 2023-10-07 start
 import { _geos}  from "/app/geodata/geo_model.js";
-import {addAction}  from "/app/map/controls/gpx.geos.edit/gpx.geos.list.edit.js";
+import {addAction, setGeosActive} from "./osm.actions.js";
 import {geo_distance} from '/app/lib/geo.js';
 
 
-const tpl = `<div class="flex">
+const tpl = `<div class="flex geosform">
         <div><b>Маршрут</b></div>
         <div class="_sm _g _i">{{tm_modified}}</div>
         <!--    <div style="width: calc(100% - 190px); cursor: pointer ; border: 0px; display: inline-block; text-align: right;" onclick='this.parentNode.remove()'>&#10006;</div>-->
-        <div style="cursor: pointer ; border: 0px; text-align: right;" onclick='this.closest(".popup-form").remove()'>&#10006;</div>
+        <div style="cursor: pointer ; border: 0px; text-align: right; position: absolute; top:0px; right: 0px;" onclick='this.closest(".popup-form").remove()'>&#10006;</div>
     </div>
 <table width="100%" style="border:0px white; ">
     <tr><td>Название</td><td>{{name|editable}}</td></tr>
@@ -28,17 +28,15 @@ const tpl = `<div class="flex">
 
 export function editGeoForm(_geoId)
 {
-    let editForm = document.createElement("div");
-    editForm.classList.add('popup-form');
-    editForm._geoid = _geoId;
 
     let o =_geos[_geoId]
+
+    setGeosActive(_geoId);
+
     let fieldInputsRe = tpl;
 
     let re = /\{{([^}]*)\}/g;
     let m;
-
-    o
 
     do {
         m = re.exec(tpl);
@@ -46,6 +44,7 @@ export function editGeoForm(_geoId)
             let fld_pipe_re = m[1];
             const fld_name = fld_pipe_re.split("|")[0];
             const fld_pipe = fld_pipe_re.split("|")[1];
+
 
             const v = eval(`o['${fld_name.replace(".","']['")}']`);
 
@@ -68,23 +67,13 @@ export function editGeoForm(_geoId)
     } while (m);
 
 
-    // console.log("@@ 75 geoForm", _geos[_geoId]);
+    $(`.popup-form`).each((k,v) =>  v.remove() );
 
-    let fieldInputs = Object.entries(o).map(([v,k],i) =>
-        `<div>${v}</div><div>${k}</div>`).join("</br>")
+    $(`[_eid="${_geoId}"]`).append(`<div class="popup-form" _eid = ${_geoId}>${fieldInputsRe}</div>`);
 
-    editForm.innerHTML = fieldInputsRe
+    let pickColorEls = $(`[pickcolor]`);
 
-    let popups = document.querySelectorAll(`.popup-form`);
-
-    [...popups].map(e => e.remove())
-
-    const popupIssuePoint = document.querySelector(`[_eid="${_geoId}"]`);
-    popupIssuePoint.appendChild(editForm);
-
-    let pickColorEls = document.querySelectorAll(`[pickcolor]`);
-
-    console.log("@@ 40 pickColorEls",pickColorEls[0]);
+    // console.log("@@ 40 pickColorEls",pickColorEls[0]);
 
     [...pickColorEls].map((el,i) => {
 
@@ -92,14 +81,14 @@ export function editGeoForm(_geoId)
         newColor.innerHTML =el.innerHTML;
         newColor.style.backgroundColor = el.innerHTML;
 
-        console.log("@@ 41 pickcolor set click",el, el.innerHTML);
+        // console.log("@@ 41 pickcolor set click",el, el.innerHTML);
 
         el.parentElement.appendChild(newColor);
 
         // el.parentElement.outerHTML = el.parentElement.outerHTML; /** remove all listner */
 
         el.addEventListener('click', (e) => {
-            console.log("@@ 19 addEventListener",e);
+            // console.log("@@ 19 addEventListener",e);
             pickColor(e);
             e.stopPropagation();
         });

@@ -18,14 +18,26 @@
         <div id="map" class="map"></div>
 </div>
 
-<script type="module">
-</script>
+<!--<script type="module">-->
+<!---->
+<!--    // API_KEY 20231211 == AIzaSyBgxpjYDBZGEX0jRrsx2aKuaKrOYWfBVgM-->
+<!---->
+<!---->
+<!--    const API_KEY = 'AIzaSyCqtLzdiGvGIu85wF1C7w4UKdUncnwgF0M'-->
+<!--                     -->
+<!--    const script = document.body.appendChild(document.createElement('script'));-->
+<!--    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=drawing`;-->
+<!--    // script.addEventListener('load', initialize);-->
+<!---->
+<!--</script>-->
+
 <script async defer type = "text/javascript"
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqtLzdiGvGIu85wF1C7w4UKdUncnwgF0M&libraries=drawing">
 </script>
 
-<!--<script type="text/javascript"-->
-<!--        src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing"></script>-->
+
+<!--<script async defer type = "text/javascript"-->
+<!--        src=`https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=drawing`>-->
 <!--</script>-->
 
 

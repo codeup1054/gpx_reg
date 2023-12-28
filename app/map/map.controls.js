@@ -6,6 +6,7 @@ import {cacheTool} from "./controls/cache.control.js";
 import { mapStyleTool, layerStravaDirect} from "./controls/layer.control.js";
 import {layerStravaHistory} from "./controls/layer.history.control.js";
 import {polylineTools} from "./controls/gpx.geos.edit/gpx.geos.list.edit.js";
+import {gpxReliefTool} from "./controls/gpx_relief.js";
 
 
 let cssId = 'myCss';  // you could encode the css path itself to generate id..
@@ -44,6 +45,7 @@ export let mapControls = {
         let customControlPanel = document.createElement("div");
 
         customControlPanel.appendChild(geoZoneTools());
+        customControlPanel.appendChild(gpxReliefTool()) ;
         customControlPanel.appendChild(cacheTool());
         customControlPanel.appendChild(polylineTools());
 
@@ -98,6 +100,8 @@ export let mapControls = {
 
 
 // export function addSliderCallback(sliderId, target) {
+
+
 export function addSlider(sliderEl) {
 
     const target = $(sliderEl).attr(`target`);

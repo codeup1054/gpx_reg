@@ -1,3 +1,8 @@
+##2023-12-05 
+todo elevation sample 
+https://jsfiddle.net/gh/get/library/pure/googlemaps/js-samples/tree/master/dist/samples/elevation-paths/jsfiddle 
+
+
 <h1>2021-08-29</h1> 
 <p>todo refactor get strava.php from cache </p>  
 

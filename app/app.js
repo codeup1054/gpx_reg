@@ -17,7 +17,7 @@ const gpx_js = [
     // '/app/map.location.cookie.js',
     // '/app/map/map.init.js',
     // '/app/map/map.overlay.js',
-    // '/app/test.js'
+    // '/app/osm.polyline.js'
 ]
 
 
@@ -27,6 +27,7 @@ const gpx_js = [
 
 import {_mapObjects}  from "/app/geodata/geo_model.js";
 window._map = _mapObjects._map;  /** set global for all modules **/
+window._elevator = _mapObjects._elevator;
 window._param = model.get();    /** get param from cookie      **/
 
 import {initMap, setMapStyler} from '/app/map/map.init.js?1'

@@ -3,15 +3,14 @@ header('content-type: application/json; charset=utf-8');
 include_once ('gpx.db.php');
 
 $res = array();
-//$res['post'] = $_POST;
 
-$rqst = json_decode(file_get_contents('php://input', true));
+$rqst_s = file_get_contents('php://input', true);
+$rqst = json_decode($rqst_s);
 
+$res['rqst'] = $rqst;
 
 $res['result'] = proccess_request($rqst);
 
-
-//print_r($res['result']);
 
 echo  json_encode($res);
 
@@ -30,9 +29,10 @@ function proccess_request($rqst)
         case 'geos_create_update':
             $res->funcres  = geosCreateUpdate($rqst->data, $rqst->verbose );
             $res->msg .= "03. geos_create_update '$rqst->action'";
+            $res->rqst2 = $rqst->data;
             break;
         default:
-            $res->msg .= "Unknown operation '$rqst->action'";
+            $res->msg .= "Unknown operation: '$rqst->action' : ".print_r($rqst,1)." POST:".print_r($_POST,1);
     }
 
     return $res;
@@ -46,50 +46,47 @@ function geosCreateUpdate($data, $verbose)
     $res = (object)array();
     $res->msg =  "geosCreateUpdate 07";
 
-    $geodata = $data->geodata;
+//    print_r($data->geodata);
 
-    if ($verbose)
-        $res->msg .= " data ".print_r($data,1);
+    if ($verbose)  $res->msg .= " data ".print_r($data,1);
 
+    $id = $data->geodata->id;
+    $name = $data->geodata->name;
+    $meta = json_encode($data->geodata->meta, JSON_UNESCAPED_UNICODE);
+    $geojson = json_encode((array)$data->geodata->geojson, JSON_UNESCAPED_UNICODE);
 
-    $meta = json_encode($geodata->meta, JSON_UNESCAPED_UNICODE);
-    $geojson = json_encode($geodata->geojson);
+    $res->data_r = $data;
 
-//    print($res->msg);
+    $sql = "REPLACE INTO gpx_geos (id, name, meta, geojson)  VALUES ($id,'$name','$meta', '$geojson')";
+
+    $res->msg = "*** $sql";
+
+    if ($conn->query($sql) === TRUE)  $res->msg .=  "Успешно создана новая запись\n".$sql;
+    else $res->msg .=  "Ошибка: " . $sql . "<br>" . $conn->error;
+
+    return $res;
+}
+//
+//function insertGeos($v)
+//{
+//    global $conn;
+//
+//    $meta = json_encode($v->meta, JSON_UNESCAPED_UNICODE);
+//    $geojson = json_encode($v->geojson);
+//
 //    print ("$meta, $geojson");
-
-//    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{serialize($v->name)}','{\"msg\":\"{$v->meta}\"}', '{$v->geojson}')";
-//    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{$geodata->name}','{$meta}', '{$geojson}')
-//ON DUPLICATE KEY UPDATE";
-
-    $sql = "REPLACE INTO gpx_geos (id, name, meta, geojson)  VALUES ($geodata->id,'$geodata->name','$meta', '$geojson')";
-
-    $res->msg .= "\n *** $sql";
-
-    if ($conn->query($sql) === TRUE)  $res =  "Успешно создана новая запись\n".$sql;
-    else $res =  "Ошибка: " . $sql . "<br>" . $conn->error;
-
-    return $res;
-}
-
-function insertGeos($v)
-{
-    global $conn;
-
-    $meta = json_encode($v->meta, JSON_UNESCAPED_UNICODE);
-    $geojson = json_encode($v->geojson);
-
-    print ("$meta, $geojson");
-
-//    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{serialize($v->name)}','{\"msg\":\"{$v->meta}\"}', '{$v->geojson}')";
-    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{$v->name}','{$meta}', '{$geojson}')";
-
-    print ($sql);
-
-    if ($conn->query($sql) === TRUE)  $res =  "Успешно создана новая запись";
-    else $res =  "Ошибка: " . $sql . "<br>" . $conn->error;
-    return $res;
-}
+//
+////    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{serialize($v->name)}','{\"msg\":\"{$v->meta}\"}', '{$v->geojson}')";
+//    $sql = "INSERT INTO gpx_geos (name, meta, geojson)  VALUES ('{$v->name}','{$meta}', '{$geojson}')";
+//
+//    print ($sql);
+//
+//    if ($conn->query($sql) === TRUE)  $res =  "Успешно создана новая запись";
+//    else $res =  "Ошибка: " . $sql . "<br>" . $conn->error;
+//
+//
+//    return $res;
+//}
 
 
 function getGeos($whe="", $sort = " order by tm_modified desc",  $verb= false)

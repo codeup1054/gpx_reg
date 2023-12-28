@@ -23,7 +23,8 @@ model = {
     get: function () {
 
         let location_param = document.location.hash.substr(1)
-            || $.cookie('location-settings' + window.location.pathname)
+        // || $.cookie('location-settings' + window.location.pathname)
+        || getCookie ('location-settings' + window.location.pathname)
         || false
 
 
@@ -47,6 +48,13 @@ model = {
     }
 }
 
+
+const getCookie = (name) => {
+    return document.cookie.split('; ').reduce((r, v) => {
+        const parts = v.split('=')
+        return parts[0] === name ? decodeURIComponent(parts[1]) : r
+    }, '')
+}
 // console.log ("@@ const",param)
 
 

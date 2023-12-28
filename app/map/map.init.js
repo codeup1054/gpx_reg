@@ -36,6 +36,10 @@ export function initMap(param) {
 
 
     _map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    // _elevator = new google.maps.ElevationService();
+
+
+
     class USGSOverlay extends google.maps.OverlayView {
         bounds;
         image;

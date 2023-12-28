@@ -83,11 +83,14 @@ export function stravaAuth()
 {
     const dt_now = new Date();
 
+
+
     if (_appState['strava_cred'] === undefined  ||  _appState['strava_cred']['dt_less']  > dt_now)
     {
-        $.getJSON("/data/apify.dat", function(json) {
+        $.getJSON("/data/apify.dat?t="+Date.now(), function(json) {
             const strava_cred = json[Object.keys(json)[0]]
 
+            console.log(`@@ layer.control json`, Date.now());
             _appState['strava_cred']  = strava_cred;
 
             // const  queryString = '&Signature='+strava_cred['CloudFront-Signature'] +
@@ -119,6 +122,9 @@ export function stravaAuth()
 
             const dt_less = new Date(dateLess * 1000);
             _appState['strava_cred']['dt_less'] = dt_less;
+
+            console.log(`@@ 21.01 layer.control strava_cred`, strava_cred, _appState['strava_cred']);
+
 
             // console.log("@@ auth 2",dt_less, dt_less < dt_now); //
         });

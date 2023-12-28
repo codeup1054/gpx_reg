@@ -17,11 +17,13 @@ export const _stateControl = {
 
 export let _mapObjects = {
     polyLines: {},
+    polyElevations: {},
     markers: {},
     polyPoints: {},
     _map: "_mapObjects_map_",
+    _elevator: false, //* global elevator
+    _elevationTile : {}
 };
-
 
 
 
@@ -37,14 +39,16 @@ export let geoZonesFiles = [
 export let _geos = {
     1: {
         id: 1,
-        name: 'name1',
+        name: 'Default sample.  Check API',
         meta: {
             color: '#7700aa99',
             desc: 'Описание 1',
             distanceDirection: 1,
             showPolyLine: true,
+            showPolyLineElevation:true,
         },
         geojson: [[55.723, 37.45], [55.73, 37.501], [55.72, 37.51]],
+        path_elevation: [],
         active: true,
     },
     2: {

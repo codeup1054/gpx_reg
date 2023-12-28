@@ -21,15 +21,15 @@
 
 .stab td{
     border: 1px solid #aaaaaa;
-    padding: 2 5px;
+    padding: 1px 3px;
     font: 400 12px Roboto, Arial, sans-serif;
 }
-.stab tr.selected{
+.stab tr.selected, div.selected{
     background: #d7e7ff;
 }
 
 ._sm {font-size: 9px;}
-._g {font-color: "#999999";}
+._g {text-color: "#999999";}
 ._i {font-style: italic;}
 
 [_bt="distance_direction"] {
@@ -45,4 +45,43 @@
     -webkit-user-select: none;
     font-size: 8px;
 }
+
+[param] {color:red; display: inline-block;}
+
+[parampopup]
+{
+    display: block;
+    position: relative;
+    left:10px;
+    min-width:100px;
+    min-height:20px;
+}
+
+#control_panel {width:200px}
+
+
+#control_panel
+{
+    display:block;
+    position: fixed;
+    top:100px;
+    left:20px;
+    width:10px;
+    border: 1px solid gray;
+    border-radius: 3px;
+    background: #FFFFFFDD;
+    overflow: visible;
+}
+
+#map {
+    display:inline-block;
+    height: 980px;
+    width: 100%;
+    float:right;
+    z-index: 0;
+}
+
+.direction0, .direction1, .direction2 { font-size:8px; width:12px; height: 12px; border-radius: 2px; padding: 1px 0px 0px 3px; }
+.direction0 { background:none; border-color:#888888;  }
+.direction1, .direction2 { background-color:#0075FF; color:#fff; border-color:#fff;  }
 
