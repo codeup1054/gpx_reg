@@ -26,19 +26,19 @@ function osmPolyline(v)
 
     _mapObjects.polyLines[_eid] = addPolylineEditable(v.geojson, {color: v.meta.color, meta: {_eid: _eid} })
 
-    console.log(`@@  osmPolyline 333`, $(_mapObjects.polyLines[_eid]).data('events') , v, v.geojson);
+    // console.log(`@@  osmPolyline 333`, $(_mapObjects.polyLines[_eid]).data('events') , v, v.geojson);
 
 
 
-    _mapObjects.polyLines[_eid].on('editstop', ()=>
-        {
-            const polyLineData = _mapObjects.polyLines[_eid];
-
-            if (_geos[_eid].active ) {
-                const points = polyLineData.getPoints();
-                console.log(`@@  edit_stop`, polyLineData, polyLineData.options.meta._eid, _eid );
-            }
-        })
+    // _mapObjects.polyLines[_eid].on('editstop', ()=>
+    //     {
+    //         const polyLineData = _mapObjects.polyLines[_eid];
+    //
+    //         if (_geos[_eid].active ) {
+    //             const points = polyLineData.getPoints();
+    //             console.log(`@@  edit_stop`, polyLineData, polyLineData.options.meta._eid, _eid );
+    //         }
+    //     })
 
     _osmmap.addLayer(_mapObjects.polyLines[_eid]);
 
@@ -73,6 +73,7 @@ export function addPolylineEditable(coordinates, param) {
         // Show editable markers only if less than this number are in map bounds:
         maxMarkers: 300,
         color: param.color,
+        weight: 2,
         meta: param.meta
     }
 
@@ -96,8 +97,6 @@ export function addPolylineEditable(coordinates, param) {
             pointsTextArea.innerHTML += '----------------------------------------------------------------------------------------------------\n';
         });
     };
-
-
 
     return polyline;
 }

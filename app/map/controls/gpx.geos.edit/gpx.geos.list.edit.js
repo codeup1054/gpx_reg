@@ -4,7 +4,7 @@
 
 import {_mapObjects, _geos, _appState, _stateControl} from "/app/geodata/geo_model.js";
 import {editGeoForm} from '/app/map/controls/gpx.geos.edit/gpx.geos.form.js';
-import {altitudeColor, geo_distance} from '/app/lib/geo.js';
+import {altitudeColor, geo_points_distance} from '/app/lib/geo.js';
 
 export function polylineTools() {
 
@@ -100,7 +100,7 @@ function drawPolyLineTable(callback = addAction) {
             // console.log("@@ _geos[k]",k,e);
             let segs = [];
             for (let i = 0; i < e.geojson.length - 1; i++) {
-                segs.push(geo_distance(e.geojson[i], e.geojson[i + 1]));
+                segs.push(geo_points_distance(e.geojson[i], e.geojson[i + 1]));
             }
 
             const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(3);
@@ -408,7 +408,7 @@ function showPolyLineOnMap() {
                 let _pts = _geos[id].geojson;
 
                 _pts.map((p,i)=> {
-                    if (i>0)  total_distance  +=  geo_distance(_pts[i-1], _pts[i]);
+                    if (i>0)  total_distance  +=  geo_points_distance(_pts[i-1], _pts[i]);
                 });
 
 
@@ -705,7 +705,7 @@ function distanceMarker()
 
 
             distPnts.map((p,i) => {
-                    if (i > 0) total_dist += geo_distance(po,p);
+                    if (i > 0) total_dist += geo_points_distance(po,p);
                     po = p;
                     // console.log("@@ >>> mileage_markers()",id, _geos[id], mapObjects.markers[id]);
 

@@ -59,7 +59,7 @@ function hexToRgb(hex) {
 }
 
 
-export function geo_distance(a, b, precision = 3, unit = "K") {
+export function geo_points_distance(a, b, precision = 3, unit = "K") {
     const lat1 = a[0];
     const lon1 = a[1];
     const lat2 = b[0];
@@ -81,6 +81,20 @@ export function geo_distance(a, b, precision = 3, unit = "K") {
         dist = dist * 0.8684
     }
     return dist;
+}
+
+
+export function geo_path_distance(path, precision = 3, unit = "K") {
+
+    let segs = [];
+
+    for (let i = 0; i < path.length - 1; i++) {
+        segs.push(geo_points_distance(path[i], path[i + 1]));
+    }
+
+    const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(3);
+
+    return polyLen
 }
 
 

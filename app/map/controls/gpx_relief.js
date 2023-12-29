@@ -1,6 +1,6 @@
 
 import {_mapObjects, _geos, _appState, _stateControl} from "/app/geodata/geo_model.js";
-import {altitudeColor, geo_distance} from '/app/lib/geo.js';
+import {altitudeColor, geo_points_distance} from '/app/lib/geo.js';
 
 let ctaLayer = {};
 
@@ -52,8 +52,8 @@ let reliefShowHide = function ()
     console.log("@@ gpx_relief", [zoneId, ctaLayer, bounds, s,w,n,e]);
 
 
-    const latDist = geo_distance([w,s],[w,n]);
-    const lngDist = geo_distance([w,s],[e,s]);
+    const latDist = geo_points_distance([w,s],[w,n]);
+    const lngDist = geo_points_distance([w,s],[e,s]);
 
     info_panel.innerHTML = bounds;
 

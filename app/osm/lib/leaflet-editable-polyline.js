@@ -152,6 +152,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         }
 
         this._parseOptions = function(options) {
+
             if(!options)
                 options = {};
 
@@ -177,25 +178,25 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             const svgIcon = L.divIcon({
                 html: `
                     <svg
-                      width="10"
-                      height="10"
+                      width="8"
+                      height="8"
                     >
-                     <circle cx="5" cy="5" r="4" stroke="${options.color}" stroke-width="1" fill="${options.color}" fill-opacity=".5" stroke-opacity=".9"/>
+                     <circle cx="4" cy="4" r="3" stroke="${options.color}" stroke-width="1" fill="${options.color}" fill-opacity=".5" stroke-opacity=".9"/>
                     </svg>`,
                 className: "",
-                iconAnchor: [5, 5],
+                iconAnchor: [4, 4],
             });
 
             const svgIcon2 = L.divIcon({
                 html: `
                     <svg
-                    width="10"
-                    height="10"
+                    width="8"
+                    height="8"
                     >
-                     <circle cx="5" cy="5" r="4" stroke="${options.color}" stroke-width="1" fill="${options.color}" fill-opacity=".1" stroke-opacity=".5"/>
+                     <circle cx="4" cy="4" r="3" stroke="${options.color}" stroke-width="1" fill="${options.color}" fill-opacity=".1" stroke-opacity=".5"/>
                     </svg>`,
                 className: "",
-                iconAnchor: [5, 5],
+                iconAnchor: [4, 4],
             });
 
             if(!options.pointIcon)     this._options.pointIcon = svgIcon;
@@ -301,6 +302,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._fixAround(fixAroundPointNo);
             that._showBoundMarkers();
             that._changed = true;
+            // console.log(`@@  _reloadPolyline` );
+            that._map.fire('updategeos' );
+
         }
 
         /**
@@ -516,9 +520,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                     if(line1) that._map.removeLayer(line1);
                     if(line2) that._map.removeLayer(line2);
 
-                    console.log('STOPPED', this.options);
+                    console.log('STOPPED', this.options, event);
 
-                    // that._map.fire('editstop', event);
+//                    that._map.fire('updategeos', event );
 
                     if(event.target != that._map) {
                         that._map.fire('click', event);
@@ -567,6 +571,9 @@ L.Polyline.polylineEditor.addInitHook(function () {
         var map = polyline._map;
         var polylines = map.getEditablePolylines();
         var index = polylines.indexOf(polyline);
+
+
+
         if (index > -1) {
             polylines[index]._markers.forEach(function(marker) {
                 map.removeLayer(marker);
@@ -574,6 +581,8 @@ L.Polyline.polylineEditor.addInitHook(function () {
                     map.removeLayer(marker.newPointMarker);
             });
             polylines.splice(index, 1);
+
+
         }
     });
 

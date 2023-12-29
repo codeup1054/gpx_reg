@@ -33,9 +33,13 @@ export function getGeosJQ(callback=false) {
 }
 
 
-export function updateGeosJQ(geodata, callback=false) {
+export function updateGeosJQ(_eid, callback=false) {
 
     // console.log("@@ update Geos");
+
+
+
+    const geodata = _geos[_eid];
 
     let body ={
         action: 'geos_create_update',
@@ -58,7 +62,7 @@ export function updateGeosJQ(geodata, callback=false) {
         if(callback) callback();
 
     })
-        .done( ()=> console.log(`@@ updateGeosJQ done `))
+        .done( ()=> console.log(`@@ updateGeosJQ done `, body))
         .fail(() => console.log(`@@  fail`))
 
 }

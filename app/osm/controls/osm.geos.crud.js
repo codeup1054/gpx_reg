@@ -1,5 +1,5 @@
 import {_appState, _geos} from "../../geodata/geo_model.js";
-import {geo_distance} from "../../lib/geo.js";
+import {geo_points_distance} from "../../lib/geo.js";
 import {addAction} from "../../map/controls/gpx.geos.edit/gpx.geos.list.edit.js";
 
 export function geosCrud(callback = addAction) {
@@ -35,7 +35,7 @@ export function geosCrud(callback = addAction) {
         // console.log("@@ _geos[k]",k,e);
         let segs = [];
         for (let i = 0; i < e.geojson.length - 1; i++) {
-            segs.push(geo_distance(e.geojson[i], e.geojson[i + 1]));
+            segs.push(geo_points_distance(e.geojson[i], e.geojson[i + 1]));
         }
 
         const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(3);
@@ -49,28 +49,27 @@ export function geosCrud(callback = addAction) {
 <!--                                        <div style="background-color: ${e.meta.color}; display: inline-block; width: 7px; height: 10px;">&nbsp</div>-->
                                      </td>
                                      <td>
-                                        <input _cn = "show_polyline"  
+                                     <input _cn = "show_polyline"  
                                                type="checkbox" 
                                               ${_geos[k].meta.showPolyLine ? 'checked' : ''} >
                                      </td>
                                      <td>
                                         <input _cn = "show_polyline_elevation"  
                                                type="checkbox" 
-                                               ${_geos[k].meta.showPolyLineElevation ? 'checked' : ''} >
+                                               ${_geos[k].meta.showPolyLineElevation ? 'checked' : '' } >
                                      </td>
                                      <td style="vertical-align: middle; ">
-                                        <div _cn="distance_direction"></div>
+                                        <div _cn="distance_direction" class="direction${ _geos[k].meta.distanceDirection }"></div>
                                      </td>
                                      <td><div _efn="name">${e.name}</div><div _efn="meta.desc">${e.meta.desc}</div></td>
                                      <td>
-                                        ${e.geojson.length} </br> <span _cn = "polyLen" >${polyLen}</span>
+                                        <polypoints>${e.geojson.length}</polypoints> </br> <polylen _cn = "polyLen" >${polyLen}</polylen>
                                      </td>
                                      <td>
                                         <!-- <button _bt="geo_cancel">&#10060;</button> -->
                                         <button _bt="geo_find">&#128269;</button>
                                         <button _bt="geo_edit">&#9998;</button>
                                         <button _bt="geo_save">&#9989;</button>
-
                                      </td>
                                  </tr>
                                 `;

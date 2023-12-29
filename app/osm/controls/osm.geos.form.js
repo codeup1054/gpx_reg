@@ -1,7 +1,7 @@
 // 2023-10-07 start
 import { _geos}  from "/app/geodata/geo_model.js";
-import {addAction, setGeosActive} from "./osm.actions.js";
-import {geo_distance} from '/app/lib/geo.js';
+import {addAction, setEditable, setGeosActive} from "./osm.actions.js";
+import {geo_path_distance} from '/app/lib/geo.js';
 
 
 const tpl = `<div class="flex geosform">
@@ -11,8 +11,8 @@ const tpl = `<div class="flex geosform">
         <div style="cursor: pointer ; border: 0px; text-align: right; position: absolute; top:0px; right: 0px;" onclick='this.closest(".popup-form").remove()'>&#10006;</div>
     </div>
 <table width="100%" style="border:0px white; ">
-    <tr><td>Название</td><td>{{name|editable}}</td></tr>
-    <tr><td>Описание </td><td>{{meta.desc|editable}}</td></tr>
+    <tr><td>Название</td><td _efn="name" >{{name|editable}}</td></tr>
+    <tr><td>Описание </td><td _efn="meta.desc" >{{meta.desc|editable}}</td></tr>
     <tr><td>Цвет</td><td><div>{{meta.color|color_picker}}</div></td></tr>
     <tr><td>Путь</td><td><textarea cols="50" rows="7">{{geojson|polyline}}</textarea></td></tr>
     </tr>
@@ -20,7 +20,7 @@ const tpl = `<div class="flex geosform">
         <span>{{geojson|polyline_info}}</span>
         <button _bt="geo_find">&#128269;</button>
         <button _bt="geo_cancel">&#10060;</button>
-        <button _bt="geo_save">&#9989;</button>
+        <button _bt="geo_save" onclick='this.closest(".popup-form").remove()'>&#9989;</button>
     </td></tr>
 </table>        
 `;
@@ -69,7 +69,15 @@ export function editGeoForm(_geoId)
 
     $(`.popup-form`).each((k,v) =>  v.remove() );
 
-    $(`[_eid="${_geoId}"]`).append(`<div class="popup-form" _eid = ${_geoId}>${fieldInputsRe}</div>`);
+    $(`[_eid="${_geoId}"]`)
+        .append(`<div class="popup-form" _eid = ${_geoId}>${fieldInputsRe}</div>`)
+        .ready(() => {
+            console.log(`@@  ready` );
+            $('.popup-form [_efn]').each((k,v) => {
+                console.log(`@@  v`, v);
+                setEditable(v)
+            });
+        });
 
     let pickColorEls = $(`[pickcolor]`);
 
@@ -104,11 +112,8 @@ export function editGeoForm(_geoId)
         if (v !== undefined)
         {
             const pointCount =  v.length;
-            let segs = [];
-            for (let i = 0; i < v.length - 1; i++) {
-                segs.push(geo_distance(v[i],v[i + 1]));
-            }
-            const totalDistance =  segs.reduce((a, b) => a + b, 0).toFixed(3);
+            console.log(`@@  pointCount`, pointCount);
+            const totalDistance =  geo_path_distance(v); // .toFixed(3)
             return `Точек: ${pointCount} | ${totalDistance}км`;
         }
 

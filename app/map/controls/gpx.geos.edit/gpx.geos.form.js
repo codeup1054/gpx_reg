@@ -1,7 +1,7 @@
 // 2023-10-07 start
 import { _geos}  from "/app/geodata/geo_model.js";
 import {addAction}  from "/app/map/controls/gpx.geos.edit/gpx.geos.list.edit.js";
-import {geo_distance} from '/app/lib/geo.js';
+import {geo_points_distance} from '/app/lib/geo.js';
 
 
 const tpl = `<div class="flex">
@@ -117,7 +117,7 @@ export function editGeoForm(_geoId)
             const pointCount =  v.length;
             let segs = [];
             for (let i = 0; i < v.length - 1; i++) {
-                segs.push(geo_distance(v[i],v[i + 1]));
+                segs.push(geo_points_distance(v[i],v[i + 1]));
             }
             const totalDistance =  segs.reduce((a, b) => a + b, 0).toFixed(3);
             return `Точек: ${pointCount} | ${totalDistance}км`;
