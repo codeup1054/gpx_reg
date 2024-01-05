@@ -609,6 +609,10 @@ div.custom-map-control-div div
 
 [_efn="meta.desc"], [_cn="polyLen"] {font-size: 10px; font-color: #888}
 
+
+[_bt] { cursor: hand; }
+[_bt]:hover { background-color: #eee; }
+
 #control_geos_table [_bt]{
     width: 23px;
     padding: 1px;
@@ -628,4 +632,22 @@ div.custom-map-control-div div
 {
     background-color: #FFFFFF;
     position:absolute;
+}
+
+.svg_small{
+    font-size:9px;
+    stroke:#fff;
+    font-weight: bolder;
+    paint-order: stroke;
+}
+
+
+.leaflet-popup-content
+{
+    margin: 3px 4px 3px 2px;
+
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 3px;
 }

@@ -3,7 +3,7 @@ import {geosCrud} from "./osm.geos.crud.js";
 import {getGeosJQ} from "../api/gpx.geos.api.js";
 import {addAction} from "./osm.actions.js";
 import {osmMarkers} from "../mapobjects/osm.marker.js";
-import {osmAllPolylines} from "../mapobjects/osm.polyline.js";
+import {osmAllPolyLines} from "../mapobjects/osm.polyline.js";
 
 
 export function addControl()
@@ -16,7 +16,7 @@ export function addControl()
         geosCrud(addAction);
         console.log(`@@  46 callback`);
         // osmMarkers();
-        osmAllPolylines();
+        osmAllPolyLines();
     });
 
 

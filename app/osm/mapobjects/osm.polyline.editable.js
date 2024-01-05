@@ -1,84 +1,218 @@
 // 2023-12-28 https://github.com/FacilMap/Leaflet.DraggableLines
 
 import {_geos, _mapObjects} from "../../geodata/geo_model.js";
+import {geo_path_distance} from "../../lib/geo.js";
+import {clearMap} from "./osm.polyline.js";
+
+export class gpxPolylineEditable {
+    constructor(latlngs, options) {
+        let result = new L.Polyline(latlngs, options);
+
+        this._e = _geos[options.meta._eid];
+        this._options = options;
+        this._eid = options.meta._eid;
+        this._markers = [];
+        this._points = latlngs;
+        this._poliline = result;
 
 
-export function addPolylineEditable(coordinates, param) {
-    /*
-    L.tileLayer('tile.png', { maxZoom: 18, attribution: '...' }).addTo(map);
-    */
+        if (this._e.active) this.showMarkers();
 
-
-    console.log(`@@  _osmmap`, _osmmap);
-
-    // let osmUrl='http://{s}.tile.openstreet_osmmap.org/{z}/{x}/{y}.png';
-    // let osmAttrib='Map data © OpenStreetMap contributors';
-
-
-    // L.tileLayer(osmUrl, {minZoom: 0, maxZoom: 15, attribution: osmAttrib}).addTo(_osmmap);
-
-    let coordinates = [
-        [55.6750072361, 37.3187695503],
-        [55.6757622049, 37.3198746204],
-        [55.6763963762, 37.3197780609],
-        [55.6787216541, 37.3263333797],
-        [55.6787216812, 37.32808218],
-        [55.6776703394, 37.3291487239],
-        [55.6746230524, 37.3283730778],
-        [55.6739752209, 37.327448813],
-        [55.6735003071, 37.3272656303],
-        [55.6732175518, 37.3276246501],
-        [55.6721955264, 37.3278538799],
-        [55.6714755129, 37.3272248028],
-        [55.6717871648, 37.3257949873],
-        [55.6728658637, 37.3252000246],
-        [55.6737827215, 37.3252887813],
-        [55.6744277756, 37.3251200459],
-        [55.6747125506, 37.3229381908],
-        [55.6746349263, 37.3213142352],
-        [55.6749326769, 37.3207699906],
-        [55.6756791761, 37.3202823162]
-    ];
-
-    let polylineOptions = {
-        // The user can add new polylines by clicking anywhere on the map:
-        newPolylines: true,
-        newPolylineConfirmMessage: 'Add a new polyline here?',
-        // Show editable markers only if less than this number are in map bounds:
-        maxMarkers: 100
+        return result;
     }
 
-    let polyline = L.Polyline.PolylineEditor(coordinates, polylineOptions).addTo(_osmmap);
-    _osmmap.fitBounds(polyline.getBounds());
+    _reloadPolyline(pointNo) {
+        this._poliline.setLatLngs(this._points);
 
-    let dumpPoints = function() {
-        let pointsTextArea = document.getElementById('pointsTextArea');
-        pointsTextArea.innerHTML = '';
-        _osmmap.getEditablePolylines().forEach(function(polyline) {
-            let points = polyline.getPoints();
-            points.forEach(function(point) {
-                let latLng = point.getLatLng();
-                console.log(point.context);
-                pointsTextArea.innerHTML += 'originalPointNo=' + (point.context ? point.context.originalPointNo : null)
-                    + ' originalPolylineNo=' + (point.context ? point.context.originalPolylineNo : null)
-                    + ' (' + latLng.lat + ',' + latLng.lng + ')\n';
-                + '\n';
-            });
-            pointsTextArea.innerHTML += '----------------------------------------------------------------------------------------------------\n';
+    }
+
+    showMarkers() {
+
+        this._markers.map((p, i) => { _osmmap.removeLayer(p); });
+
+        for (let i in _osmmap._layers) {
+            try {
+                if (_osmmap._layers[i].options.meta.type == 'new_marker') _osmmap.removeLayer(_osmmap._layers[i]);
+            } catch (e) {
+                console.log("Can not remove with " + e + _osmmap._layers[i]);
+            }
+        }
+
+        this._points.map((p, i) => { this.showMarker(p, i); });
+
+
+    }
+
+
+
+    deleteMarker(pointIdx) {
+        console.log(`@@  deleteMarker1`, pointIdx, this._points);
+
+        this._points.splice(pointIdx, 1);
+        console.log(`@@  deleteMarker2`, pointIdx, this._points);
+
+        this._reloadPolyline();
+        this.showMarkers();
+
+        _osmmap.fire('updategeos');
+
+
+    }
+
+    showMarker(pp, pointNo) {
+        let dist, svg_text, ll, ppp;
+
+        let that = this;
+
+
+        const distDir = _geos[this._eid].meta.distanceDirection;
+        const pointCount = _geos[this._eid].length;
+
+        ppp = this._points;
+
+        if (distDir == 0) svg_text = '';
+        else {
+            if (distDir == 1) ll = ppp.slice(0, pointNo + 1);
+            if (distDir == 2) ll = ppp.slice(pointNo, pointCount);
+
+            dist = geo_path_distance(ll);
+            svg_text = `<text x="10" y="7" class="svg_small" fill="${this._options.color}"> ${dist}</text>`;
+        }
+
+        const svgIcon = L.divIcon({
+            html: `<svg title="${this._options.color} "  width="38" height="8" >
+                             <title>${pointNo} | ${dist} \n ${pp[0].toFixed(4)},${pp[1].toFixed(4)}</title>
+                             <circle cx="4"  cy="4" r="3" stroke="${this._options.color}" stroke-width="1" fill="${this._options.color}" fill-opacity=".3" stroke-opacity=".5"/>
+                             ${svg_text}
+                        </svg>`,
+            className: "",
+            iconAnchor: [4, 4],
         });
-    };
-    return polyline;
+
+        const svgIconNew = L.divIcon({
+            html: `<svg title="${this._options.color} "  width="8" height="8" >
+                        <title>${pointNo}</title>
+                        <circle cx="4"  cy="4" r="3" stroke="${this._options.color}" stroke-width="1" fill="${this._options.color}" fill-opacity=".1" stroke-opacity=".3"/>
+                       </svg>`,
+            className: "",
+            iconAnchor: [4, 4],
+        });
+
+        // console.log(`@@ 77  this._addMarker`,pointNo, _geos[_eid].meta.distanceDirection);
+
+
+        /**
+         *  draw point addLayer
+         */
+
+        const pop = `<div _bt="delete_polyline_point" pointno="${pointNo} ">delete</div>`;
+
+        let delItem = $(pop);
+
+        delItem.on("click", () => {
+            console.log(`@@  clixk`);
+        });
+
+        $('body').append(delItem);
+
+
+
+        this._markers[pointNo] = L.marker(pp,
+            {
+                draggable: true,
+                icon: svgIcon,
+                meta: {pointNo: pointNo},
+                contextmenu: true,
+            }
+        ).bindPopup(`N: ${pointNo} ${pop}`).on("popupopen", (ep) => {
+
+            $(`[_bt="delete_polyline_point"]`).on("click", e => {
+                // e.preventDefault();
+                that.deleteMarker(pointNo);
+            });
+
+            console.log(`@@  ep.target()`, ep ) ;
+
+            // ep.remove();
+
+        });
+
+        _osmmap.addLayer(this._markers[pointNo]);
+
+
+
+        $(`[_bt="delete_polyline_point"]`).on('click', (event) => {
+            const pointIdx = $(event.target).attr("pointIdx");
+            console.log(`@@  11`, pointIdx);
+            that._points.splice(pointIdx, 1);
+        });
+
+        /**
+         *  move point
+         */
+
+        this._markers[pointNo].on('dragend contextmenu1', function (event) {
+            // var marker = event.target;
+            // setTimeout(function() {
+            // }, 25);
+
+
+            const marker = event.target;
+            const n = marker.options.meta.pointNo;
+
+            // console.log(`@@  event 1`, [n, marker, event, that._points]);
+
+            if (event.type == 'dragend') that._points[n] = [marker._latlng.lat, marker._latlng.lng];
+
+            if (event.type == 'contextmenu') {
+                console.log(`@@  event  "${event.type}"`, marker);
+                //
+                // const popup = `${n}:<div _bt="delete_polyline_point" pointIdx="${n}">delete</div>`;
+                //
+                // const pop = marker.bindPopup(popup); // .openPopup();
+                //
+                // _osmmap.addLayer(pop);
+
+                $(`[_bt="delete_polyline_point"]`).on('click', (event) => {
+                        const pointIdx = $(event.target).attr("pointIdx");
+                        console.log(`@@  11`, pointIdx);
+                        that._points.splice(pointIdx, 1);
+                    }
+                )
+
+
+            }
+
+            that._reloadPolyline();
+            that.showMarkers();
+            _osmmap.fire('updategeos');
+
+
+        });
+
+
+        /**
+         *  add new point
+         */
+
+        if (pointNo > 0) {
+            let ppn = [(pp[0] + ppp[pointNo - 1][0]) / 2, (pp[1] + ppp[pointNo - 1][1]) / 2]
+            let new_marker = L.marker(ppn, {draggable: true, icon: svgIconNew, meta: {pointNo: pointNo, type: 'new_marker'}});
+            _osmmap.addLayer(new_marker);
+
+            new_marker.on('dragend', function (event) {
+                const marker = event.target;
+
+                console.log(`@@  event N`, [marker, event]);
+
+                that._points.splice(pointNo, 0, [marker._latlng.lat, marker._latlng.lng])
+                that._reloadPolyline();
+                _osmmap.fire('updategeos');
+            });
+
+        }
+
+    }
+
+
 }
-
-
-
-// let polyline = addPolylineEditable();
-
-/* Check that markers are not left after the polyline is removed! */
-
-let resetPolyline = function() {
-    _osmmap.removeLayer(polyline);
-    setTimeout(() => {
-        polyline = addPolyline()
-    }, 500);
-};

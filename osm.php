@@ -31,7 +31,7 @@
 <script src="https://unpkg.com/leaflet-providers@latest/leaflet-providers.js"></script>
 
 <script src="/app/osm/lib/L.Control.Opacity.js"></script>
-<script src="/app/osm/lib/leaflet-editable-polyline.js"></script>
+<script type="module"  src="/app/osm/lib/leaflet-editable-polyline.js"></script>
 
 
 

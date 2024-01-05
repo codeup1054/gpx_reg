@@ -1,3 +1,6 @@
+import {geo_path_distance} from '/app/lib/geo.js';
+import {_geos} from "../../geodata/geo_model.js";
+
 L.Polyline.polylineEditor = L.Polyline.extend({
     _prepareMapIfNeeded: function() {
         var that = this;
@@ -13,7 +16,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         // Click anywhere on map to add a new point-polyline:
         if(this._options.newPolylines) {
-            console.log('click na map');
+            console.log('@@_ 01. _prepareMapIfNeeded ');
             that._map.on('dblclick', function(event) {
                 console.log('click, target=' + (event.target == that._map) + ' type=' + event.type);
                 if(that._map.isEditablePolylinesBusy())
@@ -47,9 +50,15 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         /**
          * Enable/disable editing.
          */
+
         this._map.setEditablePolylinesEnabled = function(enabled) {
+
             var map = this;
             map._editablePolylinesEnabled = enabled;
+
+            console.log(`@@ 80 setEditablePolylinesEnabled`,map);
+
+
             for(var i = 0; i < map._editablePolylines.length; i++) {
                 var polyline = map._editablePolylines[i];
                 if(enabled) {
@@ -114,9 +123,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
             // Map move => show different editable markers:
             var map = this._map;
+
             this._map.on("zoomend", function(e) {
                 that._showBoundMarkers();
             });
+
             this._map.on("moveend", function(e) {
                 that._showBoundMarkers();
             });
@@ -175,32 +186,26 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             // Icons:E:\_dev\gpx_reg\app\osm\lib\editmarker2.png
             // L.icon({ iconUrl: 'app/osm/lib/editmarker2.png', iconSize: [11, 11], iconAnchor: [6, 6] });
 
-            const svgIcon = L.divIcon({
-                html: `
-                    <svg
-                      width="8"
-                      height="8"
-                    >
-                     <circle cx="4" cy="4" r="3" stroke="${options.color}" stroke-width="1" fill="${options.color}" fill-opacity=".5" stroke-opacity=".9"/>
-                    </svg>`,
-                className: "",
-                iconAnchor: [4, 4],
-            });
-
-            const svgIcon2 = L.divIcon({
-                html: `
-                    <svg
-                    width="8"
-                    height="8"
-                    >
-                     <circle cx="4" cy="4" r="3" stroke="${options.color}" stroke-width="1" fill="${options.color}" fill-opacity=".1" stroke-opacity=".5"/>
-                    </svg>`,
-                className: "",
-                iconAnchor: [4, 4],
-            });
-
-            if(!options.pointIcon)     this._options.pointIcon = svgIcon;
-            if(!options.newPointIcon)  this._options.newPointIcon = svgIcon2;
+            // const svgIcon = L.divIcon({
+            //     html: `<svg width="8" height="8">
+            //             <circle cx="4" cy="4" r="3" stroke="${options.color}" stroke-width="1" fill="${options.color}" fill-opacity=".5" stroke-opacity=".9"/>
+            //            </svg>`,
+            //     className: "",
+            //     iconAnchor: [4, 4],
+            // });
+            //
+            //
+            // const svgIcon2 = L.divIcon({
+            //     html: `<svg title="${options.color} "  width="8" height="8" >
+            //         <title>Lat ${ll}</title>
+            //          <circle cx="4"  cy="4" r="3" stroke="${options.color}" stroke-width="1" fill="${options.color}" fill-opacity=".1" stroke-opacity=".5"/>
+            //         </svg>`,
+            //     className: "",
+            //     iconAnchor: [4, 4],
+            // });
+            //
+            // if(!options.pointIcon)     this._options.pointIcon = svgIcon;
+            // if(!options.newPointIcon)  this._options.newPointIcon = svgIcon2;
         };
 
         /**
@@ -209,7 +214,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * bounds.
          */
         this._showBoundMarkers = function() {
+
+            console.log(`@@ 83 _showBoundMarkers `, that , that._map );
+
             if (!that._map) {
+
                 return;
             }
 
@@ -269,9 +278,12 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         /**
          * Show/hide marker.
          */
+
         this._setMarkerVisible = function(marker, show) {
             if(!marker)
                 return;
+
+            // console.log(`@@  93 _setMarkerVisible`, marker);
 
             var map = this._map;
             if(show) {
@@ -296,13 +308,20 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Reload polyline. If it is busy, then the bound markers will not be
          * shown.
          */
+
         this._reloadPolyline = function(fixAroundPointNo) {
+
             that.setLatLngs(that._getMarkerLatLngs());
+
             if(fixAroundPointNo != null)
                 that._fixAround(fixAroundPointNo);
+
             that._showBoundMarkers();
+
             that._changed = true;
-            // console.log(`@@  _reloadPolyline` );
+
+            console.log(`@@ 91 _reloadPolyline` );
+
             that._map.fire('updategeos' );
 
         }
@@ -317,9 +336,60 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._addMarkers = function(pointNo, latLng, fixNeighbourPositions) {
             var that = this;
             var points = this.getLatLngs();
-            var marker = L.marker(latLng, {draggable: true, icon: this._options.pointIcon});
+
+            // let icon_option = this._options.pointIcon;
+            // icon_option.options.lat_lng = `${latLng.lat}`;
+            // icon_option.color = this._options.color;
+
+            const _eid = this._options.meta._eid;
+            const pointCount = _geos[_eid].length;
+
+            // this._options.pointIcon = svgIcon2;
+
+            let dist, svg_text, pp, ll;
+
+            const distDir = _geos[_eid].meta.distanceDirection;
+
+            pp = Object.values(this._latlngs).map((v) => [v.lat, v.lng]);
+
+            if (distDir == 0 ) svg_text = '';
+            else {
+                if (distDir == 1) ll = pp.slice(0, pointNo + 1);
+                if (distDir == 2) ll = pp.slice(pointNo, pointCount);
+
+                dist = geo_path_distance(ll);
+                svg_text = `<text x="10" y="7" class="svg_small" fill="${this._options.color}"> ${dist}</text>`;
+            }
+
+            const svgIcon = L.divIcon({
+                html: `<svg title="${this._options.color} "  width="38" height="88" >
+                             <title>${pointNo} | ${dist} \n ${latLng.lat.toFixed(4)},${latLng.lng.toFixed(4)}</title>
+                             <circle cx="4"  cy="4" r="3" stroke="${this._options.color}" stroke-width="1" fill="${this._options.color}" fill-opacity=".3" stroke-opacity=".5"/>
+                             ${svg_text}
+                        </svg>`,
+                className: "",
+                iconAnchor: [4, 4],
+            });
+
+            const svgIconNew = L.divIcon({
+                html: `<svg title="${this._options.color} "  width="38" height="88" >
+                        <title>${pointNo}</title>
+                        <circle cx="4"  cy="4" r="3" stroke="${this._options.color}" stroke-width="1" fill="${this._options.color}" fill-opacity=".1" stroke-opacity=".3"/>
+                       </svg>`,
+                className: "",
+                iconAnchor: [4, 4],
+            });
+
+            if(!this._options.pointIcon)     this._options.pointIcon = svgIcon;
+            if(!this._options.newPointIcon)  this._options.newPointIcon = svgIconNew;
+
+
+            // console.log(`@@ 77  this._addMarker`,pointNo, _geos[_eid].meta.distanceDirection);
+
+            var marker = L.marker(latLng, {draggable: true, icon: svgIcon});
 
             marker.newPointMarker = null;
+            
             marker.on('dragstart', function(event) {
                 var pointNo = that._getPointNo(event.target);
                 var previousPoint = pointNo && pointNo > 0 ? that._markers[pointNo - 1].getLatLng() : null;
@@ -331,6 +401,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
                 setTimeout(function() {
+                    console.log(`@@  92 dragend `, event.target);
                     that._reloadPolyline(pointNo);
                 }, 25);
             });
@@ -367,9 +438,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var previousPoint = that._markers[pointNo - 1].getLatLng();
                 var nextPoint = that._markers[pointNo].getLatLng();
                 that._setupDragLines(marker.newPointMarker, previousPoint, nextPoint);
-
                 that._hideAll(marker.newPointMarker);
             });
+
             newPointMarker.on('dragend', function(event) {
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
@@ -378,38 +449,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                     that._reloadPolyline();
                 }, 25);
             });
-            newPointMarker.on('contextmenu', function(event) {
-                // 1. Remove this polyline from map
-                var marker = event.target;
-                var pointNo = that._getPointNo(marker);
-                var markers = that.getPoints();
-                that._hideAll();
 
-                var secondPartMarkers = that._markers.slice(pointNo, pointNo.length);
-                that._markers.splice(pointNo, that._markers.length - pointNo);
-
-                that._reloadPolyline();
-
-                var points = [];
-                var contexts = [];
-                for(var i = 0; i < secondPartMarkers.length; i++) {
-                    var marker = secondPartMarkers[i];
-                    points.push(marker.getLatLng());
-                    contexts.push(marker.context);
-                }
-
-                console.log('points:' + points);
-                console.log('contexts:' + contexts);
-
-                // Need to know the current polyline order numbers, because
-                // the splitted one need to be inserted immediately after:
-                var originalPolylineNo = that._map._editablePolylines.indexOf(that);
-
-                L.Polyline.PolylineEditor(points, that._options, contexts, originalPolylineNo + 1)
-                    .addTo(that._map);
-
-                that._showBoundMarkers();
-            });
 
             this._markers.splice(pointNo, 0, marker);
 
@@ -491,6 +531,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         /**
          * Get polyline latLngs based on marker positions.
          */
+
         this._getMarkerLatLngs = function() {
             var result = [];
             for(var i = 0; i < this._markers.length; i++)
@@ -501,12 +542,14 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._setupDragLines = function(marker, point1, point2) {
             var line1 = null;
             var line2 = null;
+
             if(point1) line1 = L.polyline([marker.getLatLng(), point1], {dasharray: "5,1", weight: 1})
                 .addTo(that._map);
             if(point2) line2 = L.polyline([marker.getLatLng(), point2], {dasharray: "5,1", weight: 1})
                 .addTo(that._map);
 
             var moveHandler = function(event) {
+
                 if(line1)
                     line1.setLatLngs([event.latlng, point1]);
                 if(line2)
@@ -532,7 +575,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
             that._map.on('mousemove', moveHandler);
             marker.on('dragend', stopHandler);
-
             that._map.once('click', stopHandler);
             marker.once('click', stopHandler);
             if(line1) line1.once('click', stopHandler);
@@ -573,7 +615,6 @@ L.Polyline.polylineEditor.addInitHook(function () {
         var index = polylines.indexOf(polyline);
 
 
-
         if (index > -1) {
             polylines[index]._markers.forEach(function(marker) {
                 map.removeLayer(marker);
@@ -581,7 +622,6 @@ L.Polyline.polylineEditor.addInitHook(function () {
                     map.removeLayer(marker.newPointMarker);
             });
             polylines.splice(index, 1);
-
 
         }
     });

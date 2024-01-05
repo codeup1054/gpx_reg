@@ -349,9 +349,12 @@ export function addAction() {
 
     let _btn = document.querySelectorAll('[_bt]');
 
-    // console.log("@@ _btn",_btn, _efield);
 
     [..._btn].map((e, i) => {
+
+        console.log("@@ _btn",e);
+
+        if (e.closest('[_eid]')) return false;
 
         const _eid = e.closest('[_eid]').getAttribute('_eid');
         const _bt = e.getAttribute('_bt');

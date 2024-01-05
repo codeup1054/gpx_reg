@@ -28,6 +28,7 @@ const gpx_js = [
 import {_mapObjects}  from "/app/geodata/geo_model.js";
 window._map = _mapObjects._map;  /** set global for all modules **/
 window._elevator = _mapObjects._elevator;
+window._geos = _geos;
 window._param = model.get();    /** get param from cookie      **/
 
 import {initMap, setMapStyler} from '/app/map/map.init.js?1'

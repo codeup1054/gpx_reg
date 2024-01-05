@@ -1,6 +1,6 @@
 import {_appState, _geos} from "../../geodata/geo_model.js";
 import {geo_points_distance} from "../../lib/geo.js";
-import {addAction} from "../../map/controls/gpx.geos.edit/gpx.geos.list.edit.js";
+import {addAction} from "./osm.actions.js";
 
 export function geosCrud(callback = addAction) {
 
@@ -14,7 +14,6 @@ export function geosCrud(callback = addAction) {
         <td>Действие</td>
         </tr>`;
 
-    console.log(`@@ 12 _geos_table =`, _geos);
 
 
     let no_sorted_by_key = [];
@@ -42,6 +41,7 @@ export function geosCrud(callback = addAction) {
 
         rows += `<tr _eid="${e.id}" 
                                      _et="polyline"
+                                     _bt="set_active"
                                      class = ${_geos[k].active ? 'selected' : ''} 
                                      >
                                      <td align="right" style="background-color: ${e.meta.color};" >
@@ -62,7 +62,7 @@ export function geosCrud(callback = addAction) {
                                         <div _cn="distance_direction" class="direction${ _geos[k].meta.distanceDirection }"></div>
                                      </td>
                                      <td><div _efn="name">${e.name}</div><div _efn="meta.desc">${e.meta.desc}</div></td>
-                                     <td>
+                                     <td _bt="set_active">
                                         <polypoints>${e.geojson.length}</polypoints> </br> <polylen _cn = "polyLen" >${polyLen}</polylen>
                                      </td>
                                      <td>
@@ -78,7 +78,13 @@ export function geosCrud(callback = addAction) {
 
     });
 
-    $("#control_panel").append(`<div id="control_geos_table"><table class="stab" >${rows}</table></div>`);
+    $('#control_geos_table').remove();
+
+    $("#control_panel").append(`<div id="control_geos_table">
+                         <button _bt="geo_add">+</button>
+                         <button _bt="geo_console">?</button>
+                         <table class="stab" >${rows}</table>
+                     </div>`);
 
     $("#polyLineTable").html(rows);
 
