@@ -641,6 +641,14 @@ div.custom-map-control-div div
     paint-order: stroke;
 }
 
+.svg_medium{
+    font-size:11px;
+    stroke:#fff;
+    font-weight: bolder;
+    paint-order: stroke;
+    z-index: 1000;
+}
+
 
 .leaflet-popup-content
 {

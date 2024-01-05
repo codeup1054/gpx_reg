@@ -14,6 +14,8 @@ export class gpxPolylineEditable {
         this._markers = [];
         this._points = latlngs;
         this._poliline = result;
+        this._mileage_distance = 5;
+        this._prev_milstone = this._mileage_distance;
 
 
         if (this._e.active) this.showMarkers();
@@ -75,7 +77,7 @@ export class gpxPolylineEditable {
             if (distDir == 1) ll = ppp.slice(0, pointNo + 1);
             if (distDir == 2) ll = ppp.slice(pointNo, pointCount);
 
-            dist = geo_path_distance(ll);
+            dist = geo_path_distance(ll,2);
             svg_text = `<text x="10" y="7" class="svg_small" fill="${this._options.color}"> ${dist}</text>`;
         }
 
@@ -192,6 +194,58 @@ export class gpxPolylineEditable {
 
 
         /**
+         *  add milestones point
+         */
+
+
+        const mileage_dist = 3;
+
+        if (pointNo>1) {
+
+            const l_1 = ppp.slice(0, pointNo-1);
+            const l_2 = ppp.slice(0, pointNo);
+
+            const dist1 = geo_path_distance(l_1,2);
+            const dist2 = geo_path_distance(l_2,2);
+
+            while (this._prev_milstone > dist1 && this._prev_milstone < dist2 ) {
+
+                const a = ppp[pointNo-2];
+                const b = ppp[pointNo-1];
+
+                const dist_part = (this._prev_milstone - dist1) / (dist2-dist1);
+
+                let ppn = [a[0] + (b[0] - a[0]) * dist_part, a[1] + (b[1] - a[1]) * dist_part];
+
+
+                svg_text = `<text x="4" y="9" class="svg_medium" fill="#d40"> ${this._prev_milstone}</text>`;
+
+                this._prev_milstone = this._prev_milstone + this._mileage_distance;
+
+
+                const svgIconMileStone = L.divIcon({
+                    html: `<svg title="${this._options.color} "  width="38" height="11" >
+                        <title>${pointNo}</title>
+                        <circle cx="2"  cy="2" r="2" stroke="${this._options.color}" stroke-width="1" fill="${this._options.color}" fill-opacity=".7" stroke-opacity=".3"/>
+                        ${svg_text}
+                       </svg>`,
+                    className: "",
+                    iconAnchor: [2, 2],
+                });
+
+                let mileage_marker = L.marker(ppn, {
+                    icon: svgIconMileStone,
+                    meta: {pointNo: pointNo, type: 'new_marker'}
+                });
+
+
+                _osmmap.addLayer(mileage_marker);
+            }
+        }
+
+
+
+        /**
          *  add new point
          */
 
@@ -211,6 +265,9 @@ export class gpxPolylineEditable {
             });
 
         }
+
+
+
 
     }
 

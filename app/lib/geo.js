@@ -92,7 +92,7 @@ export function geo_path_distance(path, precision = 3, unit = "K") {
         segs.push(geo_points_distance(path[i], path[i + 1]));
     }
 
-    const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(3);
+    const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(precision);
 
     return polyLen
 }

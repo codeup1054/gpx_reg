@@ -8,9 +8,9 @@ import {addLayer}  from "./layers/osm.layers.js";
 import {addControl} from "./controls/osm.controls.custom.js";
 
 
-const center_map = [55.69, 37.35];
+const center_map = [55.69, 37.43];
 
-const map = L.map('map').setView(center_map, 15);
+const map = L.map('map').setView(center_map, 13);
 
 
 _mapObjects._osmmap = map;
