@@ -43,6 +43,7 @@ export let _geos = {
         meta: {
             color: '#7700aa99',
             desc: 'Описание 1',
+            mileage_distance: false,
             distanceDirection: 1,
             showPolyLine: true,
             showPolyLineElevation:true,

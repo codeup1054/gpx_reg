@@ -13,6 +13,7 @@ const tpl = `<div class="flex geosform">
 <table width="100%" style="border:0px white; ">
     <tr><td>Название</td><td _efn="name" >{{name|editable}}</td></tr>
     <tr><td>Описание </td><td _efn="meta.desc" >{{meta.desc|editable}}</td></tr>
+    <tr><td>Метки, км</td><td _efn="meta.mileage_distance" >{{meta.mileage_distance|editable}}</td></tr>
     <tr><td>Цвет</td><td><div>{{meta.color|color_picker}}</div></td></tr>
     <tr><td>Путь</td><td><textarea cols="50" rows="7">{{geojson|polyline}}</textarea></td></tr>
     </tr>
