@@ -20,7 +20,8 @@
 }
 
 .stab td{
-    border: 1px solid #aaaaaa;
+    border: 0px solid #aaaaaa;
+    border-top: 1px solid #aaaaaa;
     padding: 1px 3px;
     font: 400 12px Roboto, Arial, sans-serif;
 }
@@ -57,6 +58,26 @@
     min-height:20px;
 }
 
+
+
+#map {
+    display:inline-block;
+    height: 980px;
+    width: 100%;
+    float:right;
+    z-index: 0;
+}
+
+
+
+#control_geos_table {
+    background-color: #FFFFFF;
+    width: 415px;
+}
+
+#gps_xml {font-size: 9px; width:400px; height: 100px;}
+
+
 #control_panel {width:200px}
 
 
@@ -73,17 +94,55 @@
     overflow: visible;
 }
 
-#map {
-    display:inline-block;
-    height: 980px;
-    width: 100%;
-    float:right;
-    z-index: 0;
+
+[_efn="meta.desc"], [_cn="polyLen"] {font-size: 10px; font-color: #888}
+
+[_bt] { cursor: hand; }
+[_bt]:hover, [_cn]:hover { background-color: #f8faff; }
+
+#control_geos_table [_bt]{
+    width: 23px;
+    padding: 1px;
 }
 
-[_cn="distance_direction"], .direction0, .direction1, .direction2 { font-size:8px; width:8px; height: 10px; border: 1px solid gray; border-radius: 2px; padding: 1px 0px 0px 2px; }
-.direction0 { background:none; border-color:#888888;  }
-.direction1, .direction2 { background-color:#0075FF; color:#fff; border-color:#0075FF;  }
+
+div[_cn], .direction0, .direction1, .direction2 {
+    font-size: 10px;
+    width: 11px;
+    height: 11px;
+    border: 0pt solid #DDD;
+    border-radius: 2px;
+    padding: 0px 1px 1px 0px;
+    text-align: right;
+    background-color: #f0f0f0;
+}
+
+[_cn] {
+    margin: 0 0px;
+    cursor: hand;
+    display: inline-block;
+    caret-color: transparent;
+}
+
+
+/*
+https://ru.piliapp.com/emoji/list/
+📌 🚩 🏳️ 🏞
+*/
+
+[_cn="show_polyline"][state=true]::before {    content: '🏞'; }
+[_cn="show_polyline_elevation"][state=true]::before {    content: '📉'; }
+[_cn="show_polyLine_milestones"][state=true]::before {    content: '🏳️'; }
+
+
+.direction1, .direction2 {
+    /*background-color: #0075FF;*/
+    /*color: #fff;*/
+    /*border-color: #0075FF;*/
+    background-color: #fff;
+    color: #777;
+    border-color: #fff;
+}
 
 .direction0::before { content: ' '  }
 .direction1::before { content: '▶'; }

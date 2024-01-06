@@ -8,6 +8,7 @@ export function geosCrud(callback = addAction) {
         <td>ID</td>
         <td>E</td>
         <td>📈</td>
+        <td>T</td>
         <td>▶</td>
         <td>Name</td>
         <td>Инфо</td>
@@ -48,19 +49,16 @@ export function geosCrud(callback = addAction) {
                                         ${e.id}&nbsp
 <!--                                        <div style="background-color: ${e.meta.color}; display: inline-block; width: 7px; height: 10px;">&nbsp</div>-->
                                      </td>
-                                     <td>
-                                     <input _cn = "show_polyline"  
-                                               type="checkbox" 
-                                              ${_geos[k].meta.showPolyLine ? 'checked' : ''} >
-                                     </td>
-                                     <td>
-                                        <input _cn = "show_polyline_elevation"  
-                                               type="checkbox" 
-                                               ${_geos[k].meta.showPolyLineElevation ? 'checked' : '' } >
-                                     </td>
-                                     <td style="vertical-align: middle; ">
-                                        <div _cn="distance_direction" class="direction${ _geos[k].meta.distanceDirection }"></div>
-                                     </td>
+                                     
+                                     
+                                     <td> <div _cn = "show_polyline"         state=${_geos[k].meta.showPolyLine} /></td>
+                                     
+                                     <td> <div _cn="show_polyline_elevation" state=${_geos[k].meta.showPolyLineElevation} /></td>
+                                     
+                                     <td> <div _cn="show_polyLine_milestones" state=${_geos[k].meta.showPolyLineMilestones} ></div></td>
+                                     
+                                     <td ><div _cn="distance_direction" class="direction${ _geos[k].meta.distanceDirection }"></div></td>
+                                     
                                      <td><div _efn="name">${e.name}</div><div _efn="meta.desc">${e.meta.desc}</div></td>
                                      <td _bt="set_active">
                                         <polypoints>${e.geojson.length}</polypoints> </br> <polylen _cn = "polyLen" >${polyLen}</polylen>

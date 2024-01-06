@@ -602,32 +602,6 @@ div.custom-map-control-div div
 }
 
 
-#control_geos_table {
-    background-color: #FFFFFF;
-    width: 395px;
-}
-
-[_efn="meta.desc"], [_cn="polyLen"] {font-size: 10px; font-color: #888}
-
-
-[_bt] { cursor: hand; }
-[_bt]:hover { background-color: #eee; }
-
-#control_geos_table [_bt]{
-    width: 23px;
-    padding: 1px;
-}
-
-
-[_cn="show_polyline"]:hover
-{
-    background-color: red;
-}
-
-.geosform
-{
-}
-
 .popup-form
 {
     background-color: #FFFFFF;
@@ -663,3 +637,15 @@ div.custom-map-control-div div
 .leaflet-popup-content-wrapper {
     border-radius: 3px;
 }
+
+.marker_popup {
+    font-size: 12px;
+}
+
+pop_h1 {
+    display: inline-block;
+    padding: 3px 0px 2px 0px;
+    font-size: 9px;
+}
+
+

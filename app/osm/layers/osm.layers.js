@@ -13,7 +13,7 @@ export function addLayer() {
     // http://leaflet-extras.github.io/leaflet-providers/preview/index.html
     // f571e898-a632-4070-ac6b-23742f42f936
 
-    osmTile['hm'] =  L.tileLayer('https://gpxlab.ru/app/php/app.strava.php?z={z}&x={x}&y={y}.png&hist=2023-12', {attribution:"Strava HM attr",});
+    osmTile['hm'] =  L.tileLayer('https://gpxlab.ru/app/php/app.strava.php?z={z}&x={x}&y={y}.png', {attribution:"Strava HM attr",});
     osmTile['osm'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: 'OSM',    });
     osmTile['Stadia'] = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}', {
         minZoom: 0,

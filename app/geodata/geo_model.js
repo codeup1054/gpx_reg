@@ -47,6 +47,7 @@ export let _geos = {
             distanceDirection: 1,
             showPolyLine: true,
             showPolyLineElevation:true,
+            showPolyLineMilestones: 0,
         },
         geojson: [[55.723, 37.45], [55.73, 37.501], [55.72, 37.51]],
         path_elevation: [],

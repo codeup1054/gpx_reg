@@ -33,25 +33,9 @@ export function addAction() {
 
             }
         }
-        // if (_geos[_eid].active) {
-        //     const points = polyLineData.getPoints();
 
     });
 
-
-    $('[_cn="show_polyline"]').on('click', function (e) {
-
-        const _eid = $(this).closest('[_eid]').attr('_eid');
-
-        $.each(_geos,(k, i) => { if (k == _eid) _geos[k].meta.showPolyLine = $(this).prop('checked'); });
-
-        // console.log(`@@  show_polyline`, _eid, _geos);
-
-
-
-        if (e) e.stopPropagation();
-
-    })
 
 
     $('[_bt]').on('click', (e) => {
@@ -96,6 +80,35 @@ export function addAction() {
     });
 
     $('[_efn]').each((k,v) => setEditable(v));
+
+
+    $('[_cn]').on('click', function (e) {
+        
+
+        let _el =  $(e.target);
+        const _cn =  _el.attr("_cn");
+        const _eid = _el.closest('[_eid]').attr('_eid');
+        
+        console.log(`@@ 22 $('[_cn]').on('click' `, [_el, _eid, _el.attr("state")]);
+
+        _el.attr("state", !(_el.attr("state") == 'true'));
+
+        const _cns = {
+            show_polyline: "showPolyLine",
+            show_polyline_elevation: "showPolyLineElevation",
+            show_polyLine_milestones: "showPolyLineMilestones"
+        }
+
+        _geos[_eid].meta[_cns[_cn]]  = (_el.attr('state') == "true");
+
+        console.log(`@@  _geos[_eid]`, _geos[_eid].meta);
+
+        osmAllPolyLines();
+
+        if (e) e.stopPropagation();
+
+    });
+
 
 }
 
