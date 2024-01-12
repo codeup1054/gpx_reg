@@ -23,7 +23,7 @@ export function getGeosJQ(callback=false) {
 
         let _geosОbj =  [...resp.result.data].map((o, v) => _geos[o.id] = o );
 
-        // console.log("@@ 33 ***  get Geos", _geosОbj, resp.result.data, _geos); //resp.result.data );
+        console.log("@@ 33 ***  get Geos", _geosОbj, resp.result.data, _geos); //resp.result.data );
 
         if(callback) callback();
 

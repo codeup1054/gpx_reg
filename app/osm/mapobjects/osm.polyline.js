@@ -32,10 +32,11 @@ export function osmPolyline(v) {
 
     if (_mapObjects.polyLines[_eid] != undefined) _mapObjects.polyLines[_eid].removeFrom(_osmmap);
 
+    v.meta.style = typeof v.meta.style === "undefined" || !v.meta.style ?  {} : v.meta.style;
 
     if (v.meta.showPolyLineMilestones) showPathMilestones(v.geojson,
         {
-            color: v.meta.style.color,
+            color: v.meta.style.color ||  "#ff0000",
             weight: v.meta.style.weight,
             opacity: v.meta.style.opacity,
             meta: {_eid: _eid}

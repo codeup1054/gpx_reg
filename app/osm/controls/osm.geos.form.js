@@ -55,7 +55,13 @@ const pathOptions =[
 
     // const styleGeo = _geos[_gid].meta.style != undefined ? JSON.stringify(_geos[_gid].meta.style): '{}';
 
-    $(`.popup-form`).each((k,v) =>  v.remove() );
+    let popupPos = $(".popup-form").offset();
+
+
+    $(`.popup-form`).each((k,v) => {
+        console.log(`@@  55`, popupPos);
+        v.remove()
+    } );
 
 
 
@@ -98,29 +104,50 @@ const pathOptions =[
     block += `<span style="display:inline-block;">${div}</span>`
 
 const form = `
-<div class="flex geosform">
-    <div>
-        <div><b>Маршрут</b></div>
+<div class="flex geosform" >
+    <div handle>
+        <div style="display:inline-block;"><b>Маршрут</b></div>
         <div class="_sm _g _i">${_geos[_gid].tm_modified}</div>
         <div style="cursor: pointer ; border: 0px; text-align: right; position: absolute; top:3px; right: 5px;" onclick='this.closest(".popup-form").remove()'>&#10006;</div>
     </div>
-    <table width="100%" style="border:0px white; ">
+    <table width="100%"  style="border:0px white; ">
+        <tr >
+        <td align="left">
+             <nobr>
+        <div style="display:inline-block; width:195px; border: 0px solid red;">
+            <div _cn = "show_polyline"         state=${_geos[_gid].meta.showPolyLine} ></div>
+            <div _cn = "show_polyline_elevation" state=${_geos[_gid].meta.showPolyLineElevation} ></div>
+            <div _cn = "show_polyLine_milestones" state=${_geos[_gid].meta.showPolyLineMilestones} ></div>
+            <div _cn = "distance_direction" state=${_geos[_gid].meta.distanceDirection}></div>
+        </div>
+                <div style="display:inline-block;">
+                    <span>${polylineInfo(_geos[_gid].geojson)}</span>
+                    <button _bt="geo_find">&#128269;</button>
+                    <button _bt="geo_cancel">&#10060;</button>
+                    <button _bt="geo_save" onclick='this.closest(".popup-form").remove()'>&#9989;</button>
+                </div>    
+             </nobr>
+        </td></tr>
         <tr>
-            <td>Название</td><td _efn="name" >${_geos[_gid].name}</td>
+          <td >
+         </td>       
+        <tr>
+            <td><div _efn="name" >${_geos[_gid].name}</div></td>
         </tr>
-        <tr><td>Описание</td><td _efn="meta.desc" >${_geos[_gid].meta.desc}</td></tr>
+        <tr>
+            <td><div _efn="meta.desc" >${_geos[_gid].meta.desc}</div></td>
+        </tr>
         <tr title="${pathOptions.join('\n')}">
-            <td>Стиль</td>
             <td>
             <table class="stab" width="370px">
                 <tr>
                     <td>Цвет:</td>
                     <td><img width="50px"></br><span _efn="meta.style.color">${_geos[_gid].meta.style.color}</span></td>
-                    <td color_palette rowspan="5" style="vertical-align:top;">
+                    <td rowspan="5" style="vertical-align:top;">
                         <table width="250px" class="stab no_border">
                         <tr>
-                            <td>${block}</td>
-                            <td><input id="color-picker" style="height: 78px; width: 50px; margin: 5px 0px;" type="color" value="${_geos[_gid].meta.style.color}"></td>
+                            <td color_palette >${block}</td>
+                            <td><input id="color-picker" style="height: 78px; width: 50px; margin: 5px 0px;" type="color" value="${_geos[_gid].meta.style.color}"/></td>
                         </tr>
                         </table>
                      </td>
@@ -132,32 +159,24 @@ const form = `
             </table>
             </td>
         </tr>
-        <tr>
-         <td>Настройки</td> 
-          <td >
-             <nobr>
-                 <div _cn = "show_polyline"         state=${_geos[_gid].meta.showPolyLine} ></div>
-                 <div _cn = "show_polyline_elevation" state=${_geos[_gid].meta.showPolyLineElevation} ></div>
-                 <div _cn = "show_polyLine_milestones" state=${_geos[_gid].meta.showPolyLineMilestones} ></div>
-                 <div _cn = "distance_direction" state=${_geos[_gid].meta.distanceDirection}></div>
-             </nobr>
-         </td>       
-        <tr><td colspan="2" align="right">
-            <span>${polylineInfo(_geos[_gid].geojson)}</span>
-            <button _bt="geo_find">&#128269;</button>
-            <button _bt="geo_cancel">&#10060;</button>
-            <button _bt="geo_save" onclick='this.closest(".popup-form").remove()'>&#9989;</button>
-        </td></tr>
         <tr><td height="10px;"></td></tr>
-        <tr><td valign="top">Путь</td><td><textarea cols="50" text_point_list rows="17" style = "resize: both;">${_geos[_gid].geojson.join('\n')}</textarea></td></tr>
+        <tr><td><textarea _efn="geojson" cols="50" text_point_list rows="11" style = "resize: vertical;">${_geos[_gid].geojson.join('\n')}</textarea></td></tr>
     </table>
 </div>`
 
-    $(`[_eid="${_gid}"]`).append(`<div class="popup-form" _eid = ${_gid}>${form}</div>`)
+    let new_popup = $(`<div class="popup-form" _eid = ${_gid}>${form}</div>`);
+    new_popup.offset(popupPos);
+
+    $(`[_eid="${_gid}"]`).append(new_popup)
         .ready((e) => {
+
+
             addAction();
 
             const colorPicker =  $('#color-picker');
+            $(".popup-form").draggable({cancel:'[_efn]'});
+
+
 
 
             // colorPicker.on("change", watchColorPicker, false);

@@ -39,17 +39,20 @@ export function geosCrud(callback = addAction) {
 
         const polyLen = segs.reduce((a, b) => a + b, 0).toFixed(1);
 
-        console.log(`@@  33 e.meta.style`, e.meta.style);
 
         const _geo_color = e.meta.style == undefined ? e.meta.color: e.meta.style.color;
+        const _geo_weight = e.meta.style == undefined ? 1: e.meta.style.weight;
 
         rows += `<tr _eid="${e.id}" 
                                      _et="polyline"
                                      _bt="set_active"
                                      class = ${_geos[k].active ? 'selected' : ''} 
                                      >
-                                     <td align="right" style="background-color: ${_geo_color};" >
-                                        ${e.id}&nbsp
+                                     <td align="left" >
+                                     <nobr>
+                                        <div style="display: inline-block; width: 16px; height:25px; padding: 0 0 0 0px">${e.id}</div>
+                                        <div style="background-color: ${_geo_color}; display: inline-block; width: ${_geo_weight}; height:25px; padding: 0 0 0 0px">&nbsp;</div>
+                                     </nobr>   
 <!--                                        <div style="background-color: ${e.meta.style }; display: inline-block; width: 7px; height: 10px;">&nbsp</div>-->
                                      </td>
                                      <td >

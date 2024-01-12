@@ -15,7 +15,7 @@ function updateGeosColor(e)
     const new_color = this.value == undefined ? rgb2hex(_e.css("backgroundColor")):  this.value
     console.log(`@@ 11  updateGeosColor`, [_eid, _e, rgb2hex(_e.css("backgroundColor")), this.value, new_color]);
     $(`[_eid = "${_eid}"] [_efn="meta.style.color"]`).text(new_color);
-    _geos[_eid].meta.style.color=new_color;
+    _geos[_eid].meta.style.color = new_color;
     $("#color-picker").val(new_color);
 
     osmPolyline(_geos[_eid]);
@@ -202,7 +202,16 @@ export function setEditable(v)
 {
 
     $(v).prop('contenteditable',true);
-    $(v).on('input', (e) => {
+
+    $(v).on('click', (e) => {
+        console.log(`@@  ee`, e);
+        e.stopPropagation();
+    });
+
+
+        $(v).on('input', (e) => {
+
+        e.stopPropagation();
 
         const t = $(e.target)
 
