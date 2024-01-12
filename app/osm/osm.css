@@ -74,9 +74,6 @@ br1, .color, .lat, .lng, .time, .color, .idx
 .tab td {border:1px solid #fefefe; font-size: 11px;}
 .header td {font-weight:bold;}
 
-[contenteditable]       {background-color: rgba(217, 245, 255, 0.2)}
-[contenteditable]:hover {background-color: rgba(217, 245, 255, 0.5);}
-[contenteditable]:focus {outline: 1px solid rgba(170, 190, 200, 0.9); }
 
 
 
@@ -453,7 +450,7 @@ zoom
     background-color: white;
     color:black;
     line-height: 130%;
-    border:1px solid rgb(0,0,0);*/
+    border:1px solid rgb(0,0,0);
     border-radius:7px;
     display: inline-block;
     }
@@ -599,13 +596,6 @@ div.custom-map-control-div div
 .gmnoprint
 {
     margin: 0px  !important;
-}
-
-
-.popup-form
-{
-    background-color: #FFFFFF;
-    position:absolute;
 }
 
 .svg_small{

@@ -3,6 +3,7 @@
 // 2023-09-27  https://www.youtube.com/watch?v=nUdt9aMcg0M
 
 import {_mapObjects, _geos, _appState, _stateControl} from "/app/geodata/geo_model.js";
+import {roundLatLan} from "/js/adds.js";
 // import {editGeoForm} from '/app/map/controls/gpx.geos.edit/gpx.geos.form.js';
 // import {altitudeColor, geo_distance} from '/app/lib/geo.js';
 
@@ -35,11 +36,12 @@ export function getGeosJQ(callback=false) {
 
 export function updateGeosJQ(_eid, callback=false) {
 
-    // console.log("@@ update Geos");
-
-
+    const _g = _geos[_eid].geojson.map((p)=>roundLatLan(p,6))
 
     const geodata = _geos[_eid];
+
+    geodata.geojson = _g;
+
 
     let body ={
         action: 'geos_create_update',

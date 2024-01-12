@@ -18,6 +18,12 @@
     <link href="app/app.css" rel="stylesheet" type="text/css" />
     <link href="app/osm/osm.css" rel="stylesheet" type="text/css" />
 
+    <script src="js/json-editor/jquery.json-editor.min.js"></script>
+
+    <script src="js/color-picker/jscolor.js"></script>
+
+
+
 
 </head>
 <body>
@@ -32,6 +38,7 @@
 
 <script src="/app/osm/lib/L.Control.Opacity.js"></script>
 <script type="module"  src="/app/osm/lib/leaflet-editable-polyline.js"></script>
+
 
 
 

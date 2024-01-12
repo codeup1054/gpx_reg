@@ -4,6 +4,8 @@ document.write('<script type="text/javascript" src="js/cookie/jquery.cookie.js">
 var map;
 var cache_area = {};
 
+
+
 var globalSettings = { // 2020-02-25 добавить обновление из cookies
     distOnOff: {on: true, name: 'Дистанция', exec: ["updateMarkersOnMap"]},
     markerLableOnOff: {on: false, name: 'Метка точки', exec: ["updateMarkersOnMap"]},

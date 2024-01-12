@@ -1,15 +1,50 @@
 import {_geos, _mapObjects, _stateControl} from "../../geodata/geo_model.js";
-import {osmAllPolyLines, clearMap} from "../mapobjects/osm.polyline.js";
+import {osmAllPolyLines, clearMap, osmPolyline} from "../mapobjects/osm.polyline.js";
 import {updateGeosJQ} from "../api/gpx.geos.api.js";
 import {editGeoForm} from "./osm.geos.form.js";
 import {geo_path_distance} from "../../lib/geo.js";
 import {geosCrud} from "./osm.geos.crud.js";
+import {isJsonString, rgb2hex} from "../../../js/adds.js";
 
+
+
+function updateGeosColor(e)
+{   
+    const _eid = $(e.target).closest('[_eid]').attr('_eid');
+    const _e = $(e.target);
+    const new_color = this.value == undefined ? rgb2hex(_e.css("backgroundColor")):  this.value
+    console.log(`@@ 11  updateGeosColor`, [_eid, _e, rgb2hex(_e.css("backgroundColor")), this.value, new_color]);
+    $(`[_eid = "${_eid}"] [_efn="meta.style.color"]`).text(new_color);
+    _geos[_eid].meta.style.color=new_color;
+    $("#color-picker").val(new_color);
+
+    osmPolyline(_geos[_eid]);
+
+    e.stopPropagation();
+
+}
 
 export function addAction() {
+
+
+    $("#color-picker").on("input change",   updateGeosColor);
+    $("[color_palette]").on('click',        updateGeosColor);
+
     // 04. 2023-12-27 select row and set mapGeo active
 
-    console.log(`@@  _osmmap`, _osmmap);
+
+    /**
+     * set all  _efn editable
+     * */
+
+
+    $('[_efn]').each((k,v) => setEditable(v));
+
+
+    /**
+     * fire updates on map
+     * */
+
 
     $(_osmmap).on('updategeos removegeos remove', (e) => {
 
@@ -38,7 +73,7 @@ export function addAction() {
 
 
 
-    $('[_bt]').on('click', (e) => {
+    $('[_bt]').unbind('click').on('click', (e) => {
 
 
         if (e) e.stopPropagation();
@@ -46,62 +81,99 @@ export function addAction() {
         const _eid = $(e.target).closest('[_eid]').attr('_eid');
         const action = $(e.target).closest('[_bt]').attr('_bt');
 
-        console.log(`@@ action "${action}", target`, e );
+        // console.log(`@@ action "${action}", target`, e );
 
         switch(action)
         {
             case "geo_add":     addGeos();             break;
             case "set_active":  setGeosActive(e);      break;
             case "geo_find":    geosFind(e);           break;
-            case "geo_save":    updateGeosJQ(_eid);    break;
+            case "geo_save":    updateGeosJQ(_eid); osmAllPolyLines();    break;
             case "geo_edit":    editGeoForm(_eid);     break;
             case "geo_console":    console.log(`@@ 11 _geos`, _geos);    break;
 
             default: console.log(`@@ Action NOT Found" ${action}"`);
         }
 
-
         }
     );
 
+/**
+ * geos style selector
+ * */
+const _cns = {
+    show_polyline:            {meta:"showPolyLine",           states: [0,1],   state_label: ['','🏞'] },
+    show_polyline_elevation:  {meta:"showPolyLineElevation",  states: [0,1],   state_label: ['','📉'] },
+    show_polyLine_milestones: {meta:"showPolyLineMilestones", states: [0,1],   state_label: ['','🏳️'] },
+    distance_direction:       {meta:"distanceDirection",      states: [0,1,2], state_label: ['','▶','◀'] },
+}
 
-    $('[_cn="distance_direction"]').on('click', function (e) {
-        const _eid = $(e.target).closest('[_eid]').attr('_eid');
-        let dir = _geos[_eid].meta.distanceDirection | 0;
-        dir = (dir + 1) % 3;
-        _geos[_eid].meta.distanceDirection = dir;
-        $(`[_eid="${_eid}"] [_cn="distance_direction"]`).removeClass().addClass(`direction${dir}` );
-        if (e) e.stopPropagation();
 
-        // 2024-01-02 TODO update only one _eid polyline
+    /**
+     * geos style set set label
+     * */
 
-        osmAllPolyLines();
 
+    $('[_cn]').map((i,e) => {
+
+       const _cn =  $(e).attr("_cn");
+       $(e).html(_cns[_cn].state_label[$(e).attr('state')]);
     });
 
-    $('[_efn]').each((k,v) => setEditable(v));
+
+    $('[json]').map((i,e) =>{
+
+        let editor = new JsonEditor('[json_t]',getJson());
+        function getJson() {
+            try {
+                console.log(`@@  $('[json]').val()`, $('[json]').val());
+                return JSON.parse($('[json]').val());
+            } catch (ex) {
+                alert('Wrong JSON Format: ' + ex);
+            }
+        }
+
+        $('#translate').on('click', function (e) {
+            console.log(`@@ 19 translate`, e);
+            editor.load(getJson());
+            e.stopPropagation();
+        });
+
+    })
 
 
-    $('[_cn]').on('click', function (e) {
-        
+
+    /**
+     * event fire
+     * */
+
+
+    $('[_cn]').unbind('click').on('click', function (e) {
 
         let _el =  $(e.target);
         const _cn =  _el.attr("_cn");
         const _eid = _el.closest('[_eid]').attr('_eid');
         
-        console.log(`@@ 22 $('[_cn]').on('click' `, [_el, _eid, _el.attr("state")]);
 
-        _el.attr("state", !(_el.attr("state") == 'true'));
+        let _state = _el.attr('state') in [0,1,2] ?
+             (Number(_el.attr('state')) + 1) % _cns[_cn].states.length
+             : 0;
 
-        const _cns = {
-            show_polyline: "showPolyLine",
-            show_polyline_elevation: "showPolyLineElevation",
-            show_polyLine_milestones: "showPolyLineMilestones"
-        }
 
-        _geos[_eid].meta[_cns[_cn]]  = (_el.attr('state') == "true");
+        _geos[_eid].meta[_cns[_cn].meta]  = _state;
 
-        console.log(`@@  _geos[_eid]`, _geos[_eid].meta);
+
+        _el.attr("state", _state);
+        _el.text(_cns[_cn].state_label[_state]);
+
+        // console.log(`@@ 24 '[_cn]').unbind('click').on('click'`, [
+        //     _cn,
+        //     _state,
+        //     (_state + 1 ) % _cns[_cn].states.length,
+        //     _cns[_cn].states.length,
+        //     _cns[_cn].meta,
+        //     _geos[_eid].meta
+        // ]);
 
         osmAllPolyLines();
 
@@ -109,6 +181,20 @@ export function addAction() {
 
     });
 
+
+    // $('[_cn="distance_direction"]').unbind('click').on('click', function (e) {
+    //     const _eid = $(e.target).closest('[_eid]').attr('_eid');
+    //     let dir = _geos[_eid].meta.distanceDirection | 0;
+    //     dir = (dir + 1) % 3;
+    //     _geos[_eid].meta.distanceDirection = dir;
+    //     $(`[_eid="${_eid}"] [_cn="distance_direction"]`).removeClass().addClass(`direction${dir}` );
+    //     if (e) e.stopPropagation();
+    //
+    //     // 2024-01-02 TODO update only one _eid polyline
+    //
+    //     osmAllPolyLines();
+    //
+    // });
 
 }
 
@@ -118,22 +204,67 @@ export function setEditable(v)
     $(v).prop('contenteditable',true);
     $(v).on('input', (e) => {
 
-        const _eid = $(e.target).closest(`[_eid]`).attr('_eid');
-        const _efn = $(e.target).attr('_efn');
-        const _val  = $(e.target).text();
-        const ev_str = `_geos['${_eid}'].${_efn} = '${_val}'`;
+        const t = $(e.target)
 
-        $(`[_eid='${_eid}'] [_efn = '${_efn}']`).each((k,vv ) => {
-            if (v != vv) $(vv).text(_val)
-        });
+        const _eid = t.closest(`[_eid]`).attr('_eid');
+        const _efn = t.attr('_efn');
+        let _val  = t.prop('nodeName') == 'TEXTAREA' ? t.val(): $.trim(t.text()); // val for textarea
 
-        // console.log(`@@  change setEditable()`, ev_str, _geos[_eid]);
+        $(`[_eid='${_eid}'] [_efn = '${_efn}']`).each((k,vv ) => { if (vv !== v) $(vv).text(_val); });
+        
 
-        eval(ev_str);
+        if (t.attr('json') == undefined)
+        {
+            const _eval = `_geos['${_eid}'].${_efn}="${_val}"`;
+            eval(_eval);
+        }
+        else if (isJsonString(_val)) {
+            // let _b={};
+            // let _start_val = JSON.parse(_val);
+            //
+            // for (let key of _efn.split(".").reverse()) {
+            //
+            //     _b[key] = _start_val;
+            //     _start_val = JSON.parse(JSON.stringify(_b));
+            //
+            //     console.log(`@@ 12 ***`, _b);
+            //
+            // }
+
+            /**
+             * TODO remove eval
+             * */
+
+
+            const _eval = `_geos['${_eid}'].${_efn}=${_val}`;
+
+            console.log(`@@  isJsonString `, _eval);
+
+            eval(_eval);
+        }
+
+
+        console.log(`@@ 13 setEditable`, [ t, _val, t.val(), _geos[_eid].meta] );
+
 
     });
-
 }
+
+//
+// // get JSON
+// function getJson(t) {
+//     try {
+//         console.log(`@@  JSON.parse(t.val() `, JSON.parse(t.val() );
+//         return JSON.parse(t.val());
+//     } catch (ex) {
+//         alert('Wrong JSON Format: ' + ex);
+//     }
+// }
+//
+// let editor = new JsonEditor('#json-display', getJson());
+//
+
+
 
 
 export function addGeos(){
@@ -179,7 +310,7 @@ export function setGeosActive(_eid = false){
     Object.keys(_geos).map((k, i) => {
         if (k == _eid) {
             _geos[k].active = !_geos[k].active;
-            _geos[k].meta.showPolyLine = true;
+            _geos[k].meta.showPolyLine = 1;
         } else
             _geos[k].active = false;
     });
@@ -188,10 +319,10 @@ export function setGeosActive(_eid = false){
 
     if(_geos[_eid].active) {
         $(`[_eid=${_eid}]`).addClass('selected');
-        $(`[_eid=${_eid}] td [_cn="show_polyline"]`).prop('checked', true);
+        $(`[_eid=${_eid}] td [_cn="show_polyline"]`).prop('state', 1);
     }
 
-    console.log(`@@  setGeosActive`, _eid, _geos );
+    // console.log(`@@  setGeosActive`, _eid, _geos );
 
     osmAllPolyLines();
 

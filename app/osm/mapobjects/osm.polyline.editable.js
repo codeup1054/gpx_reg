@@ -33,22 +33,24 @@ export class gpxPolylineEditable {
 
     }
 
+    /**
+     * 2024-01-06 Remove only polyline and marker,leave mileage marker
+     * */
+
     showMarkers() {
 
-        this._markers.map((p, i) => { _osmmap.removeLayer(p); });
+        // this._markers.map((p, i) => { _osmmap.removeLayer(p); });
 
         for (let i in _osmmap._layers) {
             try {
                 if (_osmmap._layers[i].options.meta.type == 'new_marker') _osmmap.removeLayer(_osmmap._layers[i]);
             } catch (e) {
-                console.log("Can not remove with " + e + _osmmap._layers[i]);
+                // console.log("Can not remove with " + e + _osmmap._layers[i]);
             }
         }
 
         this._points.map((p, i) => {
-
             this.showMarker(p, i);
-
         });
 
 
@@ -308,14 +310,19 @@ export function showPathMilestones( points, param)
 
             let mileage_marker = L.marker(ppn, {
                 icon: svgIconMileStone,
-                meta: {pointNo: pointNo, type: 'new_marker'}
+                meta: {pointNo: pointNo, type: 'mileage_marker'}
             });
 
             _osmmap.addLayer(mileage_marker);
         }
 
-        const tickDist = geo_path_distance(points,2)
 
+/**
+ * Last mileage marker
+ * */
+
+
+        const tickDist = geo_path_distance(points,2)
         const penultimatePoint = points[points.length-2];
         const lastPoint = points[points.length-1];
 
@@ -340,7 +347,6 @@ export function showPathMilestones( points, param)
         let mileage_marker = L.marker(lastPoint, { icon: svgIconMileStone });
 
         _osmmap.addLayer(mileage_marker);
-
 
         }
     });
