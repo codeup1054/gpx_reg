@@ -44,7 +44,6 @@
 {
     background-color: #FFFFFF;
     position:fixed;
-    width: 400px;
     padding: 7px;
     border-radius: 3px;
 }
@@ -113,19 +112,15 @@
 
 
 #control_panel {
-    width: 200px
-}
-
-
-#control_panel {
     display: block;
     position: fixed;
     top: 100px;
     left: 20px;
     width: 10px;
-    border: 1px solid gray;
+    height: 10px;
+    border: 0px solid gray;
     border-radius: 3px;
-    background: #FFFFFFDD;
+    background: none;
     overflow: visible;
 }
 
@@ -187,7 +182,7 @@ div[_cn] {
 
 
 [color_palette] div[picker] {
-    width: 11px;
+    width: 10px !important;
     height: 10px;
     border-radius: 3px;
     font-size: 13px;
@@ -201,6 +196,32 @@ div[_cn] {
     font-size: 12px;
     font-family: "Courier New";
     background-color: #ffffdd;
+}
+
+
+div.custom-map-control
+{
+    margin: 1px 3px;
+    display: inline-block;
+    border: solid #6C9F70 1px ;
+    padding: 3px;
+    background: none;
+}
+
+.popup-form
+{
+    min-height: 50px;
+    min-width: 50px;
+    background: #ffffFF;
+    position: fixed;
+    width: 500px;
+}
+
+
+
+[resizable]
+{
+    /*overflow: scroll;*/
 }
 
 /*

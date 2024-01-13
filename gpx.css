@@ -360,31 +360,6 @@ button.sign
 }
 
 
-
-zoom, lat, lng
-{
-    display: inline-block;
-    width:50px;
-    font-size: 10px;
-    vertical-align: middle;
-    background: rgba(255,255,255,0);
-    padding: 2px 2px;
-    margin: -3px 0px 0 0 ;
-}
-
-lat, lng, zoom
-{
-border: solid 0px red;
-}
-
-
-zoom
-{
-    font-size: 21px;
-    width:30px;
-    text-align: center;
-}
-
 .tile_info
 {
     position1:absolute;

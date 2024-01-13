@@ -83,14 +83,18 @@ export function geosCrud(callback = addAction) {
 
     $('#control_geos_table').remove();
 
-    $("#control_panel").append(`<div id="control_geos_table">
+    $("#control_panel").append(`<div draggable  id="control_geos_table">
                          <button _bt="geo_add">+</button>
                          <button _bt="geo_console">?</button>
-                         
-                         <table class="stab" >${rows}</table>
+                         <button _bt="geo_find_all">🔍</button>
+                         <div geos_list resizable>
+                            <table class="stab" >${rows}</table>
+                         </div>
                      </div>`);
 
     $("#polyLineTable").html(rows);
+
+
 
 
 

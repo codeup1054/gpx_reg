@@ -114,7 +114,7 @@ const form = `
         <tr >
         <td align="left">
              <nobr>
-        <div style="display:inline-block; width:195px; border: 0px solid red;">
+        <div style="display:inline-block; width:155px; border: 0px solid red;">
             <div _cn = "show_polyline"         state=${_geos[_gid].meta.showPolyLine} ></div>
             <div _cn = "show_polyline_elevation" state=${_geos[_gid].meta.showPolyLineElevation} ></div>
             <div _cn = "show_polyLine_milestones" state=${_geos[_gid].meta.showPolyLineMilestones} ></div>
@@ -154,17 +154,17 @@ const form = `
                 </tr>
                 
                 <tr><td>Толщина</td><td _efn="meta.style.weight">${_geos[_gid].meta.style.weight}</td></tr>
-                <tr><td>Размер метки</td><td _efn="meta.style.mileage_marker_size">${_geos[_gid].meta.style.mileage_marker_size}</td></tr>
-                <tr><td>Прозрачность</td><td _efn="meta.style.opacity">${_geos[_gid].meta.style.opacity}</td></tr>
+                <tr><td>Размер</td><td _efn="meta.style.mileage_marker_size">${_geos[_gid].meta.style.mileage_marker_size}</td></tr>
+                <tr><td>Прозрач</td><td _efn="meta.style.opacity">${_geos[_gid].meta.style.opacity}</td></tr>
             </table>
             </td>
         </tr>
         <tr><td height="10px;"></td></tr>
-        <tr><td><textarea _efn="geojson" cols="50" text_point_list rows="11" style = "resize: vertical;">${_geos[_gid].geojson.join('\n')}</textarea></td></tr>
+        <tr><td><textarea _efn="geojson" cols="46" text_point_list rows="11" style = "resize: vertical;">${_geos[_gid].geojson.join('\n')}</textarea></td></tr>
     </table>
 </div>`
 
-    let new_popup = $(`<div class="popup-form" _eid = ${_gid}>${form}</div>`);
+    let new_popup = $(`<div draggable class="popup-form" style="width: 370px;" _eid = ${_gid}>${form}</div>`);
     new_popup.offset(popupPos);
 
     $(`[_eid="${_gid}"]`).append(new_popup)
@@ -174,7 +174,7 @@ const form = `
             addAction();
 
             const colorPicker =  $('#color-picker');
-            $(".popup-form").draggable({cancel:'[_efn]'});
+
 
 
 

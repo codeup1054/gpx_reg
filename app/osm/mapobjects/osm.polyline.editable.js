@@ -356,7 +356,7 @@ export function showPathMilestones( points, param)
 function angle(a, b) {
     const  dx = b[0] - a[0];
     const  dy = b[1] - a[1];
-    let theta = Math.atan2(dy *(1.1 - 1.06*(a[0]/90) ), dx); // range (-PI, PI]
+    let theta = Math.atan2(dy *(1.1 - 1.06*(Math.abs(a[0]/90) )), dx); // range (-PI, PI]
     theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
     return theta;
 }

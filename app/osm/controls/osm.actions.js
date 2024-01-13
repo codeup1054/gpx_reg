@@ -26,6 +26,32 @@ function updateGeosColor(e)
 
 export function addAction() {
 
+    $("[draggable]").draggable({cancel:'[_efn]'});
+
+    $("[resizable]").wrap('<div/>')
+        .css({'overflow': 'hidden'})
+        .parent()
+        .css({
+            'display': 'inline-block',
+            'overflow': 'hidden',
+            'height': function () {
+                return $('[resizable]', this).height();
+            },
+            'width': function () {
+                return $('[resizable]', this).width();
+            },
+            'paddingBottom': '12px',
+            'paddingRight': '12px'
+
+        }).resizable( {maxHeight: 630, maxWidth: 395, minWidth: 395 })
+        .find('[resizable]')
+        .css({
+            overflow: 'auto',
+            width: '100%',
+            height: '100%'
+        });
+
+
 
     $("#color-picker").on("input change",   updateGeosColor);
     $("[color_palette]").on('click',        updateGeosColor);
@@ -85,12 +111,13 @@ export function addAction() {
 
         switch(action)
         {
-            case "geo_add":     addGeos();             break;
-            case "set_active":  setGeosActive(e);      break;
-            case "geo_find":    geosFind(e);           break;
-            case "geo_save":    updateGeosJQ(_eid); osmAllPolyLines();    break;
-            case "geo_edit":    editGeoForm(_eid);     break;
-            case "geo_console":    console.log(`@@ 11 _geos`, _geos);    break;
+            case "geo_add":         addGeos();            break;
+            case "set_active":      setGeosActive(e);     break;
+            case "geo_find":        geosFind(_eid);       break;
+            case "geo_find_all":    geosFind();           break;
+            case "geo_save":        updateGeosJQ(_eid); osmAllPolyLines();    break;
+            case "geo_edit":        editGeoForm(_eid);     break;
+            case "geo_console":     console.log(`@@ 11 _geos`, _geos);    break;
 
             default: console.log(`@@ Action NOT Found" ${action}"`);
         }
@@ -343,7 +370,23 @@ export function setGeosActive(_eid = false){
 
 
 export function geosFind(_eid = false){
-    _osmmap.fitBounds(_mapObjects.polyLines[getEidByEvent(_eid)].getBounds());
+
+    if  (_eid) {
+
+        console.log(`@@  geos`, _eid);
+        _osmmap.flyToBounds(_geos[_eid].geojson,{ duration: 0.5 });
+    }
+    else
+    {
+        let points = [];
+
+        for (let _eid in _geos) {
+            if(_geos[_eid].meta.showPolyLine) points = [...points, ..._geos[_eid].geojson];
+        }
+
+        _osmmap.flyToBounds(points, { duration: 0.7 });
+    }
+
 }
 
 function getEidByEvent(_eid)

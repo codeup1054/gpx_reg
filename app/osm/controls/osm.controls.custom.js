@@ -26,7 +26,7 @@ export function addControl()
 function osmDisplayMapParams()
 {
 
-    $("#control_panel").append(`<div id="control_map_params" class="custom-map-control-div"><zoom/><lat/><lng/></div>`);
+    $("#control_panel").append(`<div draggable id="control_map_params" class="custom-map-control-div"><zoom/><lat/><lng/></div>`);
 
     _osmmap.on('load zoomend move', showZoomCenter  );
 
@@ -38,7 +38,7 @@ function showZoomCenter()
 {
     const c = _osmmap.getCenter();
     const zoom = _osmmap.getZoom();
-    $("zoom").text(zoom);
-    $("lat").text(c.lat.toFixed(4));
-    $("lng").text(c.lng.toFixed(4));
+    $("zoom").text(zoom.toFixed(0));
+    $("lat").text(c.lat.toFixed(5));
+    $("lng").text(c.lng.toFixed(5));
 }
